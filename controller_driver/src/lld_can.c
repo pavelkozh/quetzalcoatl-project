@@ -50,21 +50,39 @@ static const CANRxFrame can_rx_frame_conf = {
 };
 #endif
 
-#if 0
+#if 1
 /* CAN instance configuration */
 static CANConfig cancfg = {
   CAN_MCR_ABOM | CAN_MCR_AWUM,
-  CAN_BTR_SJW(0) | CAN_BTR_TS2(2) |
-  CAN_BTR_TS1(1)
-  /*CAN_BTR_BRP bits define the length of a time quanta.
-  tq = (BRP[9:0]+1) x tPCLK*/
-  | CAN_BTR_BRP(13)
+  CAN_BTR_SJW(0) | CAN_BTR_TS2(1) |
+  CAN_BTR_TS1(8) | CAN_BTR_BRP(6)
 };
 #endif
 
 CANRxFrame rxmsg;
 int iFilterMask = 0;
 int iFilterValue = 0;
+
+#if 0
+static THD_WORKING_AREA(can_tx_wa, 256);
+static THD_FUNCTION(can_tx, p) {
+  CANTxFrame txmsg;
+
+  (void)p;
+  chRegSetThreadName("transmitter");
+  txmsg.IDE = CAN_IDE_EXT;
+  txmsg.EID = 0x01234567;
+  txmsg.RTR = CAN_RTR_DATA;
+  txmsg.DLC = 8;
+  txmsg.data32[0] = 0x55AA55AA;
+  txmsg.data32[1] = 0x00FF00FF;
+
+  while (true) {
+    canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, MS2ST(100));
+    chThdSleepMilliseconds(500);
+  }
+}
+#endif
 
 void canNetInit ( void )
 {
