@@ -8,7 +8,6 @@ CAN_BTR_SJW(0) | CAN_BTR_TS2(0) |
 CAN_BTR_TS1(5) | CAN_BTR_BRP(26)
 };
 
-CANRxFrame rxmsg;
 
 /*
  * Receiver thread.
@@ -21,7 +20,7 @@ static THD_FUNCTION(can_rx, arg) {
   {
     if (chEvtWaitAnyTimeout(ALL_EVENTS, MS2ST(100)) == 0)
       continue;
-    while ( canReceive(CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK)
+    while ( canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK)
     {
       /* Process message.*/
       palTogglePad( GPIOA, 0 );
@@ -29,6 +28,17 @@ static THD_FUNCTION(can_rx, arg) {
     chThdSleepMilliseconds( 10 );
   }
 }
+
+void can_init ( void )
+{
+    canStart(&CAND1, &cancfg);
+    chThdCreateStatic(can_rx1_wa, sizeof(can_rx1_wa), NORMALPRIO + 7, can_rx, NULL);
+
+}
+
+
+
+
 
 
 

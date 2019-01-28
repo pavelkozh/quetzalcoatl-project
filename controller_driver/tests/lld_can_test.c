@@ -1,17 +1,8 @@
 #include <tests.h>
-#include <hal_can_lld.h>
+#include <lld_can.h>
 #include <chprintf.h>
 
 
-
-static void simulation_init ( void )
-{
-    canStart(&CAND1,NULL);
-    palSetPadMode( GPIOA, 0, PAL_MODE_OUTPUT_PUSHPULL );
-    chThdCreateStatic(can_rx1_wa, sizeof(can_rx1_wa), NORMALPRIO + 7, can_rx, NULL);
-
-    chprintf( (BaseSequentialStream *)&SD7, "Simulation enabled\n" );
-}
 
 static const SerialConfig sdcfg = {
   .speed = 115200,
@@ -23,8 +14,10 @@ void TestCanRouting ( void )
     sdStart( &SD7, &sdcfg );
     palSetPadMode( GPIOE, 8, PAL_MODE_ALTERNATE(8) );   // TX
     palSetPadMode( GPIOE, 7, PAL_MODE_ALTERNATE(7) );   // RX
+    chprintf( (BaseSequentialStream *)&SD7, "Simulation enabled\n" );
 
-    simulation_init();
+    can_init();
+    palSetPadMode( GPIOA, 0, PAL_MODE_OUTPUT_PUSHPULL );
 
     while (1)
     {

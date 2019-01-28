@@ -2,7 +2,7 @@
 #include <tests.h>
 #include <chprintf.h>
 
-#define MAIN_PROGRAM_ROUTINE            PROGRAM_ROUTINE_TEST_CAN
+
 
 int main(void)
 {
