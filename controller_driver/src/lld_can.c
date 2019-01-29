@@ -18,7 +18,7 @@ static THD_FUNCTION(can_rx, arg) {
 
     event_listener_t el;
     chRegSetThreadName("receiver");
-    chEvtRegister(CAND1.rxfull_event, &el, 0);
+    chEvtRegister(&CAND1.rxfull_event, &el, 0);
 
     while (1)
     {
