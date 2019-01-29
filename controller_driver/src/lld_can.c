@@ -14,20 +14,25 @@ CAN_BTR_TS1(5) | CAN_BTR_BRP(26)
  */
 static THD_WORKING_AREA(can_rx1_wa, 256);
 static THD_FUNCTION(can_rx, arg) {
-  arg = arg;
+    arg = arg;
 
-  while (1)
-  {
-    if (chEvtWaitAnyTimeout(ALL_EVENTS, MS2ST(100)) == 0)
-      continue;
-    while ( canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK)
+    event_listener_t el;
+    chRegSetThreadName("receiver");
+    chEvtRegister(CAND1.rxfull_event, &el, 0);
+
+    while (1)
     {
-      /* Process message.*/
-      palTogglePad( GPIOA, 0 );
+      if (chEvtWaitAnyTimeout(ALL_EVENTS, MS2ST(100)) == 0)
+        continue;
+      while ( canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK)
+      {
+        /* Process message.*/
+        palTogglePad( GPIOA, 0 );
+      }
+     // chThdSleepMilliseconds( 10 );
+      chEvtUnregister(&CAND1.rxfull_event, &el);
     }
-    chThdSleepMilliseconds( 10 );
   }
-}
 
 void can_init ( void )
 {
