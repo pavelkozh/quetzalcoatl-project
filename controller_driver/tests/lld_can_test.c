@@ -16,8 +16,10 @@ void TestCanRouting ( void )
     palSetPadMode( GPIOE, 7, PAL_MODE_ALTERNATE(7) );   // RX
     chprintf( (BaseSequentialStream *)&SD7, "Simulation enabled\n" );
 
+    palSetPadMode( GPIOB, 7, PAL_MODE_OUTPUT_PUSHPULL );
+    palSetPadMode( GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL );
+    palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );
     can_init();
-    palSetPadMode( GPIOA, 0, PAL_MODE_OUTPUT_PUSHPULL );
 
     while (1)
     {

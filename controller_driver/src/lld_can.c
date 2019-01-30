@@ -4,9 +4,10 @@
 
 static const CANConfig cancfg = {
 CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP,
-CAN_BTR_SJW(0) | CAN_BTR_TS2(0) |
+CAN_BTR_LBKM | CAN_BTR_SJW(0) | CAN_BTR_TS2(0) |
 CAN_BTR_TS1(5) | CAN_BTR_BRP(26)
 };
+
 
 
 /*
@@ -27,17 +28,49 @@ static THD_FUNCTION(can_rx, arg) {
       while ( canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK)
       {
         /* Process message.*/
-        palTogglePad( GPIOA, 0 );
+        palTogglePad(GPIOB,0);
       }
-     // chThdSleepMilliseconds( 10 );
-      chEvtUnregister(&CAND1.rxfull_event, &el);
+      chThdSleepMilliseconds( 10 );
+
     }
+    chEvtUnregister(&CAND1.rxfull_event, &el);
+
   }
+
+/*
+ * Transmitter thread.
+ */
+static THD_WORKING_AREA(can_tx_wa, 256);
+static THD_FUNCTION(can_tx, p) {
+  CANTxFrame txmsg;
+  (void)p;
+  chRegSetThreadName("transmitter");
+  txmsg.IDE = CAN_IDE_EXT;
+  txmsg.EID = 0x01234567;
+  txmsg.RTR = CAN_RTR_DATA;
+  txmsg.DLC = 8;
+  txmsg.data32[0] = 0x55AA55AA;
+  txmsg.data32[1] = 0x00FF00FF;
+
+  while (true) {
+
+    if( canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, MS2ST(100)) == MSG_OK){
+         palTogglePad(GPIOB,7);
+    }else{
+         palTogglePad(GPIOB,14);
+    }
+
+    chThdSleepMilliseconds(500);
+  }
+}
 
 void can_init ( void )
 {
+    palSetPadMode(GPIOD,1,PAL_MODE_ALTERNATE(9));
+    palSetPadMode(GPIOD,0,PAL_MODE_ALTERNATE(9));
     canStart(&CAND1, &cancfg);
     chThdCreateStatic(can_rx1_wa, sizeof(can_rx1_wa), NORMALPRIO + 7, can_rx, NULL);
+    chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 6, can_tx, NULL);
 
 }
 
