@@ -9,9 +9,10 @@
 #include <stdlib.h>
 
 #define     PROGRAM_ROUTINE_MASTER                      0
+#define     PROGRAM_ROUTINE_TEST_ADC                    1
 
 
-#define     MAIN_PROGRAM_ROUTINE                        PROGRAM_ROUTINE_MASTER
+#define     MAIN_PROGRAM_ROUTINE                        PROGRAM_ROUTINE_TEST_ADC
 
 
 #endif /* INCLUDE_COMMON_H_ */
