@@ -10,9 +10,10 @@
 
 #define     PROGRAM_ROUTINE_MASTER                      0
 #define     PROGRAM_ROUTINE_TEST_ADC                    1
+#define     PROGRAM_ROUTINE_TEST_PWM                    2
 
 
-#define     MAIN_PROGRAM_ROUTINE                        PROGRAM_ROUTINE_TEST_ADC
+#define     MAIN_PROGRAM_ROUTINE                        PROGRAM_ROUTINE_TEST_PWM
 
 void commonADC1UnitInit ( void );
 adcsample_t commonADC1UnitGetValue ( uint8_t ch );

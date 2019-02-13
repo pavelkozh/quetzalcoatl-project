@@ -88,7 +88,7 @@ static const ADCConversionGroup adcgrpcfg1 =
      * Prescaler = 4 ->> fadc = 108 / 4 = 27 MHz  ->> Tadc = 1/fadc
      * Sample time = 480 * Tadc
      */
-    .smpr1 = ADC_SMPR1_SMP_AN10(ADC_SAMPLE_480),
+    .smpr1 = ADC_SMPR1_SMP_AN13(ADC_SAMPLE_480),
 
     /*Sample time (for each channel[0-9])*/
     //.smpr2 = ADC_SMPR1_SMP_AN____№___(ADC_SAMPLE_480),
@@ -100,7 +100,7 @@ static const ADCConversionGroup adcgrpcfg1 =
     .sqr2 = 0,
 
     /*Channel sequence [1-6]*/
-    .sqr3 = ADC_SQR3_SQ2_N(ADC_CHANNEL_IN10)
+    .sqr3 = ADC_SQR3_SQ2_N(ADC_CHANNEL_IN13)
 
 };
 
@@ -121,7 +121,7 @@ void commonADC1UnitInit ( void )
   adcStart(&ADCD1, NULL);
 
   /*analog input on PC0 pin */
-  palSetLineMode( LINE_ADC123_IN10, PAL_MODE_INPUT_ANALOG );
+  palSetLineMode( LINE_ADC123_IN13, PAL_MODE_INPUT_ANALOG );
 
   /*
    * Starts an ADC continuous conversion triggered with a period of
@@ -146,6 +146,8 @@ adcsample_t commonADC1UnitGetValue ( uint8_t ch )
    // return adc_buffer[0];
     return analog_in;
 }
+
+
 
 
 

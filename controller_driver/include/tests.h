@@ -5,6 +5,8 @@
 
 void TestADCRouting ( void );
 
+void TestPWMRouting (void);
+
 
 
 
@@ -15,6 +17,10 @@ static inline void testsRoutines( void )
 #if (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ADC)
 
     TestADCRouting();
+
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_PWM)
+
+    TestPWMRouting();
 
 #endif
 }
