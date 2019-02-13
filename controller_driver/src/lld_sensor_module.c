@@ -2,7 +2,7 @@
 
 
 
-
+#if 0
 static THD_WORKING_AREA ( waADCThd, 128);
 static THD_FUNCTION ( ADCThd, arg )
 {
@@ -12,7 +12,7 @@ static THD_FUNCTION ( ADCThd, arg )
 
 }
 
-
+#endif
 
 
 

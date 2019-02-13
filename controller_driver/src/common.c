@@ -24,6 +24,7 @@ static const GPTConfig gpt4cfg1 = {
   .dier      =  0U
 };
 
+static uint16_t analog_in = 0;
 
 /*
  * ADC streaming callback.
@@ -33,6 +34,9 @@ static void adccallback(ADCDriver *adcp, adcsample_t *buffer, size_t n)
     (void)adcp;
     (void)buffer;
     (void)n;
+
+    analog_in = adc_buffer[0]; // channel 1
+
 }
 
 /*
@@ -93,10 +97,10 @@ static const ADCConversionGroup adcgrpcfg1 =
     .sqr1 = COMMON_ADC_NUM_CHANNELS,
 
     /*Channel sequence [7-12]*/
-    .sgr2 = 0,
+    .sqr2 = 0,
 
     /*Channel sequence [1-6]*/
-    .sgr3 = ADC_SQR3_SQ2_N(ADC_CHANNEL_IN10)
+    .sqr3 = ADC_SQR3_SQ2_N(ADC_CHANNEL_IN10)
 
 };
 
@@ -111,10 +115,10 @@ void commonADC1UnitInit ( void )
       return;
 
   /* Starting GPT4 driver, it is used for triggering the ADC*/
-  gptStart(&adcTriggerDriver, &gpt4cfg1);
+  gptStart(&GPTD4, &gpt4cfg1);
 
   /* Activates the ADC1 driver */
-  adcStart(&commonADCDriver, NULL);
+  adcStart(&ADCD1, NULL);
 
   /*analog input on PC0 pin */
   palSetLineMode( LINE_ADC123_IN10, PAL_MODE_INPUT_ANALOG );
@@ -123,8 +127,8 @@ void commonADC1UnitInit ( void )
    * Starts an ADC continuous conversion triggered with a period of
    * 10 millisecond.
    */
-   adcStartConversion(&commonADCDriver, &adcgrpcfg1, adc_buffer, COMMON_ADC_BUF_DEPTH);
-   gptStartContinuous(&adcTriggerDriver, &gpt4cfg1.frequency / 1000);
+   adcStartConversion(&ADCD1, &adcgrpcfg1, adc_buffer, COMMON_ADC_BUF_DEPTH);
+   gptStartContinuous(&GPTD4, gpt4cfg1.frequency / 1000);
 
    adcInitialized = true;
 
@@ -132,12 +136,15 @@ void commonADC1UnitInit ( void )
 
 adcsample_t commonADC1UnitGetValue ( uint8_t ch )
 {
-    if ( ch >= COMMON_ADC_CHANNELS_NUMBER )
+#if 0
+    if ( ch > COMMON_ADC_NUM_CHANNELS )
     {
         return 0;
     }
+#endif
 
-    return adc_buffer[ch];
+   // return adc_buffer[0];
+    return analog_in;
 }
 
 

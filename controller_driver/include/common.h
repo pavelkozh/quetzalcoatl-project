@@ -14,5 +14,9 @@
 
 #define     MAIN_PROGRAM_ROUTINE                        PROGRAM_ROUTINE_TEST_ADC
 
+void commonADC1UnitInit ( void );
+adcsample_t commonADC1UnitGetValue ( uint8_t ch );
+
+
 
 #endif /* INCLUDE_COMMON_H_ */
