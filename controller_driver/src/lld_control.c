@@ -6,14 +6,6 @@
 /*********  PWM Unit    *********/
 /********************************/
 
-#if 0
-GPTConfig gpt1conf = {
-    .frequency    = 10000,
-    .callback     = NULL,
-    .cr2          = 0,
-    .dier         = 0
-};
-#endif
 
 #define PWM_FREQ           10000 /* PWM clock frequency [Hz] */
 #define PWM_PERIOD         200   /* PWM period[tics] = 20ms  */

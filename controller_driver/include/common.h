@@ -11,12 +11,12 @@
 #define     PROGRAM_ROUTINE_MASTER                      0
 #define     PROGRAM_ROUTINE_TEST_ADC                    1
 #define     PROGRAM_ROUTINE_TEST_PWM                    2
+#define     PROGRAM_ROUTINE_TEST_TRANSFER_FUNC          3
 
 
-#define     MAIN_PROGRAM_ROUTINE                        PROGRAM_ROUTINE_TEST_PWM
+#define     MAIN_PROGRAM_ROUTINE              PROGRAM_ROUTINE_TEST_TRANSFER_FUNC
 
-void commonADC1UnitInit ( void );
-adcsample_t commonADC1UnitGetValue ( uint8_t ch );
+
 
 
 

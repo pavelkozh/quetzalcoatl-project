@@ -8,7 +8,7 @@ static const SerialConfig sdcfg = {
 };
 
 
-static uint16_t Ain = 0;
+static uint16_t Ain_ch1 = 0, Ain_ch2 = 0;
 
 void TestADCRouting ( void )
 {
@@ -22,8 +22,14 @@ void TestADCRouting ( void )
 
     while ( 1 )
     {
-        Ain = commonADC1UnitGetValue ( 0 );
-        chprintf( (BaseSequentialStream *)&SD7, "ADC1 IN10: %d\n\r", Ain );
+        Ain_ch1 = commonADC1UnitGetValue ( 1 );
+        Ain_ch2 = commonADC1UnitGetValue ( 2 );
+
+        chprintf( (BaseSequentialStream *)&SD7, "IN10:  %d\n\r", Ain_ch2 );
+       /* chprintf( (BaseSequentialStream *)&SD7, "IN10:  %d\n","  ",
+                  "IN10:  %d\n\r ", Ain_ch1, Ain_ch2 );
+
+                  */
 
         chThdSleepMilliseconds( 10 );
     }

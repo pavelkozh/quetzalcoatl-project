@@ -7,6 +7,8 @@ void TestADCRouting ( void );
 
 void TestPWMRouting (void);
 
+void testTFCalcRouting ( void );
+
 
 
 
@@ -21,6 +23,10 @@ static inline void testsRoutines( void )
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_PWM)
 
     TestPWMRouting();
+
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_TRANSFER_FUNC)
+
+    testTFCalcRouting();
 
 #endif
 }
