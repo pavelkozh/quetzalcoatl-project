@@ -16,11 +16,26 @@ TFConf_t tfconf = {
 };
 
 TFConf_t* p_tfconf = &tfconf;
+uint16_t gpt_callback_counter = 0, i = 0;
+float out_array[205] = {0.0};
 
 static void gpt3_callback (GPTDriver *gptp)
 {
     (void)gptp;
     tfOutCalculation ( p_tfconf );
+    gpt_callback_counter ++;
+    if ( gpt_callback_counter == 500 )
+    {
+        gpt_callback_counter = 0;
+        if ( i <= 204 )
+        {
+            out_array[i] = tfconf.output;
+            i++;
+        }
+
+
+    }
+
 }
 
 /*
@@ -49,13 +64,14 @@ void testTFCalcRouting ( void )
     {
       chprintf( (BaseSequentialStream *)&SD7, "k= %d\t T = %d\t input = %d\t prev_out = %d\t y = %d\n\r",
                 (uint8_t) (tfconf.k * 10),
-                (uint8_t) (tfconf.T * 10),
-                (uint8_t) (tfconf.input * 10),
-                (uint8_t) (tfconf.prev_output * 10),
-                (int32_t) (tfconf.output * 1000));
+                (uint16_t) (tfconf.T * 10),
+                (uint16_t) (tfconf.input * 10),
+                (int32_t) (tfconf.prev_output * 10),
+                (int32_t) (out_array[i] * 1000) );
+      //(int32_t) (tfconf.output * 1000))
 
        // chprintf( (BaseSequentialStream *)&SD7, "y = :  %d\r\n", (int32_t) (tfconf.output * 10000) );
-        chThdSleepMilliseconds( 100 );
+        chThdSleepMilliseconds( 500 );
 
     }
 }
