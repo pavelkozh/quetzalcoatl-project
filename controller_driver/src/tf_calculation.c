@@ -1,12 +1,17 @@
 #include <tf_calculation.h>
 
 
-
+/* time quantum (s). DT value depends on timer period. */
 float DT = 0.001;
+
+/* temporary variable for time constant storage */
 float tau = 0.0;
 
-//TFConf_t tfconf;
 
+/*
+ * @brief    Function calculates difference equation
+ * @params   Pointer to structure(transfer function state)
+ */
 void tfOutCalculation ( TFConf_t* p_tf  )
 {
   tau = DT / ( p_tf->T + DT );

@@ -7,6 +7,7 @@ static const SerialConfig sdcfg = {
   .cr1 = 0, .cr2 = 0, .cr3 = 0
 };
 
+/* Transfer function state initialization*/
 TFConf_t tfconf = {
                    .k             = 3.0,
                    .T             = 100.0,
@@ -15,10 +16,17 @@ TFConf_t tfconf = {
                    .input         = 100.0
 };
 
+/* pointer to stucture*/
 TFConf_t* p_tfconf = &tfconf;
+
+
 uint16_t gpt_callback_counter = 0, i = 0;
 float out_array[205] = {0.0};
 
+/* Difference equation calculation on timer trigger event (overflow)
+ * Ones in (time interval = 500 times * timer period) calculated value
+ * will recorded to array.
+ */
 static void gpt3_callback (GPTDriver *gptp)
 {
     (void)gptp;
@@ -43,7 +51,7 @@ static void gpt3_callback (GPTDriver *gptp)
  * calculation.
  */
 static const GPTConfig gpt3cfg1 = {
-  .frequency =  100000U,
+  .frequency =  100000U,        /* 100 kHz*/
   .callback  =  gpt3_callback,
   .cr2       =  TIM_CR2_MMS_1,  /* MMS = 010 = TRGO on Update Event.        */
   .dier      =  0U
@@ -57,7 +65,7 @@ void testTFCalcRouting ( void )
 
     /* Starting GPT3 driver */
     gptStart(&GPTD3, &gpt3cfg1);
-    gptStartContinuous(&GPTD3, gpt3cfg1.frequency / 1000); //1ms
+    gptStartContinuous(&GPTD3, gpt3cfg1.frequency / 1000); //Timer period = 1ms
 
 
     while ( 1 )

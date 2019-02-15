@@ -4,7 +4,8 @@
 #include <common.h>
 
 /*
- * @brief      Transfer function structure
+ * @brief      Transfer function structure.
+ *             Parameters and state of difference equation.
  *             W(s) = k / ( T*s + 1 )
  */
 struct TFConf {
@@ -26,14 +27,14 @@ struct TFConf {
 
 typedef struct TFConf TFConf_t;
 
+
 //extern TFConf_t tfconf;
 
 
 
 /*
- * @brief
- * @param
- * @return
+ * @brief    Function calculates difference equation
+ * @params   Pointer to structure(transfer function state)
  */
 void tfOutCalculation ( TFConf_t * );
 
