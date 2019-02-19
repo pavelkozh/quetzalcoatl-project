@@ -38,7 +38,6 @@ void PWMUnitInit ( void )
 {
     palSetLineMode( PAL_LINE( GPIOE, 9 ),  PAL_MODE_ALTERNATE(1) );
     pwmStart( &PWMD1, &pwm1conf );
-    //gptStart( &GPTD1, &gpt1conf );
     pwmEnableChannel( &PWMD1, 0, duty_cycle_ticks );
 
 }
