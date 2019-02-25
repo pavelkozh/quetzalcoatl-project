@@ -7,12 +7,12 @@
 /********************************/
 
 
-#define PWM_FREQ           10000 /* PWM clock frequency [Hz] */
-#define PWM_PERIOD         200   /* PWM period[tics] = 20ms  */
-#define DUTY_CYCLE         50  /* % of period */
+#define PWM_FREQ           1000000  /* PWM clock frequency [Hz] */
+#define PWM_PERIOD         100      /* PWM period[tics]  */
 
-//static const uint16_t pwm_period_ticks =  PWM_PERIOD_MS * PWM_FREQ;
-const uint8_t  duty_cycle_ticks =  DUTY_CYCLE * PWM_PERIOD / 100;
+//#define DUTY_CYCLE         50       /* % of period */
+//static const uint16_t pwm_period_ticks =  PWM_PERIOD_S * PWM_FREQ;
+//const uint8_t  duty_cycle_ticks =  DUTY_CYCLE * PWM_PERIOD / 100;
 
 
 
@@ -38,6 +38,6 @@ void PWMUnitInit ( void )
 {
     palSetLineMode( PAL_LINE( GPIOE, 9 ),  PAL_MODE_ALTERNATE(1) );
     pwmStart( &PWMD1, &pwm1conf );
-    pwmEnableChannel( &PWMD1, 0, duty_cycle_ticks );
+    //pwmEnableChannel( &PWMD1, 0, duty_cycle_ticks );
 
 }

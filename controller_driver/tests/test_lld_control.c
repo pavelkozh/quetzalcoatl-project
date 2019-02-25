@@ -3,65 +3,102 @@
 #include <lld_sensor_module.h>
 #include <chprintf.h>
 
+
+#define DRIVE_ENABLE_BUTTON_PORT      GPIOE
+#define DRIVE_ENABLE_BUTTON_PIN       4
+
+#define DRIVE_DIR_BUTTON_PORT         GPIOE
+#define DRIVE_DIR_BUTTON_PIN          5
+
+#define CONTROL_DRIVE_ENABLE_PORT     GPIOF
+#define CONTROL_DRIVE_ENABLE_PIN      14
+
+#define CONTROL_DRIVE_DIR_PORT        GPIOE
+#define CONTROL_DRIVE_DIR_PIN         11
+
+
 static const SerialConfig sdcfg = {
   .speed = 115200,
   .cr1 = 0, .cr2 = 0, .cr3 = 0
 };
 
 static bool right_dir = 0, left_dir = 0, drive_enable = 0;
-static uint16_t Ain = 0;
-static float duty_cucle = 0;
+static uint16_t Ain = 0, period_s = 0;
+static float duty_cucle = 0.0;
+static uint8_t sd_buff[10];
+uint16_t *sd_value;
 
 
 static void extcb( EXTDriver *extp, expchannel_t channel )
 {
+    /* to avoid warnings */
     extp = extp;
-    //channel = channel;
-    if ( channel == 4 )
+
+    /* Driver enable button (latching) change state:
+     * (0->1: drive enable)
+     * (1->0: drive disable)
+     */
+    if ( channel == DRIVE_ENABLE_BUTTON_PIN )
     {
-        if ( palReadPad ( GPIOE, 4 ) )
+        if ( palReadPad ( DRIVE_ENABLE_BUTTON_PORT, DRIVE_ENABLE_BUTTON_PIN ) )
         {
             drive_enable = 1;
+
+            /* to indicate "enable" button state */
             palClearLine( LINE_LED1 );
+
+            /* to control driver's "enable" pin */
+            palSetPad ( CONTROL_DRIVE_ENABLE_PORT, CONTROL_DRIVE_ENABLE_PIN );
         }
         else
         {
             drive_enable = 0;
+
+            /* to indicate "enable" button state */
             palSetLine( LINE_LED1 );
+
+            /* to control driver's "enable" pin */
+            palClearPad ( CONTROL_DRIVE_ENABLE_PORT, CONTROL_DRIVE_ENABLE_PIN );
         }
     }
-    if ( channel == 5 )
+
+    /* Driver direction toggle button changing state occure:
+     * (0->1: right direction)
+     * (1->0: left direction )
+     */
+    if ( channel == DRIVE_DIR_BUTTON_PIN )
     {
-        if ( palReadPad (GPIOE, 5) )
+        if ( palReadPad (DRIVE_DIR_BUTTON_PORT, DRIVE_DIR_BUTTON_PIN) )
         {
             left_dir = 0;
             right_dir = 1;
+
+            /* to indicate "direction" button state */
             palClearLine( LINE_LED3 );
             palSetLine( LINE_LED2 );
+
+            /* to control driver's "direction" pin */
+            palSetPad ( CONTROL_DRIVE_DIR_PORT, CONTROL_DRIVE_DIR_PIN );
 
         }
         else
         {
             right_dir = 0;
             left_dir = 1;
+
+            /* to indicate "direction" button state */
             palClearLine( LINE_LED2 );
             palSetLine( LINE_LED3 );
+
+            /* to control driver's "direction" pin */
+            palClearPad (  CONTROL_DRIVE_DIR_PORT, CONTROL_DRIVE_DIR_PIN );
 
         }
 
     }
-    /*
-    if ( channel == 6 )
-    {
-        right_dir = 0;
-        left_dir = 1;
-        palToggleLine( LINE_LED3 );
-    }
-    */
-
-    //palToggleLine( LINE_LED1 );
 }
 
+/* EXT Driver configuration */
 static const EXTConfig extcfg = {
   .channels =
   {
@@ -89,14 +126,19 @@ void TestPWMRouting (void)
 {
   PWMUnitInit();
   commonADC1UnitInit();
+
   extStart( &EXTD1, &extcfg );
+  //pwmEnableChannel( &PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH (&PWMD1,5000) );
 
   sdStart( &SD7, &sdcfg );
   palSetPadMode( GPIOE, 8, PAL_MODE_ALTERNATE(8) );   // TX
   palSetPadMode( GPIOE, 7, PAL_MODE_ALTERNATE(8) );   // RX
 
-  palSetPadMode( GPIOE, 4, PAL_MODE_OUTPUT_OPENDRAIN );
-  palSetPadMode( GPIOE, 5, PAL_MODE_OUTPUT_OPENDRAIN );
+  palSetPadMode( GPIOE, 4, PAL_MODE_INPUT_PULLDOWN ); // enable button
+  palSetPadMode( GPIOE, 5, PAL_MODE_INPUT_PULLDOWN ); // direction button
+
+  palSetPadMode( GPIOE, 11, PAL_MODE_OUTPUT_OPENDRAIN ); // direction output (control signal)
+  palSetPadMode( GPIOF, 14, PAL_MODE_OUTPUT_OPENDRAIN ); // enable output (control signal)
 
 
 
@@ -104,16 +146,20 @@ void TestPWMRouting (void)
   while (1)
   {
       Ain = commonADC1UnitGetValue ( 1 );
-      duty_cucle = (float)Ain * 10000.0 / 4096.0;
+      //duty_cucle = (float)Ain * 10000.0 / 4096.0;
+
+      //period_s = (  Ain * 1000 / 4096 );
+      //pwmChangePeriod(&PWMD1, 5000);
+
 
 
 
       if ( drive_enable )
       {
-          pwmEnableChannel( &PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH (&PWMD1, (uint16_t)(duty_cucle) ) );
-          //pwmEnableChannel( &PWMD1, 0, 100 );
+          //pwmEnableChannel( &PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH (&PWMD1, (uint16_t)(duty_cucle) ) );
+          pwmEnableChannel( &PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH (&PWMD1,5000) );
       }
-#if 0
+#if 1
       else
       {
           pwmEnableChannel( &PWMD1, 0, 0 );
@@ -121,9 +167,16 @@ void TestPWMRouting (void)
 
 #endif
 
-      chprintf( (BaseSequentialStream *)&SD7, "ADC:  %d\t En %d\t DirR %d\t DirL %d\t Duty %d\n\r", Ain, drive_enable, right_dir, left_dir, (uint16_t) (duty_cucle *10) );
+      chprintf( (BaseSequentialStream *)&SD7, "ADC:  %d\t En %d\t DirR %d\t DirL %d\t Duty %d\n\r",
+                Ain, drive_enable, right_dir, left_dir, sd_buff[0]  );
 
-      //palReadPad(GPIOE, 6);
+
+      /* read data from serial */
+      //sdRead(&SD7, sd_buff, 1);
+      //sd_value = &sd_buff;
+
+
+
 
 
       chThdSleepMilliseconds( 100 );

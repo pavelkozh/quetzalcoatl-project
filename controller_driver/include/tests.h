@@ -3,10 +3,27 @@
 
 #include <common.h>
 
+/*
+ * @brief   Routine of ADC module testing
+ * @note    The routine has internal infinite loop
+ * @note    SD7 is used for testing (PE7, PE8)
+ */
 void TestADCRouting ( void );
 
+
+/*
+ * @brief   Routine of PWM module testing
+ * @note    The routine has internal infinite loop
+ * @note    SD7 is used for testing (PE7, PE8)
+ */
 void TestPWMRouting (void);
 
+
+/*
+ * @brief   Routine of transfer function calculation module testing
+ * @note    The routine has internal infinite loop
+ * @note    SD7 is used for testing (PE7, PE8)
+ */
 void testTFCalcRouting ( void );
 
 

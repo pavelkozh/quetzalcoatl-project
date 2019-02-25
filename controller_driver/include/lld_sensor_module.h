@@ -4,8 +4,24 @@
 
 #include <common.h>
 
+/*
+ * Hardware description
+ * ------------------------------------
+ * PC0, PA3 - ADC channels
+ */
 
+
+
+/*** Prototypes ***/
+
+/* @brief: ADC initialization */
 void commonADC1UnitInit ( void );
+
+
+/* @brief:   ADC read channel
+ * @prams:   Channel number from 1 (1,2..)
+ * @return:  ADC value
+ */
 adcsample_t commonADC1UnitGetValue ( uint8_t ch );
 
 
