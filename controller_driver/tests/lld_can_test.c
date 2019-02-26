@@ -1,6 +1,7 @@
 #include <tests.h>
 #include <lld_can.h>
 #include <chprintf.h>
+#include <term_graph.h>
 
 
 
@@ -11,24 +12,28 @@ static const SerialConfig sdcfg = {
 
 void TestCanRouting ( void )
 {
-    sdStart( &SD7, &sdcfg );
-    palSetPadMode( GPIOE, 8, PAL_MODE_ALTERNATE(8) );   // TX
-    palSetPadMode( GPIOE, 7, PAL_MODE_ALTERNATE(7) );   // RX
-    chprintf( (BaseSequentialStream *)&SD7, "Simulation enabled\n" );
+    sdStart( &SD3, &sdcfg );
+    palSetPadMode( GPIOD, 8, PAL_MODE_ALTERNATE(7) );   // TX
+    palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
+    chprintf( (BaseSequentialStream *)&SD3, "Simulation enabled\n" );
 
     palSetPadMode( GPIOB, 7, PAL_MODE_OUTPUT_PUSHPULL );
     palSetPadMode( GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL );
     palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );
     can_init();
+    set_display_atrib(F_RED);
 
+    home();
+    clrscr();
+    chprintf( (BaseSequentialStream *)&SD3,  "Hello,         ! " ); 
+    resetcolor();
+    uint32_t i = 0;
     while (1)
     {
-        for ( int i = 0; i < rxmsg.DLC; i++)
-        {
-            chprintf( (BaseSequentialStream *)&SD7,  ",%02X", rxmsg.data8[i] );
-        }
-
+        gotoxy(7,1);
+        set_display_atrib(F_RED);
+        chprintf( (BaseSequentialStream *)&SD3,  "%d", i++); 
+        resetcolor();
         chThdSleepMilliseconds( 100 );
-
     }
 }
