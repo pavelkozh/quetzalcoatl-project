@@ -25,8 +25,8 @@ static const SerialConfig sdcfg = {
 static bool right_dir = 0, left_dir = 0, drive_enable = 0;
 static uint16_t Ain = 0, period_s = 0;
 static float duty_cucle = 0.0;
-static uint8_t sd_buff[10];
-uint16_t *sd_value;
+static uint8_t rcv_data = 0, sd_buff[10];
+int8_t *sd_value;
 
 
 static void extcb( EXTDriver *extp, expchannel_t channel )
@@ -137,8 +137,8 @@ void TestPWMRouting (void)
   palSetPadMode( GPIOE, 4, PAL_MODE_INPUT_PULLDOWN ); // enable button
   palSetPadMode( GPIOE, 5, PAL_MODE_INPUT_PULLDOWN ); // direction button
 
-  palSetPadMode( GPIOE, 11, PAL_MODE_OUTPUT_OPENDRAIN ); // direction output (control signal)
-  palSetPadMode( GPIOF, 14, PAL_MODE_OUTPUT_OPENDRAIN ); // enable output (control signal)
+  palSetPadMode( GPIOE, 11, PAL_MODE_OUTPUT_PUSHPULL ); // direction output (control signal)
+  palSetPadMode( GPIOF, 14, PAL_MODE_OUTPUT_PUSHPULL ); // enable output (control signal)
 
 
 
@@ -168,17 +168,18 @@ void TestPWMRouting (void)
 #endif
 
       chprintf( (BaseSequentialStream *)&SD7, "ADC:  %d\t En %d\t DirR %d\t DirL %d\t Duty %d\n\r",
-                Ain, drive_enable, right_dir, left_dir, sd_buff[0]  );
+                Ain, drive_enable, right_dir, left_dir, *sd_value   );
 
 
       /* read data from serial */
-      //sdRead(&SD7, sd_buff, 1);
-      //sd_value = &sd_buff;
+      //rcv_data = sdGetTimeout( &SD7, TIME_IMMEDIATE );
+      sdReadTimeout( &SD7, sd_buff, 4, TIME_IMMEDIATE   );
+      sd_value = &sd_buff;
 
 
 
 
 
-      chThdSleepMilliseconds( 100 );
+      chThdSleepMilliseconds( 10 );
   }
 }
