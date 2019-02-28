@@ -1,6 +1,7 @@
 #include <lld_can.h>
 
 
+void can_handler(CANRxFrame msg);
 
 static const CANConfig cancfg= {
 CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP,
@@ -17,33 +18,27 @@ static THD_WORKING_AREA(can_rx_wa, 256);
 static THD_FUNCTION(can_rx, arg) {
     arg = arg;
 
-    event_listener_t el2;
     event_listener_t el1;
 
     chRegSetThreadName("receiver");
-    chEvtRegister(&CAND2.rxfull_event, &el2, 0);
     chEvtRegister(&CAND1.rxfull_event, &el1, 0);
 
     while (1)
     {
       if (chEvtWaitAnyTimeout(ALL_EVENTS, MS2ST(100)) == 0)
         continue;
-      while ( canReceive(&CAND2, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK)
-      {
-        /* Process message.*/
-        palTogglePad(GPIOB,0); //Зелёный
-      }
       while ( canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK)
             {
               /* Process message.*/
-              palTogglePad(GPIOB,14); //Красный
+              palTogglePad(GPIOB,14); 
               txmsg.data32[0] = rxmsg.data32[0];
               txmsg.data32[1] = rxmsg.data32[1];
+              can_handler(rxmsg);
             }
       chThdSleepMilliseconds( 10 );
 
+
     }
-    chEvtUnregister(&CAND2.rxfull_event, &el2);
     chEvtUnregister(&CAND1.rxfull_event, &el1);
 
   }
@@ -64,11 +59,11 @@ static THD_FUNCTION(can_tx, p) {
 
   while (true) {
 
-    if( canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, MS2ST(100)) == MSG_OK){
-         palTogglePad(GPIOB,7);//Синий
+    /*if( canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, MS2ST(100)) == MSG_OK){
+         palTogglePad(GPIOB,7);
     }else{
-//         palTogglePad(GPIOB,14); //Крачный
-    }
+         palTogglePad(GPIOB,14); 
+    }*/
 
     chThdSleepMilliseconds(500);
   }
@@ -81,33 +76,90 @@ static THD_FUNCTION(can_tx, p) {
 /*0b110 - Mask enable for EID/SID and DATA/RTR*/
 #define set_can_eid_mask(x) ((x << 3)|0b110)
 
+
+extern  gazelParam gazel = {
+  .EngineSpeed = 0.0 ,
+  .Speed = 0,
+  .AcceleratorPedalPosition = 0 ,
+  .EngineOilTemperature= 0 ,
+  .EngineFuelTemperature = 0 ,
+  .Positionofdoors = 0 ,
+  .EngineFuelRate = 0 ,
+  .EngineInstantaneousFuelEconomy = 0 ,
+  .EngineThrottleValve = 0 ,
+  .NetBatteryCurrent = 0 ,
+  .AlternatorCurrent = 0,
+  .AlternatorPotential = 0 ,
+  .ElectricalPotential = 0 ,
+  .BatteryPotential = 0 ,
+  .BrakePedalPosition=0
+};
+
 void can_init ( void )
 {
   //Setting pin mode
     palSetPadMode(GPIOD,1,PAL_MODE_ALTERNATE(9));
     palSetPadMode(GPIOD,0,PAL_MODE_ALTERNATE(9));
-    palSetPadMode(GPIOB,5,PAL_MODE_ALTERNATE(9));
-    palSetPadMode(GPIOB,6,PAL_MODE_ALTERNATE(9));
+
+
   // Setting can filters
-    CANFilter can_filter[2] = {\
+    CANFilter can_filter[8] = {\
     {0, 1, 1, 0, set_can_eid_data(0x00008000), set_can_eid_data(0x00005555)},\
-    {1, 0, 1, 0, set_can_eid_data(0x00005555), set_can_eid_mask(0x0000fff0)}\
+    {1, 0, 1, 0, set_can_eid_data(PGN_ELECTRONIC_ENGINE_CONTROLLER_1), set_can_eid_mask(0x00ffff00)},\
+    {2, 0, 1, 0, set_can_eid_data(PGN_CRUISE_CONTROL_AND_VEHICL_SPEED), set_can_eid_mask(0x00ffff00)},\
+    {3, 0, 1, 0, set_can_eid_data(PGN_ELECTRONIC_ENGINE_CONTROLLER_2), set_can_eid_mask(0x00ffff00)},\
+    {4, 0, 1, 0, set_can_eid_data(PGN_ENGINE_TEMPERATURE_1), set_can_eid_mask(0x00ffff00)},\
+    {5, 0, 1, 0, set_can_eid_data(PGN_DOOR_CONTROL), set_can_eid_mask(0x00ffff00)},\
+    {6, 0, 1, 0, set_can_eid_data(PGN_FUEL_ECONOMY), set_can_eid_mask(0x00ffff00)},\
+    {7, 0, 1, 0, set_can_eid_data(PGN_VEHICLE_ELECTRICAL_POWER), set_can_eid_mask(0x00ffff00)}\
     };
 
     //Filters for can2 and can1 are configured together. See Reference manual( CAN filter master register (CAN_FMR) )
-    canSTM32SetFilters(&CAND1,1,2,&can_filter[0]);
+    canSTM32SetFilters(&CAND1,8,8,&can_filter[0]);
 
     //start Can
     canStart(&CAND1, &cancfg);
-    canStart(&CAND2, &cancfg);
     chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 7, can_rx, NULL);
     chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 6, can_tx, NULL);
 
 }
 
 
+void can_handler(CANRxFrame msg){
+  switch((msg.EID & 0x00ffff00)){
+    case PGN_ELECTRONIC_ENGINE_CONTROLLER_1: 
+      gazel.EngineSpeed =0.125*( (msg.data8[4]<<8)|msg.data8[3]);
+      break;
+    case PGN_CRUISE_CONTROL_AND_VEHICL_SPEED:
+      gazel.Speed = ((msg.data8[2]<<8)|msg.data8[1])/256;
+      break;
+    case PGN_ELECTRONIC_ENGINE_CONTROLLER_2:
+      gazel.AcceleratorPedalPosition = 0.4*msg.data8[1];
+      break;
+    case PGN_ENGINE_TEMPERATURE_1:
+      gazel.EngineOilTemperature = 0.03125*((msg.data8[3]<<8)|msg.data8[2]);
+      gazel.EngineFuelTemperature = msg.data8[1];
+      break;
+    case PGN_DOOR_CONTROL: 
+      gazel.Positionofdoors = (msg.data8[0]>>1)&0xf;
+      break;
+    case PGN_FUEL_ECONOMY:
+      gazel.EngineFuelRate = 0.05* ( (msg.data8[1]<<8)|msg.data8[0]);
+      gazel.EngineInstantaneousFuelEconomy = ((msg.data8[3]<<8)|msg.data8[2])/512;
+      gazel.EngineThrottleValve = 0.4*msg.data8[6];
+      break;
+    case PGN_VEHICLE_ELECTRICAL_POWER:
+      gazel.NetBatteryCurrent = msg.data8[0]-125; 
+      gazel.AlternatorCurrent = msg.data8[1]; 
+      gazel.AlternatorPotential = 0.05* ( (msg.data8[3]<<8)|msg.data8[2]);
+      gazel.ElectricalPotential = 0.05* ( (msg.data8[5]<<8)|msg.data8[4]);
+      gazel.BatteryPotential = 0.05* ( (msg.data8[7]<<8)|msg.data8[6]);
+    case PGN_ELECTRONIC_BRAKE_CONTROLLER:
+      gazel.BrakePedalPosition = msg.data8[1]*0.4;
+      break;
+  };
 
-
+}
 
 
 

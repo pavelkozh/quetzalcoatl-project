@@ -3,7 +3,6 @@
 
 #include <common.h>
 
-
 /*
  * @brief   Routine of CAN controller testing
  * @note    The routine has internal infinite loop

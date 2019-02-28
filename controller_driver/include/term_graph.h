@@ -34,7 +34,7 @@
 #define B_WHITE		47
 
 #define home() 			chprintf((BaseSequentialStream *)&SD3,ESC "[H"); //Move cursor to the indicated row, column (origin at 1,:1)
-#define clrscr()		chprintf((BaseSequentialStream *)&SD3,ESC "[2J") //lear the screen, move to (1,1)
+#define clrscr()		chprintf((BaseSequentialStream *)&SD3,ESC "[2J"); //lear the screen, move to (1,1)
 #define gotoxy(x,y)		chprintf((BaseSequentialStream *)&SD3,ESC "[%d;%dH", y, x);
 #define visible_cursor() chprintf((BaseSequentialStream *)&SD3,ESC "[?251");
 //Set Display Attribute Mode	<ESC>[{attr1};...;{attrn}m
