@@ -12,9 +12,9 @@ static const SerialConfig sdcfg = {
 
 void TestEncoderRouting (void)
 {
-    sdStart( &SD7, &sdcfg );
-    palSetPadMode( GPIOE, 8, PAL_MODE_ALTERNATE(8) );   // TX
-    palSetPadMode( GPIOE, 7, PAL_MODE_ALTERNATE(8) );   // RX
+    sdStart( &SD3, &sdcfg );
+    palSetPadMode( GPIOD, 8, PAL_MODE_ALTERNATE(7) );   // TX
+    palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
 
     while ( 1 )
     {

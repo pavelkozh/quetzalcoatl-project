@@ -8,7 +8,7 @@
  * ------------------------------------
  *
  * EXT driver uses inputs PE4, PE5
- * PWM PE9
+ * PWM (pin PE9) uses TIM1
  * PE11, PF14 uses as general outputs.
  */
 

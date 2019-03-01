@@ -154,14 +154,18 @@ static const EXTConfig extcfg = {
   }
 };
 
+void testPWMRoutingInit ( void )
+{
+
+}
 
 void TestPWMRouting (void)
 {
   PWMUnitInit();
   commonADC1UnitInit();
 
-  extStart( &EXTD1, &extcfg );
-  //pwmEnableChannel( &PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH (&PWMD1,5000) );
+  /*EXT driver initialization*/
+  commonExtDriverInit();
 
   sdStart( &SD3, &sdcfg );
   palSetPadMode( GPIOD, 8, PAL_MODE_ALTERNATE(7) );   // TX
