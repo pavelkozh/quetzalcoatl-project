@@ -3,13 +3,18 @@
 #include <lld_sensor_module.h>
 #include <chprintf.h>
 
-
-#define DRIVE_ENABLE_BUTTON_PORT      GPIOE
-#define DRIVE_ENABLE_BUTTON_PIN       4
+/* BUTTONS*/
+#define DRIVE_START_BUTTON_PORT       GPIOE
+#define DRIVE_START_BUTTON_PIN        4
 
 #define DRIVE_DIR_BUTTON_PORT         GPIOE
 #define DRIVE_DIR_BUTTON_PIN          5
 
+#define DRIVE_ENABLE_BUTTON_PORT      GPIOE
+#define DRIVE_ENABLE_BUTTON_PIN       6
+
+
+/*Control pins*/
 #define CONTROL_DRIVE_ENABLE_PORT     GPIOF
 #define CONTROL_DRIVE_ENABLE_PIN      14
 
@@ -22,11 +27,11 @@ static const SerialConfig sdcfg = {
   .cr1 = 0, .cr2 = 0, .cr3 = 0
 };
 
-static bool right_dir = 0, left_dir = 0, drive_enable = 0;
+static bool right_dir = 0, left_dir = 0, drive_enable = 0, drive_start = 0;
 static uint16_t Ain = 0, period_s = 0;
 static float duty_cucle = 0.0;
-static uint8_t sd_buff[10];
-uint16_t *sd_value;
+static uint8_t rcv_data = 0, sd_buff[10];
+int8_t *sd_value;
 
 
 static void extcb( EXTDriver *extp, expchannel_t channel )
@@ -34,35 +39,63 @@ static void extcb( EXTDriver *extp, expchannel_t channel )
     /* to avoid warnings */
     extp = extp;
 
-    /* Driver enable button (latching) change state:
+    /* Driver ENABLE button (latching) change state:
      * (0->1: drive enable)
      * (1->0: drive disable)
      */
     if ( channel == DRIVE_ENABLE_BUTTON_PIN )
-    {
-        if ( palReadPad ( DRIVE_ENABLE_BUTTON_PORT, DRIVE_ENABLE_BUTTON_PIN ) )
         {
-            drive_enable = 1;
+            if ( palReadPad ( DRIVE_ENABLE_BUTTON_PORT, DRIVE_ENABLE_BUTTON_PIN ) )
+            {
+                drive_enable = 0;
+
+                /* to indicate "enable" button state */
+                palClearLine( LINE_LED1 );
+
+                /* to control driver's "enable" pin */
+                palSetPad ( CONTROL_DRIVE_ENABLE_PORT, CONTROL_DRIVE_ENABLE_PIN );
+            }
+            else
+            {
+                drive_enable = 1;
+
+                /* to indicate "enable" button state */
+                palSetLine( LINE_LED1 );
+
+                /* to control driver's "enable" pin */
+                palClearPad ( CONTROL_DRIVE_ENABLE_PORT, CONTROL_DRIVE_ENABLE_PIN );
+            }
+        }
+
+    /* Driver START/STOP button (latching) change state:
+     * (0->1: drive start)
+     * (1->0: drive stop )
+     */
+    if ( channel == DRIVE_START_BUTTON_PIN )
+    {
+        if ( palReadPad ( DRIVE_START_BUTTON_PORT, DRIVE_START_BUTTON_PIN ) )
+        {
+            drive_start = 1;
 
             /* to indicate "enable" button state */
-            palClearLine( LINE_LED1 );
+            //palClearLine( LINE_LED1 );
 
             /* to control driver's "enable" pin */
-            palSetPad ( CONTROL_DRIVE_ENABLE_PORT, CONTROL_DRIVE_ENABLE_PIN );
+            //palSetPad ( CONTROL_DRIVE_ENABLE_PORT, CONTROL_DRIVE_ENABLE_PIN );
         }
         else
         {
-            drive_enable = 0;
+            drive_start = 0;
 
             /* to indicate "enable" button state */
-            palSetLine( LINE_LED1 );
+            //palSetLine( LINE_LED1 );
 
             /* to control driver's "enable" pin */
-            palClearPad ( CONTROL_DRIVE_ENABLE_PORT, CONTROL_DRIVE_ENABLE_PIN );
+            //palClearPad ( CONTROL_DRIVE_ENABLE_PORT, CONTROL_DRIVE_ENABLE_PIN );
         }
     }
 
-    /* Driver direction toggle button changing state occure:
+    /* Driver DIRECTION toggle button changing state occure:
      * (0->1: right direction)
      * (1->0: left direction )
      */
@@ -108,7 +141,7 @@ static const EXTConfig extcfg = {
     [3]  = {EXT_CH_MODE_DISABLED, NULL},
     [4]  = {EXT_CH_MODE_BOTH_EDGES   | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOE, extcb}, //PE4
     [5]  = {EXT_CH_MODE_BOTH_EDGES   | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOE, extcb}, //PE5
-    [6]  = {EXT_CH_MODE_DISABLED, NULL},
+    [6]  = {EXT_CH_MODE_BOTH_EDGES   | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOE, extcb}, //PE6
     [7]  = {EXT_CH_MODE_DISABLED, NULL},
     [8]  = {EXT_CH_MODE_DISABLED, NULL},
     [9]  = {EXT_CH_MODE_DISABLED, NULL},
@@ -130,15 +163,16 @@ void TestPWMRouting (void)
   extStart( &EXTD1, &extcfg );
   //pwmEnableChannel( &PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH (&PWMD1,5000) );
 
-  sdStart( &SD7, &sdcfg );
-  palSetPadMode( GPIOE, 8, PAL_MODE_ALTERNATE(8) );   // TX
-  palSetPadMode( GPIOE, 7, PAL_MODE_ALTERNATE(8) );   // RX
+  sdStart( &SD3, &sdcfg );
+  palSetPadMode( GPIOD, 8, PAL_MODE_ALTERNATE(7) );   // TX
+  palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
 
   palSetPadMode( GPIOE, 4, PAL_MODE_INPUT_PULLDOWN ); // enable button
   palSetPadMode( GPIOE, 5, PAL_MODE_INPUT_PULLDOWN ); // direction button
+  palSetPadMode( GPIOE, 6, PAL_MODE_INPUT_PULLDOWN ); // enable button
 
-  palSetPadMode( GPIOE, 11, PAL_MODE_OUTPUT_OPENDRAIN ); // direction output (control signal)
-  palSetPadMode( GPIOF, 14, PAL_MODE_OUTPUT_OPENDRAIN ); // enable output (control signal)
+  palSetPadMode( GPIOE, 11, PAL_MODE_OUTPUT_PUSHPULL ); // direction output (control signal)
+  palSetPadMode( GPIOF, 14, PAL_MODE_OUTPUT_PUSHPULL ); // enable output (control signal)
 
 
 
@@ -154,7 +188,8 @@ void TestPWMRouting (void)
 
 
 
-      if ( drive_enable )
+     // if ( drive_enable && drive_start )
+      if ( drive_start )
       {
           //pwmEnableChannel( &PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH (&PWMD1, (uint16_t)(duty_cucle) ) );
           pwmEnableChannel( &PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH (&PWMD1,5000) );
@@ -167,18 +202,23 @@ void TestPWMRouting (void)
 
 #endif
 
-      chprintf( (BaseSequentialStream *)&SD7, "ADC:  %d\t En %d\t DirR %d\t DirL %d\t Duty %d\n\r",
-                Ain, drive_enable, right_dir, left_dir, sd_buff[0]  );
+      //chprintf( (BaseSequentialStream *)&SD7, "ADC:  %d\t En %d\t DirR %d\t DirL %d\t Duty %d\n\r",
+           //     Ain, drive_enable, right_dir, left_dir, *sd_value   );
 
 
       /* read data from serial */
-      //sdRead(&SD7, sd_buff, 1);
-      //sd_value = &sd_buff;
+      //rcv_data = sdGetTimeout( &SD7, TIME_IMMEDIATE );
+      int test = sdReadTimeout( &SD3, sd_buff, 4, TIME_IMMEDIATE   );
+      sd_value = &sd_buff[3];
+
+      uint8_t *sign;
+      chprintf( (BaseSequentialStream *)&SD3, "%d\n\r",
+                     *sd_value   );
 
 
 
 
 
-      chThdSleepMilliseconds( 100 );
+      chThdSleepMilliseconds( 10 );
   }
 }
