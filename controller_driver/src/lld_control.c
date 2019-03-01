@@ -8,7 +8,7 @@
 
 
 #define PWM_FREQ           1000000  /* PWM clock frequency [Hz] */
-#define PWM_PERIOD         100      /* PWM period[tics]  */
+#define PWM_PERIOD         1000      /* PWM period[tics]  */
 
 //#define DUTY_CYCLE         50       /* % of period */
 //static const uint16_t pwm_period_ticks =  PWM_PERIOD_S * PWM_FREQ;
