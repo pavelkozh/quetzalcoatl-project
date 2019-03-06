@@ -1,6 +1,7 @@
 #ifndef INCLUDE_LLD_ENCODER_H_
 #define INCLUDE_LLD_ENCODER_H_
 
+#include <common.h>
 typedef int32_t    rawEncoderValue_t;
 typedef float      rawRevEncoderValue_t;
 

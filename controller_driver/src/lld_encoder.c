@@ -198,7 +198,7 @@ Position_t encoderGetPosition ( void )
 
 #endif
 
-#include <tests.h>
+//#include <tests.h>
 #include <lld_encoder.h>
 
 #define ENC_MAX_TICK_NUM        2000  // 1000 * 2 (BOTH_EDGES)
@@ -207,9 +207,13 @@ Position_t encoderGetPosition ( void )
 /***    LINE CONFIGURATION   ***/
 /*******************************/
 
-#define ENCODER_CH_A_LINE   PAL_LINE( GPIOD, 5 )
-#define ENCODER_CH_B_LINE   PAL_LINE( GPIOD, 4 )
-#define ENCODER_NULL_LINE   PAL_LINE( GPIOD, 3 )
+#define ENCODER_CH_A_PAD    5
+#define ENCODER_CH_B_PAD    4
+#define ENCODER_NULL_PAD    3
+
+#define ENCODER_CH_A_LINE   PAL_LINE( GPIOD, ENCODER_CH_A_PAD )
+#define ENCODER_CH_B_LINE   PAL_LINE( GPIOD, ENCODER_CH_B_PAD )
+#define ENCODER_NULL_LINE   PAL_LINE( GPIOD, ENCODER_NULL_PAD )
 
 /*******************************/
 
@@ -234,9 +238,13 @@ static void extcb_base(EXTDriver *extp, expchannel_t channel)
     (void)extp;
     (void)channel;
 
+    enc_tick_cntr    += 1;
+
+#if 0
     /***    To define direction of encoder rotation  ***/
     if( enc_dir_state )   enc_tick_cntr    += 1;   // counterclockwise
     else                  enc_tick_cntr    -= 1;   // clockwise
+#endif
 
 
     /***    Reset counter when it reaches the MAX value  ***/
@@ -283,35 +291,31 @@ static void extcb_null(EXTDriver *extp, expchannel_t channel)
 /*** Configuration structures ***/
 /********************************/
 
-
+#if 0
 static const EXTConfig extcfg =
 {
+ .channels =
    {
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD , extcb_null}, // PD3
-    {EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD , extcb_dir},  // PD4
-    {EXT_CH_MODE_BOTH_EDGES  | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD , extcb_base}, // PD5
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL}
+        [0]  = {EXT_CH_MODE_DISABLED, NULL},
+        [1]  = {EXT_CH_MODE_DISABLED, NULL},
+        [2]  = {EXT_CH_MODE_DISABLED, NULL},
+        [3]  = {EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD , extcb_null}, //PD3
+        [4]  = {EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD , extcb_dir},  //PD4
+        [5]  = {EXT_CH_MODE_BOTH_EDGES  | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD , extcb_base}, //PD5
+        [6]  = {EXT_CH_MODE_DISABLED, NULL},
+        [7]  = {EXT_CH_MODE_DISABLED, NULL},
+        [8]  = {EXT_CH_MODE_DISABLED, NULL},
+        [9]  = {EXT_CH_MODE_DISABLED, NULL},
+        [10] = {EXT_CH_MODE_DISABLED, NULL},
+        [11] = {EXT_CH_MODE_DISABLED, NULL},
+        [12] = {EXT_CH_MODE_DISABLED, NULL},
+        [13] = {EXT_CH_MODE_DISABLED, NULL},
+        [14] = {EXT_CH_MODE_DISABLED, NULL},
+        [15] = {EXT_CH_MODE_DISABLED, NULL},
   }
 };
+#endif
+
 
 static bool         isInitialized       = false;
 
@@ -321,13 +325,66 @@ static bool         isInitialized       = false;
  */
 void lldEncoderInit( void )
 {
-    if ( isInitialized )
-            return;
+    //if ( isInitialized )
+           // return;
 
-    extStart( &EXTD1, &extcfg );
+   // extStart( &EXTD1, &extcfg );
+
+#if 0
+
+    EXTConfig extcfg =
+    {
+     .channels =
+      {
+        [3]  = {EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD , extcb_null}, //PD3
+        [4]  = {EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD , extcb_dir},  //PD4
+        [5]  = {EXT_CH_MODE_BOTH_EDGES  | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD , extcb_base}, //PD5
+
+      }
+    };
+#endif
+
+
+    /* Define channel config structure */
+    EXTChannelConfig A_ch_conf, B_ch_conf, NULL_ch_conf;
+
+    /* Fill in configuration for channel */
+    A_ch_conf.mode  = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD;
+    A_ch_conf.cb    = extcb_base;
+
+    B_ch_conf.mode  = EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD;
+    B_ch_conf.cb    = extcb_dir;
+
+    NULL_ch_conf.mode  = EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD;
+    NULL_ch_conf.cb    = extcb_null;
+
+    /*EXT driver initialization*/
+    commonExtDriverInit();
+
+    /* Set channel (second arg) mode with filled configuration */
+    extSetChannelMode( &EXTD1, ENCODER_CH_A_PAD, &A_ch_conf );
+    extSetChannelMode( &EXTD1, ENCODER_CH_B_PAD, &B_ch_conf );
+    extSetChannelMode( &EXTD1, ENCODER_NULL_PAD, &NULL_ch_conf );
+
+
+#if 0
+    /* Set up EXT channels hardware pin mode as digital input  */
+    palSetLineMode( ENCODER_CH_A_LINE, PAL_MODE_INPUT_PULLDOWN ); // enable button
+    palSetLineMode( ENCODER_CH_B_LINE, PAL_MODE_INPUT_PULLDOWN ); // direction button
+    palSetLineMode( ENCODER_NULL_LINE, PAL_MODE_INPUT_PULLDOWN ); // enable button
+#endif
+
+
+
+#if 1
+    /* Set up EXT channel hardware pin mode as digital input  */
+    palSetLineMode( ENCODER_CH_A_LINE, PAL_MODE_INPUT_PULLUP );
+    palSetLineMode( ENCODER_CH_B_LINE, PAL_MODE_INPUT_PULLUP );
+    palSetLineMode( ENCODER_NULL_LINE, PAL_MODE_INPUT_PULLUP );
+#endif
 
     /* Set initialization flag */
-    isInitialized = true;
+    //isInitialized = true;
 }
 
 /**

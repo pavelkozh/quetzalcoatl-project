@@ -13,15 +13,32 @@
  */
 
 
-
+/******************/
 /*** Prototypes ***/
-
+/******************/
 
 /* @brief: starts PWM Driver.
  *         Not enable. Enabling with certain duty cycle
  *         need to be done separately.
  */
 void PWMUnitInit ( void );
+
+
+/*
+ * @brief: lld control module initialization
+ *         EXT driver initialization (buttons enable/disable, start/stop,
+ *                                    left/right direction)
+ *         setup PUL, DIR, EN control pins
+ */
+void lldControlInit( void );
+
+
+/*
+ * @brief:    detect if driver enable or not (depends on buttons state)
+ * @return:   true  - if enable and in start mode,
+ *            false - if disable or in stop mode .
+ */
+bool ifDriverEnable ( void );
 
 
 #endif /* INCLUDE_LLD_CONTROL_H */

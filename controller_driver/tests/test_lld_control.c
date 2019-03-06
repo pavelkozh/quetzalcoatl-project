@@ -3,23 +3,7 @@
 #include <lld_sensor_module.h>
 #include <chprintf.h>
 
-/* BUTTONS*/
-#define DRIVE_START_BUTTON_PORT       GPIOE
-#define DRIVE_START_BUTTON_PIN        4
 
-#define DRIVE_DIR_BUTTON_PORT         GPIOE
-#define DRIVE_DIR_BUTTON_PIN          5
-
-#define DRIVE_ENABLE_BUTTON_PORT      GPIOE
-#define DRIVE_ENABLE_BUTTON_PIN       6
-
-
-/*Control pins*/
-#define CONTROL_DRIVE_ENABLE_PORT     GPIOF
-#define CONTROL_DRIVE_ENABLE_PIN      14
-
-#define CONTROL_DRIVE_DIR_PORT        GPIOE
-#define CONTROL_DRIVE_DIR_PIN         11
 
 
 static const SerialConfig sdcfg = {
@@ -27,13 +11,13 @@ static const SerialConfig sdcfg = {
   .cr1 = 0, .cr2 = 0, .cr3 = 0
 };
 
-static bool right_dir = 0, left_dir = 0, drive_enable = 0, drive_start = 0;
+//static bool right_dir = 0, left_dir = 0, drive_enable = 0, drive_start = 0;
 static uint16_t Ain = 0, period_s = 0;
 static float duty_cucle = 0.0;
 static uint8_t rcv_data = 0, sd_buff[10];
 int8_t *sd_value;
 
-
+#if 0
 static void extcb( EXTDriver *extp, expchannel_t channel )
 {
     /* to avoid warnings */
@@ -130,6 +114,7 @@ static void extcb( EXTDriver *extp, expchannel_t channel )
 
     }
 }
+#endif
 
 #if 0
 /* EXT Driver configuration */
@@ -171,10 +156,13 @@ void TestPWMRouting (void)
   palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
 
 
-  PWMUnitInit();
+ // PWMUnitInit();
   commonADC1UnitInit();
+  lldCcontrolInit();
 
+  bool motor_run_enable = 0;
 
+#if 0
   /* Define channel config structure */
   EXTChannelConfig ch_conf;
 
@@ -200,26 +188,25 @@ void TestPWMRouting (void)
   palSetPadMode( GPIOF, CONTROL_DRIVE_ENABLE_PIN, PAL_MODE_OUTPUT_PUSHPULL ); // enable output (control signal)
 
 
-
+#endif
 
   while (1)
   {
       Ain = commonADC1UnitGetValue ( 1 );
       //duty_cucle = (float)Ain * 10000.0 / 4096.0;
-
       //period_s = (  Ain * 1000 / 4096 );
       //pwmChangePeriod(&PWMD1, 5000);
 
+      motor_run_enable =  ifDriverEnable ();
 
 
 
-     // if ( drive_enable && drive_start )
-      if ( drive_start )
+#if 1
+      if ( motor_run_enable )
       {
-          //pwmEnableChannel( &PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH (&PWMD1, (uint16_t)(duty_cucle) ) );
           pwmEnableChannel( &PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH (&PWMD1,5000) );
       }
-#if 1
+
       else
       {
           pwmEnableChannel( &PWMD1, 0, 0 );
