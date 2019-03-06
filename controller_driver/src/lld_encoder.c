@@ -201,7 +201,7 @@ Position_t encoderGetPosition ( void )
 #include <tests.h>
 #include <lld_encoder.h>
 
-#define ENC_MAX_TICK_NUM        1000
+#define ENC_MAX_TICK_NUM        2000  // 1000 * 2 (BOTH_EDGES)
 
 /*******************************/
 /***    LINE CONFIGURATION   ***/
@@ -235,16 +235,9 @@ static void extcb_base(EXTDriver *extp, expchannel_t channel)
     (void)channel;
 
     /***    To define direction of encoder rotation  ***/
-    if( palReadLine( ENCODER_CH_B_LINE ) == 0 )
-    {
-        enc_tick_cntr    += 1;
-        enc_dir_state    = 1;       // counterclockwise
-    }
-    else
-    {
-        enc_tick_cntr    -= 1;
-        enc_dir_state    = 0;       // clockwise
-    }
+    if( enc_dir_state )   enc_tick_cntr    += 1;   // counterclockwise
+    else                  enc_tick_cntr    -= 1;   // clockwise
+
 
     /***    Reset counter when it reaches the MAX value  ***/
     /***    Count encoder revolutions                    ***/
@@ -265,6 +258,12 @@ static void extcb_dir(EXTDriver *extp, expchannel_t channel)
 {
     (void)extp;
     (void)channel;
+
+    if( palReadLine( ENCODER_CH_A_LINE ) == 0 )
+        enc_dir_state    = 1;       // counterclockwise
+    else
+        enc_dir_state    = 0;       // clockwise
+
 
 }
 
@@ -292,8 +291,8 @@ static const EXTConfig extcfg =
     {EXT_CH_MODE_DISABLED, NULL},
     {EXT_CH_MODE_DISABLED, NULL},
     {EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD , extcb_null}, // PD3
-    {EXT_CH_MODE_BOTH_EDGES  | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD , extcb_dir},  // PD4
-    {EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD , extcb_base}, // PD5
+    {EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD , extcb_dir},  // PD4
+    {EXT_CH_MODE_BOTH_EDGES  | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD , extcb_base}, // PD5
     {EXT_CH_MODE_DISABLED, NULL},
     {EXT_CH_MODE_DISABLED, NULL},
     {EXT_CH_MODE_DISABLED, NULL},
@@ -360,7 +359,7 @@ bool lldGetEncoderDirection( void )
  */
 rawRevEncoderValue_t   lldGetEncoderRawRevs( void )
 {
-    return ( enc_revs_cntr + enc_tick_cntr / (float)ENC_MAX_TICK_NUM );
+    return ( enc_revs_cntr + ( enc_tick_cntr / (float)ENC_MAX_TICK_NUM ) );
 }
 
 /**
