@@ -12,9 +12,10 @@
 #define     PROGRAM_ROUTINE_TEST_ADC                    1
 #define     PROGRAM_ROUTINE_TEST_PWM                    2
 #define     PROGRAM_ROUTINE_TEST_TRANSFER_FUNC          3
+#define     PROGRAM_ROUTINE_TEST_ENCODER                4
 
 
-#define     MAIN_PROGRAM_ROUTINE              PROGRAM_ROUTINE_TEST_PWM
+#define     MAIN_PROGRAM_ROUTINE              PROGRAM_ROUTINE_TEST_ENCODER
 
 
 

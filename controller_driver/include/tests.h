@@ -3,6 +3,7 @@
 
 #include <common.h>
 
+
 /*
  * @brief   Routine of ADC module testing
  * @note    The routine has internal infinite loop
@@ -27,6 +28,12 @@ void TestPWMRouting (void);
 void testTFCalcRouting ( void );
 
 
+/*
+ * @brief  Routing for encoder module testing
+ */
+void TestEncoderRouting (void);
+
+
 
 
 
@@ -44,6 +51,10 @@ static inline void testsRoutines( void )
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_TRANSFER_FUNC)
 
     testTFCalcRouting();
+
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ENCODER)
+
+    TestEncoderRouting();
 
 #endif
 }

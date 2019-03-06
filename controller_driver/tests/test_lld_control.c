@@ -131,6 +131,7 @@ static void extcb( EXTDriver *extp, expchannel_t channel )
     }
 }
 
+#if 0
 /* EXT Driver configuration */
 static const EXTConfig extcfg = {
   .channels =
@@ -153,30 +154,50 @@ static const EXTConfig extcfg = {
     [15] = {EXT_CH_MODE_DISABLED, NULL},
   }
 };
+#endif
 
+#if 0
 void testPWMRoutingInit ( void )
 {
 
 }
+#endif
 
 void TestPWMRouting (void)
 {
-  PWMUnitInit();
-  commonADC1UnitInit();
-
-  /*EXT driver initialization*/
-  commonExtDriverInit();
-
+  /* Serial driver configuration*/
   sdStart( &SD3, &sdcfg );
   palSetPadMode( GPIOD, 8, PAL_MODE_ALTERNATE(7) );   // TX
   palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
 
-  palSetPadMode( GPIOE, 4, PAL_MODE_INPUT_PULLDOWN ); // enable button
-  palSetPadMode( GPIOE, 5, PAL_MODE_INPUT_PULLDOWN ); // direction button
-  palSetPadMode( GPIOE, 6, PAL_MODE_INPUT_PULLDOWN ); // enable button
 
-  palSetPadMode( GPIOE, 11, PAL_MODE_OUTPUT_PUSHPULL ); // direction output (control signal)
-  palSetPadMode( GPIOF, 14, PAL_MODE_OUTPUT_PUSHPULL ); // enable output (control signal)
+  PWMUnitInit();
+  commonADC1UnitInit();
+
+
+  /* Define channel config structure */
+  EXTChannelConfig ch_conf;
+
+  /* Fill in configuration for channel */
+  ch_conf.mode  = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOE;
+  ch_conf.cb    = extcb;
+
+  /*EXT driver initialization*/
+  commonExtDriverInit();
+
+  /* Set channel (second arg) mode with filled configuration */
+  extSetChannelMode( &EXTD1, DRIVE_START_BUTTON_PIN, &ch_conf );
+  extSetChannelMode( &EXTD1, DRIVE_DIR_BUTTON_PIN, &ch_conf );
+  extSetChannelMode( &EXTD1, DRIVE_ENABLE_BUTTON_PIN, &ch_conf );
+
+  /* Set up EXT channels hardware pin mode as digital input  */
+  palSetPadMode( GPIOE, DRIVE_START_BUTTON_PIN,  PAL_MODE_INPUT_PULLDOWN ); // enable button
+  palSetPadMode( GPIOE, DRIVE_DIR_BUTTON_PIN,    PAL_MODE_INPUT_PULLDOWN ); // direction button
+  palSetPadMode( GPIOE, DRIVE_ENABLE_BUTTON_PIN, PAL_MODE_INPUT_PULLDOWN ); // enable button
+
+  /* Set up hardware pin mode as digital output  */
+  palSetPadMode( GPIOE, CONTROL_DRIVE_DIR_PIN,    PAL_MODE_OUTPUT_PUSHPULL ); // direction output (control signal)
+  palSetPadMode( GPIOF, CONTROL_DRIVE_ENABLE_PIN, PAL_MODE_OUTPUT_PUSHPULL ); // enable output (control signal)
 
 
 

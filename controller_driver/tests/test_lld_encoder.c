@@ -16,8 +16,16 @@ void TestEncoderRouting (void)
     palSetPadMode( GPIOD, 8, PAL_MODE_ALTERNATE(7) );   // TX
     palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
 
+    Position_t pos = 0.0;
+    Velocity_t vel = 0.0;
+
     while ( 1 )
     {
+        pos = encoderGetPosition ( );
+        vel = encoderGetVelocity ( );
+        chprintf( (BaseSequentialStream *)&SD3, "pos: %d\t vel: %d\t n\r", (int16_t) (pos*100), (int16_t) (vel*100) );
+
+        chThdSleepMilliseconds( 10 );
 
     }
 }
