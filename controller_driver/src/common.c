@@ -17,7 +17,7 @@ void commonExtDriverInit ( void )
     if ( m_extDriverInitialized )
         return;
 
-    EXTConfig extcfg;
+    static EXTConfig extcfg;
     for ( expchannel_t ch = 0; ch < EXT_MAX_CHANNELS; ch++ )
     {
         extcfg.channels[ch].mode  = EXT_CH_MODE_DISABLED;

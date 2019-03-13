@@ -107,16 +107,14 @@ static void extcb_start_button( EXTDriver *extp, expchannel_t channel )
     if ( palReadPad ( DRIVE_START_BUTTON_PORT, DRIVE_START_BUTTON_PIN ) )
     {
         drive_start = 1;
-//        palSetLine(LINE_LED3);
-//        sdWrite(&SD3, "s1",2);
+        palSetLine(LINE_LED3);
     }
     else
     {
         drive_start = 0;
-//        palClearLine(LINE_LED3);
-//        sdWrite(&SD3, "s2",2);
+        palClearLine(LINE_LED3);
     }
-//    palSetLine(LINE_LED2);
+
 }
 
 /* Driver DIRECTION toggle button changing state occure:
@@ -133,7 +131,7 @@ static void extcb_dir_button( EXTDriver *extp, expchannel_t channel )
     {
         left_dir = 0;
         right_dir = 1;
-        //palClearLine( LINE_LED3 );
+        palClearLine( LINE_LED2 );
 
         /* to control driver's "direction" pin */
         palSetPad ( CONTROL_DRIVE_DIR_PORT, CONTROL_DRIVE_DIR_PIN );
@@ -143,16 +141,24 @@ static void extcb_dir_button( EXTDriver *extp, expchannel_t channel )
     {
         right_dir = 0;
         left_dir = 1;
-       // palSetLine( LINE_LED3 );
+        palSetLine( LINE_LED2 );
 
         /* to control driver's "direction" pin */
         palClearPad (  CONTROL_DRIVE_DIR_PORT, CONTROL_DRIVE_DIR_PIN );
     }
 }
 
+static bool         lld_control_Initialized       = false;
 
+/**
+ * @brief   Initialize periphery that used for control motor
+ * @note    Stable for repeated calls
+ */
 void lldControlInit ( void )
 {
+      if ( lld_control_Initialized )
+                return;
+
       /*EXT driver initialization*/
       commonExtDriverInit();
 
@@ -169,27 +175,32 @@ void lldControlInit ( void )
       dir_b_ch_conf.mode  = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOE;
       dir_b_ch_conf.cb    = extcb_dir_button;
 
+      /* Set up EXT channels hardware pin mode as digital input.
+       * Needs to be set up before set EXT channel mode! */
       palSetPadMode( GPIOE, DRIVE_START_BUTTON_PIN,  PAL_MODE_INPUT_PULLDOWN ); // enable button
       palSetPadMode( GPIOE, DRIVE_ENABLE_BUTTON_PIN, PAL_MODE_INPUT_PULLDOWN ); // enable button
+      palSetPadMode( GPIOE, DRIVE_DIR_BUTTON_PIN,    PAL_MODE_INPUT_PULLDOWN ); // direction button
+
       /* Set channel (second arg) mode with filled configuration */
-//      extSetChannelMode( &EXTD1, DRIVE_ENABLE_BUTTON_PIN, &en_b_ch_conf    );
-//      extSetChannelMode( &EXTD1, DRIVE_START_BUTTON_PIN,  &start_b_ch_conf );
-//      extSetChannelMode( &EXTD1, DRIVE_DIR_BUTTON_PIN,    &dir_b_ch_conf   );
+      extSetChannelMode( &EXTD1, DRIVE_ENABLE_BUTTON_PIN, &en_b_ch_conf    );
+      extSetChannelMode( &EXTD1, DRIVE_START_BUTTON_PIN,  &start_b_ch_conf );
+      extSetChannelMode( &EXTD1, DRIVE_DIR_BUTTON_PIN,    &dir_b_ch_conf   );
 
-      /* Set up EXT channels hardware pin mode as digital input  */
-
-//      palSetPadMode( GPIOE, DRIVE_DIR_BUTTON_PIN,    PAL_MODE_INPUT_PULLDOWN ); // direction button
-//
 
       /* Set up hardware pin mode as digital output  */
       palSetPadMode( GPIOE, CONTROL_DRIVE_DIR_PIN,    PAL_MODE_OUTPUT_PUSHPULL ); // direction output (control signal)
       palSetPadMode( GPIOF, CONTROL_DRIVE_ENABLE_PIN, PAL_MODE_OUTPUT_PUSHPULL ); // enable output (control signal)
 
+      /* PWM Unit initialization */
       PWMUnitInit();
+
+      /* Set initialization flag */
+      lld_control_Initialized = true;
 }
 
 bool ifDriverEnable ( void )
 {
+#if 0
     if ( palReadPad ( DRIVE_ENABLE_BUTTON_PORT, DRIVE_ENABLE_BUTTON_PIN ) )
     {
         drive_enable = 0;
@@ -214,7 +225,23 @@ bool ifDriverEnable ( void )
     //&& drive_enable
     return palReadPad ( DRIVE_START_BUTTON_PORT, DRIVE_START_BUTTON_PIN );
 
+#endif
+
     if ( drive_start  )                return 1;
     else                               return 0;
 }
 
+void motorRun ( void )
+{
+    bool motor_run_enable = 0;
+
+    motor_run_enable   =  ifDriverEnable ();
+    if ( motor_run_enable )
+    {
+        pwmEnableChannel( &PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH ( &PWMD1, 5000 ) );
+    }
+    else
+    {
+        pwmEnableChannel( &PWMD1, 0, 0 );
+    }
+}

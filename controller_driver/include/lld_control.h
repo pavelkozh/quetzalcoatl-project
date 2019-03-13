@@ -41,4 +41,11 @@ void lldControlInit( void );
 bool ifDriverEnable ( void );
 
 
+/*
+ * @brief:   enable PWM channel if enable button pressed
+ * @note :   duty cycle always 50%
+ */
+void motorRun ( void );
+
+
 #endif /* INCLUDE_LLD_CONTROL_H */
