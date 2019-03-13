@@ -15,7 +15,8 @@ static const SerialConfig sdcfg = {
 static uint16_t Ain = 0, period_s = 0;
 static float duty_cucle = 0.0;
 static uint8_t rcv_data = 0, sd_buff[10];
-int8_t *sd_value;
+int16_t *sd_value;
+int16_t rcv_value = 0;
 
 
 
@@ -28,53 +29,30 @@ void TestPWMRouting (void)
 
 
   commonADC1UnitInit();
-  lldCcontrolInit();
+  lldControlInit();
 
-  bool motor_run_enable = 0;
+
 
 
 
   while (1)
   {
-      Ain = commonADC1UnitGetValue ( 1 );
+      //Ain = commonADC1UnitGetValue ( 1 );
       //duty_cucle = (float)Ain * 10000.0 / 4096.0;
       //period_s = (  Ain * 1000 / 4096 );
       //pwmChangePeriod(&PWMD1, 5000);
 
-      motor_run_enable =  ifDriverEnable ();
-
-
-
-#if 1
-      if ( motor_run_enable )
-      {
-          pwmEnableChannel( &PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH (&PWMD1,5000) );
-      }
-
-      else
-      {
-          pwmEnableChannel( &PWMD1, 0, 0 );
-      }
-
-#endif
-
-      //chprintf( (BaseSequentialStream *)&SD7, "ADC:  %d\t En %d\t DirR %d\t DirL %d\t Duty %d\n\r",
-           //     Ain, drive_enable, right_dir, left_dir, *sd_value   );
+      motorRun();
 
 
       /* read data from serial */
-      //rcv_data = sdGetTimeout( &SD7, TIME_IMMEDIATE );
-      int test = sdReadTimeout( &SD3, sd_buff, 4, TIME_IMMEDIATE   );
-      sd_value = &sd_buff[3];
+      sdReadTimeout( &SD3, sd_buff, 4, TIME_IMMEDIATE   );
+      rcv_value = atoi(sd_buff);
 
-      uint8_t *sign;
-      chprintf( (BaseSequentialStream *)&SD3, "%d\n\r",
-                     *sd_value   );
+      chprintf( (BaseSequentialStream *)&SD3, "%d\n\r", rcv_value );
 
-
-
-
-
-      chThdSleepMilliseconds( 10 );
+      //motorSetSpeed ( rcv_value );
+      //setPwmPeriod ( rcv_value );
+      chThdSleepMilliseconds( 100 );
   }
 }

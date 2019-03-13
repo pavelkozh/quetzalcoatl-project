@@ -29,7 +29,7 @@ static volatile bool right_dir = 0, left_dir = 0, drive_enable = 0, drive_start 
 /*********  PWM Unit    *********/
 /********************************/
 
-#define PWM_FREQ           1000000  /* PWM clock frequency [Hz] */
+#define PWM_FREQ           10000000  /* PWM clock frequency [Hz] */
 #define PWM_PERIOD         100      /* PWM period[tics]  */
 
 PWMConfig pwm1conf = {
@@ -200,33 +200,6 @@ void lldControlInit ( void )
 
 bool ifDriverEnable ( void )
 {
-#if 0
-    if ( palReadPad ( DRIVE_ENABLE_BUTTON_PORT, DRIVE_ENABLE_BUTTON_PIN ) )
-    {
-        drive_enable = 0;
-
-        /* to indicate "enable" button state */
-        palClearLine( LINE_LED1 );
-
-        /* to control driver's "enable" pin */
-        palSetPad ( CONTROL_DRIVE_ENABLE_PORT, CONTROL_DRIVE_ENABLE_PIN );
-    }
-    else
-    {
-        drive_enable = 1;
-
-        /* to indicate "enable" button state */
-        palSetLine( LINE_LED1 );
-
-        /* to control driver's "enable" pin */
-        palClearPad ( CONTROL_DRIVE_ENABLE_PORT, CONTROL_DRIVE_ENABLE_PIN );
-    }
-
-    //&& drive_enable
-    return palReadPad ( DRIVE_START_BUTTON_PORT, DRIVE_START_BUTTON_PIN );
-
-#endif
-
     if ( drive_start  )                return 1;
     else                               return 0;
 }
@@ -244,4 +217,57 @@ void motorRun ( void )
     {
         pwmEnableChannel( &PWMD1, 0, 0 );
     }
+}
+
+
+#define MAX_MOTOR_SPEED_RPM          4000  /*Maximal frequency of Motor (rpm)*/
+#define LINEAR_MOVEMENT_STEP_MM      5   /*The distance that passes the carriage for 1 revolution of the shaft in mm*/
+#define SHAFT_LENGTH_MM              300 /*mm*/
+
+/*
+ * @brief :    The function converts the motor speed specified as a percentage
+ *             to the PWM period (number of ticks).
+ * @params:    v - may take values in the range (-100% - 100%);
+ *             PWMConfig - PWM unit configuration structure
+ * @return:    PWM period in ticks
+ */
+uint32_t mSpeed2pwmPeriodRecalc ( int8_t v )
+{
+    float ticks = 0;
+
+    if(v > 100 || v < -100) v = 100; //Check for going beyond the zone from -100 to 100
+    if(v == 0) return ticks = 0; //If the speed is 0, the ticks are 0
+    else if(v < 0) v *= -1; //If the speed is negative then make it positive
+
+    ticks = ( ( pwm1conf.frequency / MAX_MOTOR_SPEED_RPM / 60 ) * v ) / 100; //Ticks calculation
+
+    return ticks;
+}
+
+
+void setPwmPeriod ( uint16_t pwm_period_ticks )
+{
+    //pwmcnt_t pwm_period_ticks = 0;
+    //pwm_period_ticks = mSpeed2pwmPeriodRecalc ( speed );
+    pwmChangePeriod(&PWMD1, pwm_period_ticks);
+
+    //chprintf( (BaseSequentialStream *)&SD3, "%d\n\r", pwm_period_ticks );
+    //chThdSleepMilliseconds( 10 );
+
+
+}
+
+/*
+ *
+ */
+void motorSetSpeed ( int8_t speed )
+{
+    pwmcnt_t pwm_period_ticks = 0;
+    pwm_period_ticks = mSpeed2pwmPeriodRecalc ( speed );
+    pwmChangePeriod(&PWMD1, pwm_period_ticks);
+
+    chprintf( (BaseSequentialStream *)&SD3, "%d\n\r", pwm_period_ticks );
+    chThdSleepMilliseconds( 10 );
+
+
 }

@@ -48,4 +48,28 @@ bool ifDriverEnable ( void );
 void motorRun ( void );
 
 
+/*
+ * @brief :    The function converts the motor speed specified as a percentage
+ *             to the PWM period (number of ticks).
+ * @params:    speed - may take values in the range (-100% - 100%);
+ *             PWMConfig - PWM unit configuration structure
+ * @return:    PWM period in ticks
+ */
+uint32_t mSpeed2pwmPeriodRecalc ( int8_t speed );
+
+
+/*
+ * @brief :   function change PWM period
+ * @params:   speed - may take values in the range (-100% - 100%);
+ *            PWMConfig - PWM unit configuration structure
+ */
+void motorSetSpeed ( int8_t speed );
+
+
+/*
+ *
+ */
+void setPwmPeriod ( uint16_t pwm_period_ticks );
+
+
 #endif /* INCLUDE_LLD_CONTROL_H */
