@@ -6,7 +6,6 @@
 /*******************************/
 /***    LINE CONFIGURATION   ***/
 /*******************************/
-
 #define ENCODER_CH_A_PAD    7
 #define ENCODER_CH_B_PAD    8
 #define ENCODER_NULL_PAD    9
@@ -14,22 +13,45 @@
 #define ENCODER_CH_A_LINE   PAL_LINE( GPIOF, ENCODER_CH_A_PAD )
 #define ENCODER_CH_B_LINE   PAL_LINE( GPIOF, ENCODER_CH_B_PAD )
 #define ENCODER_NULL_LINE   PAL_LINE( GPIOF, ENCODER_NULL_PAD )
-
 /*******************************/
 
 
 /***********************************/
 /***    Variable CONFIGURATION   ***/
 /***********************************/
-
 volatile rawEncoderValue_t       enc_tick_cntr       = 0;
 volatile rawRevEncoderValue_t    enc_revs_cntr       = 0;
-
 volatile rawEncoderValue_t       enc_null_revs_cntr  = 0;
-
 volatile bool                    enc_dir_state       = 0;
 
+int32_t impulseCounter      = 0,
+        prev_time           = 0,
+        prev_prev_time      = 0,
+        measured_width      = 0;
+
+
+int32_t overflow_counter    = 0;
+int32_t prev_overflow_cntr  = 0;
 /***********************************/
+
+
+
+/**********************************/
+/***    GPT UNIT CONFIGURATION  ***/
+/**********************************/
+static void gpt_overflow_cb ( GPTDriver *timeIntervalsDriver );
+static GPTDriver                        *timeIntervalsDriver = &GPTD3;
+/* Timer period = 50 ms */
+#define TimerPeriod             50000
+static const GPTConfig timeIntervalsCfg = {
+                                             .frequency      =  1000000,// 1 MHz
+                                             .callback       =  gpt_overflow_cb,
+                                             .cr2            =  0,
+                                             .dier           =  0U
+
+};
+
+
 
 
 /***    Base channel processing     ***/

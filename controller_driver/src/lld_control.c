@@ -224,8 +224,7 @@ void motorRun ( void )
 
 #define MAX_MOTOR_SPEED_RPM          4000    /*Maximal frequency of Motor (rpm)*/
 #define MAX_DRIVE_SPEED_HZ           100000  /*Maximal driver frequency (Hz)*/
-#define LINEAR_MOVEMENT_STEP_MM      5   /*The distance that passes the carriage for 1 revolution of the shaft in mm*/
-#define SHAFT_LENGTH_MM              300 /*mm*/
+
 
 /*
  * @brief :    The function converts the motor speed specified as a percentage
