@@ -53,8 +53,8 @@ Driver | Pins | Input / Output
 -------|------|-------
 
 ## Analoge sensors unit
--------|------|-------
-Driver | Pins | Input / Output 
-ADC1   | PC0  | Input   
-ADC1   | PA3  | Input   
-GPT4   | Trg  |  -     
+Driver | Pins | Input / Output | Description 
+-------|------|----------------|-----------
+ADC1   | PC0  | Analog Input   | -
+ADC1   | PA3  | Analog Input   | - 
+GPT4   | Trg  |  -             |    
