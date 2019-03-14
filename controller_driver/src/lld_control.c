@@ -1,4 +1,5 @@
 #include <lld_control.h>
+#include <math.h>
 
 /* BUTTONS*/
 #define DRIVE_START_BUTTON_PORT       GPIOE
@@ -19,7 +20,7 @@
 #define CONTROL_DRIVE_DIR_PIN         11
 
 /* Variables */
-static volatile bool right_dir = 0, left_dir = 0, drive_enable = 0, drive_start = 0;
+static volatile bool  drive_dir = 0, drive_enable = 0, drive_start = 0;
 
 
 
@@ -30,7 +31,7 @@ static volatile bool right_dir = 0, left_dir = 0, drive_enable = 0, drive_start 
 /********************************/
 
 #define PWM_FREQ           10000000  /* PWM clock frequency [Hz] */
-#define PWM_PERIOD         100      /* PWM period[tics]  */
+#define PWM_PERIOD         200      /* PWM period[tics]  */
 
 PWMConfig pwm1conf = {
     /* 10kHz PWM clock frequency.   */
@@ -129,8 +130,9 @@ static void extcb_dir_button( EXTDriver *extp, expchannel_t channel )
 
     if ( palReadPad (DRIVE_DIR_BUTTON_PORT, DRIVE_DIR_BUTTON_PIN) )
     {
-        left_dir = 0;
-        right_dir = 1;
+        //left_dir = 0;
+        //right_dir = 1;
+        drive_dir = 1; // clockwise
         palClearLine( LINE_LED2 );
 
         /* to control driver's "direction" pin */
@@ -139,8 +141,9 @@ static void extcb_dir_button( EXTDriver *extp, expchannel_t channel )
     }
     else
     {
-        right_dir = 0;
-        left_dir = 1;
+        //right_dir = 0;
+        //left_dir = 1;
+        drive_dir = 0; // counterclockwise
         palSetLine( LINE_LED2 );
 
         /* to control driver's "direction" pin */
@@ -220,54 +223,88 @@ void motorRun ( void )
 }
 
 
-#define MAX_MOTOR_SPEED_RPM          4000  /*Maximal frequency of Motor (rpm)*/
+#define MAX_MOTOR_SPEED_RPM          4000    /*Maximal frequency of Motor (rpm)*/
+#define MAX_DRIVE_SPEED_HZ           100000  /*Maximal driver frequency (Hz)*/
 #define LINEAR_MOVEMENT_STEP_MM      5   /*The distance that passes the carriage for 1 revolution of the shaft in mm*/
 #define SHAFT_LENGTH_MM              300 /*mm*/
 
 /*
  * @brief :    The function converts the motor speed specified as a percentage
  *             to the PWM period (number of ticks).
- * @params:    v - may take values in the range (-100% - 100%);
+ * @params:    v - may take values in the range ( 0%...100% );
  *             PWMConfig - PWM unit configuration structure
  * @return:    PWM period in ticks
  */
-uint32_t mSpeed2pwmPeriodRecalc ( int8_t v )
+pwmcnt_t mSpeed2pwmPeriodRecalc ( uint8_t v )
 {
-    float ticks = 0;
+    pwmcnt_t ticks = 0;
 
-    if(v > 100 || v < -100) v = 100; //Check for going beyond the zone from -100 to 100
-    if(v == 0) return ticks = 0; //If the speed is 0, the ticks are 0
-    else if(v < 0) v *= -1; //If the speed is negative then make it positive
+    //if(v > 100 || v < -100) v = 100; //Check for going beyond the zone from -100 to 100
+    //if(v == 0) return ticks = 0; //If the speed is 0, the ticks are 0
+    //else if(v < 0) v *= -1; //If the speed is negative then make it positive
 
-    ticks = ( ( pwm1conf.frequency / MAX_MOTOR_SPEED_RPM / 60 ) * v ) / 100; //Ticks calculation
+    ticks = pwm1conf.frequency / (MAX_DRIVE_SPEED_HZ / 100 * v ); //Ticks calculation
 
     return ticks;
 }
 
 
+/*
+ * @brief :  directly change PWM period
+ * @params:  desired PWM period in ticks
+ */
 void setPwmPeriod ( uint16_t pwm_period_ticks )
 {
-    //pwmcnt_t pwm_period_ticks = 0;
-    //pwm_period_ticks = mSpeed2pwmPeriodRecalc ( speed );
     pwmChangePeriod(&PWMD1, pwm_period_ticks);
-
-    //chprintf( (BaseSequentialStream *)&SD3, "%d\n\r", pwm_period_ticks );
-    //chThdSleepMilliseconds( 10 );
-
-
 }
+
 
 /*
- *
+ * @brief : function set PWM period to control speed of rotation
+ *          and set hardware pins which controls direction of rotation.
+ * @params: speed in the range -100%...100% (sign specify direction)
+ * @note  :
  */
-void motorSetSpeed ( int8_t speed )
+void mSetSpeed ( int8_t speed )
 {
     pwmcnt_t pwm_period_ticks = 0;
+
+    /* Check for going beyond the range -100...100 */
+    if ( speed > 100 || speed < -100 ) speed = 100;
+
+    /* If the speed is 0, the ticks are 0 */
+    if ( speed < 0 )
+    {
+        drive_dir = 0;
+        mSetDirection ( drive_dir );
+        speed = speed * (-1); //If the speed is negative then make it positive
+    }
+    else
+    {
+        drive_dir = 1;
+        mSetDirection ( drive_dir );
+    }
     pwm_period_ticks = mSpeed2pwmPeriodRecalc ( speed );
-    pwmChangePeriod(&PWMD1, pwm_period_ticks);
-
-    chprintf( (BaseSequentialStream *)&SD3, "%d\n\r", pwm_period_ticks );
-    chThdSleepMilliseconds( 10 );
-
+    setPwmPeriod ( pwm_period_ticks );
 
 }
+
+
+
+/*
+ * @brief :  set motor's rotation direction
+ * @params:  dir = 1 ->> clockwise rotation
+ *           dir = 0 ->> counterclockwise rotation
+ */
+void mSetDirection ( bool dir )
+{
+    if ( dir )  palSetPad ( CONTROL_DRIVE_DIR_PORT, CONTROL_DRIVE_DIR_PIN );
+    else        palClearPad ( CONTROL_DRIVE_DIR_PORT, CONTROL_DRIVE_DIR_PIN );
+}
+
+
+
+
+
+
+

@@ -51,25 +51,35 @@ void motorRun ( void );
 /*
  * @brief :    The function converts the motor speed specified as a percentage
  *             to the PWM period (number of ticks).
- * @params:    speed - may take values in the range (-100% - 100%);
+ * @params:    v - may take values in the range ( 0%...100% );
  *             PWMConfig - PWM unit configuration structure
  * @return:    PWM period in ticks
  */
-uint32_t mSpeed2pwmPeriodRecalc ( int8_t speed );
+pwmcnt_t mSpeed2pwmPeriodRecalc ( uint8_t v );
 
 
 /*
- * @brief :   function change PWM period
- * @params:   speed - may take values in the range (-100% - 100%);
- *            PWMConfig - PWM unit configuration structure
+ * @brief : function set PWM period to control speed of rotation
+ *          and set hardware pins which controls direction of rotation.
+ * @params: speed in the range -100%...100% (sign specify direction)
+ * @note  :
  */
-void motorSetSpeed ( int8_t speed );
+void mSetSpeed ( int8_t speed );
 
 
 /*
- *
+ * @brief :  directly change PWM period
+ * @params:  desired PWM period in ticks
  */
 void setPwmPeriod ( uint16_t pwm_period_ticks );
+
+
+/*
+ * @brief :  set motor's rotation direction
+ * @params:  dir = 1 ->> clockwise rotation
+ *           dir = 0 ->> counterclockwise rotation
+ */
+void mSetDirection ( bool dir );
 
 
 #endif /* INCLUDE_LLD_CONTROL_H */
