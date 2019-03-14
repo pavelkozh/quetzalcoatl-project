@@ -8,6 +8,7 @@
  * Hardware description
  * ------------------------------------
  * PC0, PA3 - ADC channels
+ * TIM4 for ADC
  */
 
 
