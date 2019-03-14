@@ -1,10 +1,10 @@
 # Controller periphery usage
 
 ## Encoder unit for clutch pedal actuator 
-Driver | Pins | Input / Output | Description
+Driver | Pins | Input / Output 
 EXT1   | PF7  | Input (chA)
 EXT1   | PF8  | Input (chB)
-GPT3   | Timer| -              | For speed calculation
+GPT3   | Timer| -              
 
 
 ## Encoder unit for brake pedal actuator 
@@ -25,13 +25,13 @@ Driver | Pins | Input / Output
 
 
 ## Clutch pedal actuator control unit 
-Driver | Pins | Input / Output | Description
-PWM1   | PE9  | Output         | PWM use TIM1
-EXT1   | PE6  | Input          | Enable button
-EXT1   | PE5  | Input          | Direction button
-EXT1   | PE4  | Input          | Start button
-PAL    | PF14 | Output         | Enable or disable motor (for driver)
-PAL    | PE11 | Output         | Control motor rotation direction (for driver)
+Driver | Pins | Input / Output 
+PWM1   | PE9  | Output         
+EXT1   | PE6  | Input    
+EXT1   | PE5  | Input   
+EXT1   | PE4  | Input  
+PAL    | PF14 | Output  
+PAL    | PE11 | Output  
 
 
 ## Brake pedal actuator control unit 
@@ -51,7 +51,7 @@ Driver | Pins | Input / Output
 -------|------|-------
 
 ## Analoge sensors unit
-Driver | Pins | Input / Output | Description
-ADC1   | PC0  | Input          | -
-ADC1   | PA3  | Input          | -
-GPT4   | Trg  |  -             | -
+Driver | Pins | Input / Output 
+ADC1   | PC0  | Input   
+ADC1   | PA3  | Input   
+GPT4   | Trg  |  -     
