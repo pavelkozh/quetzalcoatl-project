@@ -180,7 +180,7 @@ void lldEncoderInit( void )
     EXTChannelConfig A_ch_conf, B_ch_conf, NULL_ch_conf;
 
     /* Fill in configuration for channel */
-    A_ch_conf.mode     = EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOF; // EXT_CH_MODE_BOTH_EDGES
+    A_ch_conf.mode     = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOF; // EXT_CH_MODE_BOTH_EDGES
     A_ch_conf.cb       = extcb_base;
 
     B_ch_conf.mode     = EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOF;
