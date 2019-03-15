@@ -15,7 +15,7 @@
 #define     PROGRAM_ROUTINE_TEST_ENCODER                4
 
 
-#define     MAIN_PROGRAM_ROUTINE              PROGRAM_ROUTINE_TEST_PWM
+#define     MAIN_PROGRAM_ROUTINE              PROGRAM_ROUTINE_TEST_ENCODER
 
 
 

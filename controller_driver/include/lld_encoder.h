@@ -4,6 +4,7 @@
 #include <common.h>
 typedef int32_t    rawEncoderValue_t;
 typedef float      rawRevEncoderValue_t;
+typedef float      mVelocity_t;
 
 
 /**
@@ -43,6 +44,33 @@ rawRevEncoderValue_t   lldGetEncoderRawRevs( void );
  * @return  Encoder revolutions number depends on direction of rotation
  */
 rawEncoderValue_t   lldGetAbsoluteEncoderRawRevs( void );
+
+
+/**
+ * @ brief                            Gets motor rotation current velocity value
+ *                                    [revolutions per minute (rpm)]
+ * @ note                             Function use value ImpsPerRevQuantity  -
+ *                                    Defined number of impulses per revolution
+ *                                    (depends on given sensor)
+ * @ return                           Current motor velocity value [rpm]
+ */
+mVelocity_t encoderGetVelocity ( void );
+
+
+/**
+ * @brief      reset encoder counter
+ * @note       useful for initialization (linear actuator for example)
+ */
+void resetEncoder ( void );
+
+
+/**
+ * @brief        when timer overflow counter is larger then specified value
+ *               then rotation flag is resets
+ * @return       1 - if motor is rotating
+ *               0 - if motror is not rotating
+ */
+bool motorIsRotating( void );
 
 #endif /* INCLUDE_LLD_ENCODER_H_ */
 

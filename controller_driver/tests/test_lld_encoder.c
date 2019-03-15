@@ -34,17 +34,19 @@ void TestEncoderRouting (void)
     rawEncoderValue_t encoder_ticks_cntr = 0;
     rawRevEncoderValue_t  revolutions_cntr = 0;
     bool rotation_dir = 0;
+    mVelocity_t m_speed = 0;
 
     while ( 1 )
     {
         encoder_ticks_cntr = lldGetEncoderRawTicks();
         rotation_dir       = lldGetEncoderDirection();
         revolutions_cntr   = lldGetEncoderRawRevs();
+        m_speed            = encoderGetVelocity ();
 
         motorRun();
 
-        chprintf( (BaseSequentialStream *)&SD3, "rev: %d\t ticks: %d\t dir: %d\n\r",
-                  (int16_t) (revolutions_cntr*100), encoder_ticks_cntr, rotation_dir );
+        chprintf( (BaseSequentialStream *)&SD3, "rev: %d\t ticks: %d\t dir: %d\t vel:%d\n\r",
+                  (int16_t) (revolutions_cntr*100), encoder_ticks_cntr, rotation_dir, (int16_t)(m_speed *100) );
 
         chThdSleepMilliseconds( 100 );
 
