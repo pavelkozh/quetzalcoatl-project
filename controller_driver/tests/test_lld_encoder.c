@@ -31,20 +31,35 @@ void TestEncoderRouting (void)
     chThdSleepMilliseconds( 500 );
 
 
+    /* Variables */
     rawEncoderValue_t encoder_ticks_cntr = 0;
     rawRevEncoderValue_t  revolutions_cntr = 0;
     bool rotation_dir = 0;
+    mVelocity_t m_speed = 0;
+    int32_t rcv_value = 0;
+    static uint8_t  sd_buff[10];
 
     while ( 1 )
     {
         encoder_ticks_cntr = lldGetEncoderRawTicks();
         rotation_dir       = lldGetEncoderDirection();
         revolutions_cntr   = lldGetEncoderRawRevs();
+        m_speed            = encoderGetVelocity ();
 
         motorRun();
 
-        chprintf( (BaseSequentialStream *)&SD3, "rev: %d\t ticks: %d\t dir: %d\n\r",
-                  (int16_t) (revolutions_cntr*100), encoder_ticks_cntr, rotation_dir );
+
+
+        chprintf( (BaseSequentialStream *)&SD3, "rev: %d\t ticks: %d\t dir: %d\t set speed: %d\t vel: %d\n\r",
+                  (int16_t) (revolutions_cntr*100), encoder_ticks_cntr, rotation_dir, rcv_value, (int32_t)( m_speed * 100 ) );
+
+        /* Read data from serial. Send value in range 000...100
+         * First character used for sign,
+         * but "atoi" cannot understand nothing but digits...  */
+        sdReadTimeout( &SD3, sd_buff, 3, TIME_IMMEDIATE   );
+        rcv_value = atoi(sd_buff);
+
+        mSetSpeed ( rcv_value );
 
         chThdSleepMilliseconds( 100 );
 
