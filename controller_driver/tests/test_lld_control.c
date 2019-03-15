@@ -1,6 +1,6 @@
 #include <tests.h>
 #include <lld_control.h>
-#include <lld_sensor_module.h>
+//#include <lld_sensor_module.h>
 #include <chprintf.h>
 
 
@@ -10,11 +10,8 @@ static const SerialConfig sdcfg = {
 };
 
 
-//static bool right_dir = 0, left_dir = 0, drive_enable = 0, drive_start = 0;
-static uint16_t Ain = 0, period_s = 0;
-static float duty_cucle = 0.0;
-static uint8_t rcv_data = 0, sd_buff[10];
-int16_t *sd_value;
+
+static uint8_t  sd_buff[10];
 int32_t rcv_value = 0;
 pwmcnt_t pwm_period_ticks = 0;
 
@@ -28,13 +25,7 @@ void TestPWMRouting (void)
   palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
 
 
-
-  commonADC1UnitInit();
   lldControlInit();
-
-
-
-
 
 
   while (1)

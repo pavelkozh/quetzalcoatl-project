@@ -74,4 +74,3 @@ bool motorIsRotating( void );
 
 #endif /* INCLUDE_LLD_ENCODER_H_ */
 
-

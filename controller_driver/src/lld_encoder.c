@@ -180,7 +180,8 @@ void lldEncoderInit( void )
     EXTChannelConfig A_ch_conf, B_ch_conf, NULL_ch_conf;
 
     /* Fill in configuration for channel */
-    A_ch_conf.mode     = EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOF; // EXT_CH_MODE_BOTH_EDGES
+
+    A_ch_conf.mode     = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOF; // EXT_CH_MODE_BOTH_EDGES
     A_ch_conf.cb       = extcb_base;
 
     B_ch_conf.mode     = EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOF;
@@ -323,10 +324,23 @@ mVelocity_t encoderGetVelocity ( void )
     if ( measured_time_width != 0)
     {
         /**
-         * second between fronts (Tf) = measured_width / frequency
-         * there are 4 (config) fronts per revolution ~ 4 x Tf = second for revolution (Tr)
-         * rps = 1 / Tr = 1 / (4 x Tf) = freq / (4 x ticks)
-         * rpm = 60 * rps = 60 * freq / (4 x ticks)
+         * velocity = dx/dt, which means constant part of the revolution divided
+         *                   by variable time width.
+         *                   - dx is constant and equal 1/ENC_MAX_TICK_NUM.
+         *                   - dt is equal time, mesured between two encoder base
+         *                        channel fronts.
+         *
+         *  dt = timer counter / timer frequency [sec]
+         *  ------------------------------------------
+         *  velocity_rps = (1/ENC_MAX_TICK_NUM) / (timer counter / timer frequency)
+         *  [rev per sec]
+         *  ------------------------------------------
+         *  Convert velocity units in [rev per minute]:
+         *  velocity_rpm = velocity * 60
+         *  ____________________________________________
+         *  Thus:
+         *  velocity_rpm = ( 60 * timer frequency / ENC_MAX_TICK_NUM ) / timer counter
+         *  (numerator of this formula is constant and calculates ones. See function lldEncoderInit())
          */
         velocity = velocityCalcTicksToRPM / measured_time_width;
     }
