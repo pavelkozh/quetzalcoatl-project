@@ -1,6 +1,7 @@
 #include <tests.h>
 #include <tf_calculation.h>
 #include <chprintf.h>
+#include <term_graph.h>
 
 static const SerialConfig sdcfg = {
   .speed = 115200,
@@ -9,11 +10,11 @@ static const SerialConfig sdcfg = {
 
 /* Transfer function state initialization*/
 TFConf_t tfconf = {
-                   .k             = 1023,
+                   .k             = 1023.0,
                    .T             = 1.0,
                    .prev_output   = 0.0,
                    .output        = 0.0,
-                   .input         = 0,
+                   .input         = 1,
 				   .a             = 0,
 				   .b             = 0
 };
@@ -61,9 +62,12 @@ static const GPTConfig gpt3cfg1 = {
 
 void testTFCalcRouting ( void )
 {
-    sdStart( &SD7, &sdcfg );
-    palSetPadMode( GPIOE, 8, PAL_MODE_ALTERNATE(8) );   // TX
-    palSetPadMode( GPIOE, 7, PAL_MODE_ALTERNATE(8) );   // RX
+	sdStart( &SD3, &sdcfg );
+	palSetPadMode( GPIOD, 8, PAL_MODE_ALTERNATE(7) ); // TX
+	palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) ); // RX
+
+	//Button
+	palSetPadMode(GPIOC, 13,PAL_MODE_INPUT);
 
     /* Starting GPT3 driver */
     gptStart(&GPTD3, &gpt3cfg1);
@@ -72,16 +76,17 @@ void testTFCalcRouting ( void )
 
     while ( 1 )
     {
-      chprintf( (BaseSequentialStream *)&SD7, "k= %d\t T = %d\t input = %d\t prev_out = %d\t y = %d\n\r",
-                (uint8_t) (tfconf.k * 10),
-                (uint16_t) (tfconf.T * 10),
-                (uint16_t) (tfconf.input * 10),
-                (int32_t) (tfconf.prev_output * 10),
-                (int32_t) (out_array[i] * 1000) );
+      chprintf( (BaseSequentialStream *)&SD3, "k= %d\t T = %d,ms\t  input = %d\t prev_out = %d\t y = %d\n\r",
+                (uint16_t) (tfconf.k),
+                (uint16_t) (tfconf.T*1000),
+                (uint16_t) (tfconf.input),
+                (int32_t) (tfconf.prev_output),
+                (int32_t) (tfconf.output) );
       //(int32_t) (tfconf.output * 1000))
 
        // chprintf( (BaseSequentialStream *)&SD7, "y = :  %d\r\n", (int32_t) (tfconf.output * 10000) );
-        chThdSleepMilliseconds( 500 );
+      tfconf.input = palReadPad(GPIOC,13);
+      chThdSleepMilliseconds( 500 );
 
     }
 }

@@ -3,7 +3,7 @@
 
 
 
-#define dT  0.0001
+#define dT  0.001
 //float tau = 0.0;
 //TFConf_t tfconf;
 

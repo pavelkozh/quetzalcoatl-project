@@ -130,7 +130,7 @@ void TestPWMRouting (void)
   extStart( &EXTD1, &extcfg );
   //pwmEnableChannel( &PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH (&PWMD1,5000) );
 
-  sdStart( &SD7, &sdcfg );
+  sdStart( &SD3, &sdcfg );
   palSetPadMode( GPIOE, 8, PAL_MODE_ALTERNATE(8) );   // TX
   palSetPadMode( GPIOE, 7, PAL_MODE_ALTERNATE(8) );   // RX
 
@@ -167,7 +167,7 @@ void TestPWMRouting (void)
 
 #endif
 
-      chprintf( (BaseSequentialStream *)&SD7, "ADC:  %d\t En %d\t DirR %d\t DirL %d\t Duty %d\n\r",
+      chprintf( (BaseSequentialStream *)&SD3, "ADC:  %d\t En %d\t DirR %d\t DirL %d\t Duty %d\n\r",
                 Ain, drive_enable, right_dir, left_dir, sd_buff[0]  );
 
 
