@@ -54,7 +54,7 @@ static void gpt3_callback (GPTDriver *gptp)
  * calculation.
  */
 static const GPTConfig gpt3cfg1 = {
-  .frequency =  100000U,        /* 100 kHz*/
+  .frequency =  10000U,        /*  10kHz*/
   .callback  =  gpt3_callback,
   .cr2       =  TIM_CR2_MMS_1,  /* MMS = 010 = TRGO on Update Event.        */
   .dier      =  0U
