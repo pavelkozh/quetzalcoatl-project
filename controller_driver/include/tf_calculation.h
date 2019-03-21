@@ -23,6 +23,11 @@ struct TFConf {
 
   /* transfer function previous output   */
   float prev_output;
+
+  /*a=T/(T+dt)*/
+  float a;
+  /*k*dt/(T+dt)*/
+  float b;
 };
 
 typedef struct TFConf TFConf_t;

@@ -9,11 +9,13 @@ static const SerialConfig sdcfg = {
 
 /* Transfer function state initialization*/
 TFConf_t tfconf = {
-                   .k             = 3.0,
-                   .T             = 100.0,
+                   .k             = 1023,
+                   .T             = 1.0,
                    .prev_output   = 0.0,
                    .output        = 0.0,
-                   .input         = 100.0
+                   .input         = 0,
+				   .a             = 0,
+				   .b             = 0
 };
 
 /* pointer to stucture*/
