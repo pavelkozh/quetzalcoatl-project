@@ -121,7 +121,7 @@ void commonADC1UnitInit ( void )
   adcStart(&ADCD1, NULL);
 
   /*analog input on PC0 pin */
-  palSetLineMode( LINE_ADC123_IN13, PAL_MODE_INPUT_ANALOG );  // PC0
+  palSetLineMode( LINE_ADC123_IN10, PAL_MODE_INPUT_ANALOG );  // PC0
   palSetLineMode( LINE_ADC123_IN3, PAL_MODE_INPUT_ANALOG );   // PA3
 
   /*
