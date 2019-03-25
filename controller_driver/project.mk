@@ -1,6 +1,7 @@
 
 PROJECT_MODULES = src/lld_sensor_module.c   \
                   src/lld_control.c         \
+                  src/lld_dac.c				\
                   src/tf_calculation.c      \
                   
                   

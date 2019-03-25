@@ -34,7 +34,7 @@ static void adccallback(ADCDriver *adcp, adcsample_t *buffer, size_t n)
     (void)n;
 
     analog_in_ch1 = adc_buffer[0]; // channel 1
-    analog_in_ch2 = adc_buffer[1]; // channel 1
+    analog_in_ch2 = adc_buffer[1]; // channel 2
 
 }
 

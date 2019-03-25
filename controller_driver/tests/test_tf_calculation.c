@@ -1,6 +1,8 @@
 #include <tests.h>
 #include <tf_calculation.h>
 #include <chprintf.h>
+#include <lld_sensor_module.h>
+#include <lld_dac.h>
 #include <term_graph.h>
 
 static const SerialConfig sdcfg = {
@@ -10,8 +12,8 @@ static const SerialConfig sdcfg = {
 
 /* Transfer function state initialization*/
 TFConf_t tfconf = {
-                   .k             = 1023.0,
-                   .T             = 1.0,
+                   .k             = 1,
+                   .T             = 1.5,
                    .prev_output   = 0.0,
                    .output        = 0.0,
                    .input         = 1,
@@ -20,7 +22,7 @@ TFConf_t tfconf = {
 };
 
 /* pointer to stucture*/
-TFConf_t* p_tfconf = &tfconf;
+TFConf_t *p_tfconf = &tfconf;
 
 
 uint16_t gpt_callback_counter = 0, i = 0;
@@ -33,7 +35,9 @@ float out_array[205] = {0.0};
 static void gpt3_callback (GPTDriver *gptp)
 {
     (void)gptp;
+    tfconf.input = commonADC1UnitGetValue ( 2 );
     tfOutCalculation ( p_tfconf );
+    dacPutChannelX( &DACD1, 0 ,(int32_t)tfconf.output);
     gpt_callback_counter ++;
     if ( gpt_callback_counter == 500 )
     {
@@ -42,9 +46,9 @@ static void gpt3_callback (GPTDriver *gptp)
         {
             out_array[i] = tfconf.output;
             i++;
+        }else{
+        	i=0;
         }
-
-
     }
 
 }
@@ -69,6 +73,12 @@ void testTFCalcRouting ( void )
 	//Button
 	palSetPadMode(GPIOC, 13,PAL_MODE_INPUT);
 
+	//Sensor init. 1 - PC0, 2 - PA3
+    commonADC1UnitInit();
+
+    //DAC init. PA4 (ch1)
+    dac_init();
+
     /* Starting GPT3 driver */
     gptStart(&GPTD3, &gpt3cfg1);
     gptStartContinuous(&GPTD3, gpt3cfg1.frequency / 1000); //Timer period = 1ms
@@ -85,7 +95,7 @@ void testTFCalcRouting ( void )
       //(int32_t) (tfconf.output * 1000))
 
        // chprintf( (BaseSequentialStream *)&SD7, "y = :  %d\r\n", (int32_t) (tfconf.output * 10000) );
-      tfconf.input = palReadPad(GPIOC,13);
+      //tfconf.input = palReadPad(GPIOC,13);
       chThdSleepMilliseconds( 500 );
 
     }

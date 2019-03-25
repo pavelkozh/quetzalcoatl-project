@@ -22,7 +22,7 @@ void TestPWMRouting (void);
 /*
  * @brief   Routine of transfer function calculation module testing
  * @note    The routine has internal infinite loop
- * @note    SD7 is used for testing (PE7, PE8)
+ * @note    SD3 is used for testing (PD8, PD9)
  */
 void testTFCalcRouting ( void );
 
