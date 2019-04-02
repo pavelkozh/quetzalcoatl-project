@@ -7,6 +7,9 @@
 	 PGN     PGNhex  SPN Description            		spn     Bytes		convert
 		
 	61444   0xF004  Engine speed                		190     4-5     	0.125rpm/bit
+	61444   0xF004	Driver's Demand Engine -			512		2			1 %/bit , -125% offset
+	 	 	 	 	 	 	 	 	 Percent Torque
+	61444   0xF004	Actual Engine - Percent Torque		513		3			1 %/bit , -125% offset
 	65265	0xFEF1	Wheel-Based Vehicle Speed 			84		2-3			1/256 km/h per bit
 	61443   0xF003  Accelerator Pedal Position  		91      2       	0.4 %/bit
 	65262   0xFEEE  Engine Oil Temperature 1    		175     3-4     	0.03125 deg C/bit 
@@ -45,6 +48,8 @@ static CANTxFrame txmsg;
 typedef struct 
 {
 	double EngineSpeed ;
+	int8_t DriverIsDemandEnginePercentTorque;
+	int8_t ActualEnginePercentTorque ;
 	double Speed;
 	double AcceleratorPedalPosition;
 	double EngineOilTemperature;

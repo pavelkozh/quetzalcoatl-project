@@ -79,6 +79,8 @@ static THD_FUNCTION(can_tx, p) {
 
 extern  gazelParam gazel = {
   .EngineSpeed = 0.0 ,
+  .DriverIsDemandEnginePercentTorque = 0,
+  .ActualEnginePercentTorque  = 0,
   .Speed = 0,
   .AcceleratorPedalPosition = 0 ,
   .EngineOilTemperature= 0 ,
@@ -129,6 +131,8 @@ void can_handler(CANRxFrame msg){
   switch((msg.EID & 0x00ffff00)){
     case PGN_ELECTRONIC_ENGINE_CONTROLLER_1: 
       gazel.EngineSpeed =0.125*( (msg.data8[4]<<8)|msg.data8[3]);
+      gazel.DriverIsDemandEnginePercentTorque = msg.data8[1]-125;
+      gazel.ActualEnginePercentTorque = msg.data8[2]-125;
       break;
     case PGN_CRUISE_CONTROL_AND_VEHICL_SPEED:
       gazel.Speed = ((msg.data8[2]<<8)|msg.data8[1])/256;
@@ -153,7 +157,7 @@ void can_handler(CANRxFrame msg){
       gazel.AlternatorCurrent = msg.data8[1]; 
       gazel.AlternatorPotential = 0.05* ( (msg.data8[3]<<8)|msg.data8[2]);
       gazel.ElectricalPotential = 0.05* ( (msg.data8[5]<<8)|msg.data8[4]);
-      gazel.BatteryPotential = 0.05* ( (msg.data8[7]<<8)|msg.data8[6]);
+      gazel.BatteryPotential = 0.05* (double)( (msg.data8[7]<<8)|msg.data8[6]);
     case PGN_ELECTRONIC_BRAKE_CONTROLLER:
       gazel.BrakePedalPosition = msg.data8[1]*0.4;
       break;
