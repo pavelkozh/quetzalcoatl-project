@@ -82,17 +82,11 @@ extern  gazelParam gazel = {
   .DriverIsDemandEnginePercentTorque = 0,
   .ActualEnginePercentTorque  = 0,
   .Speed = 0,
-  .AcceleratorPedalPosition = 0 ,
-  .EngineOilTemperature= 0 ,
-  .EngineFuelTemperature = 0 ,
-  .Positionofdoors = 0 ,
+  .AcceleratorPedalPosition = 0,
+  .PercentLoadAtCurrentSpeed = 0,
   .EngineFuelRate = 0 ,
   .EngineInstantaneousFuelEconomy = 0 ,
   .EngineThrottleValve = 0 ,
-  .NetBatteryCurrent = 0 ,
-  .AlternatorCurrent = 0,
-  .AlternatorPotential = 0 ,
-  .ElectricalPotential = 0 ,
   .BatteryPotential = 0 ,
   .BrakePedalPosition=0
 };
@@ -110,7 +104,6 @@ void can_init ( void )
     {1, 0, 1, 0, set_can_eid_data(PGN_ELECTRONIC_ENGINE_CONTROLLER_1), set_can_eid_mask(0x00ffff00)},\
     {2, 0, 1, 0, set_can_eid_data(PGN_CRUISE_CONTROL_AND_VEHICL_SPEED), set_can_eid_mask(0x00ffff00)},\
     {3, 0, 1, 0, set_can_eid_data(PGN_ELECTRONIC_ENGINE_CONTROLLER_2), set_can_eid_mask(0x00ffff00)},\
-    {4, 0, 1, 0, set_can_eid_data(PGN_ENGINE_TEMPERATURE_1), set_can_eid_mask(0x00ffff00)},\
     {5, 0, 1, 0, set_can_eid_data(PGN_DOOR_CONTROL), set_can_eid_mask(0x00ffff00)},\
     {6, 0, 1, 0, set_can_eid_data(PGN_FUEL_ECONOMY), set_can_eid_mask(0x00ffff00)},\
     {7, 0, 1, 0, set_can_eid_data(PGN_VEHICLE_ELECTRICAL_POWER), set_can_eid_mask(0x00ffff00)}\
@@ -136,16 +129,12 @@ void can_handler(CANRxFrame msg){
       break;
     case PGN_CRUISE_CONTROL_AND_VEHICL_SPEED:
       gazel.Speed = ((msg.data8[2]<<8)|msg.data8[1])/256;
+      gazel.BrakeSwitch = (msg.data8[4]>>4) & 0x03;
+      gazel.ClutchSwitch =(msg.data8[4]>>6) & 0x03;
       break;
     case PGN_ELECTRONIC_ENGINE_CONTROLLER_2:
       gazel.AcceleratorPedalPosition = 0.4*msg.data8[1];
-      break;
-    case PGN_ENGINE_TEMPERATURE_1:
-      gazel.EngineOilTemperature = 0.03125*((msg.data8[3]<<8)|msg.data8[2]);
-      gazel.EngineFuelTemperature = msg.data8[1];
-      break;
-    case PGN_DOOR_CONTROL: 
-      gazel.Positionofdoors = (msg.data8[0]>>1)&0xf;
+      gazel.PercentLoadAtCurrentSpeed = msg.data8[3];
       break;
     case PGN_FUEL_ECONOMY:
       gazel.EngineFuelRate = 0.05* ( (msg.data8[1]<<8)|msg.data8[0]);
@@ -153,11 +142,7 @@ void can_handler(CANRxFrame msg){
       gazel.EngineThrottleValve = 0.4*msg.data8[6];
       break;
     case PGN_VEHICLE_ELECTRICAL_POWER:
-      gazel.NetBatteryCurrent = msg.data8[0]-125; 
-      gazel.AlternatorCurrent = msg.data8[1]; 
-      gazel.AlternatorPotential = 0.05* ( (msg.data8[3]<<8)|msg.data8[2]);
-      gazel.ElectricalPotential = 0.05* ( (msg.data8[5]<<8)|msg.data8[4]);
-      gazel.BatteryPotential = 0.05* (double)( (msg.data8[7]<<8)|msg.data8[6]);
+      gazel.BatteryPotential = 0.05* (double)( (msg.data8[5]<<8) | msg.data8[6]);
     case PGN_ELECTRONIC_BRAKE_CONTROLLER:
       gazel.BrakePedalPosition = msg.data8[1]*0.4;
       break;

@@ -31,19 +31,15 @@ void TestCanRouting ( void )
     chprintf( (BaseSequentialStream *)&SD3,  "Engine Speed: \n\r"); 
     chprintf( (BaseSequentialStream *)&SD3,  "Driver's Demand Engine: \n\r");
     chprintf( (BaseSequentialStream *)&SD3,  "Actual Engine - Percent Torque: \n\r");
-    chprintf( (BaseSequentialStream *)&SD3,  "Speed: \n\r"); 
+    chprintf( (BaseSequentialStream *)&SD3,  "Speed: \n\r");
+    chprintf( (BaseSequentialStream *)&SD3,  "Brake Switch: \n\r");
+    chprintf( (BaseSequentialStream *)&SD3,  "Clutch Switch: \n\r");
     chprintf( (BaseSequentialStream *)&SD3,  "Accelerator Pedal Position: \n\r"); 
-    chprintf( (BaseSequentialStream *)&SD3,  "Engine Oil Temperature: \n\r"); 
-    chprintf( (BaseSequentialStream *)&SD3,  "Engine Fuel Temperature: \n\r"); 
-    chprintf( (BaseSequentialStream *)&SD3,  "Position of doors: \n\r"); 
+    chprintf( (BaseSequentialStream *)&SD3,  "Percent Load At Current Speed: \n\r");
     chprintf( (BaseSequentialStream *)&SD3,  "Engine Fuel Rate: \n\r"); 
     chprintf( (BaseSequentialStream *)&SD3,  "Engine Instantaneous Fuel Economy: \n\r"); 
     chprintf( (BaseSequentialStream *)&SD3,  "Engine Throttle Valve : \n\r"); 
-    chprintf( (BaseSequentialStream *)&SD3,  "Net Battery Current: \n\r"); 
-    chprintf( (BaseSequentialStream *)&SD3,  "Alternator Current: \n\r"); 
-    chprintf( (BaseSequentialStream *)&SD3,  "Alternator Current: \n\r"); 
-    chprintf( (BaseSequentialStream *)&SD3,  "Electrical Potential (V): \n\r"); 
-    chprintf( (BaseSequentialStream *)&SD3,  "Electrical Potential (V): \n\r"); 
+    chprintf( (BaseSequentialStream *)&SD3,  "Battery Potential (V): \n\r");
     chprintf( (BaseSequentialStream *)&SD3,  "Break Pedal Position: \n\r"); 
 
 
@@ -53,19 +49,19 @@ void TestCanRouting ( void )
     gotoxy(40,1);
     chprintf((BaseSequentialStream *)&SD3, "%.02f rpm/bit",gazel.EngineSpeed );
     gotoxy(40,2);
-    chprintf((BaseSequentialStream *)&SD3, "%.02f rpm/bit",gazel.DriverIsDemandEnginePercentTorque );
+    chprintf((BaseSequentialStream *)&SD3, "%d rpm/bit",gazel.DriverIsDemandEnginePercentTorque );
     gotoxy(40,3);
-    chprintf((BaseSequentialStream *)&SD3, "%.02f rpm/bit",gazel.ActualEnginePercentTorque );
+    chprintf((BaseSequentialStream *)&SD3, "%d rpm/bit",gazel.ActualEnginePercentTorque );
     gotoxy(40,4);
     chprintf((BaseSequentialStream *)&SD3, "%.02f km/h",gazel.Speed );
     gotoxy(40,5);
-    chprintf((BaseSequentialStream *)&SD3, "%.02f %",gazel.AcceleratorPedalPosition);
+    chprintf((BaseSequentialStream *)&SD3, "%d km/h",gazel.BrakeSwitch );
     gotoxy(40,6);
-    chprintf((BaseSequentialStream *)&SD3, "%.04f deg C   ",gazel.EngineOilTemperature);
+    chprintf((BaseSequentialStream *)&SD3, "%d km/h",gazel.ClutchSwitch );
     gotoxy(40,7);
-    chprintf((BaseSequentialStream *)&SD3, "%d deg C   ",gazel.EngineFuelTemperature);
+    chprintf((BaseSequentialStream *)&SD3, "%.02f %",gazel.AcceleratorPedalPosition);
     gotoxy(40,8);
-    chprintf((BaseSequentialStream *)&SD3, "%d  ",gazel.Positionofdoors);
+    chprintf((BaseSequentialStream *)&SD3, "%d %",gazel.PercentLoadAtCurrentSpeed);
     gotoxy(40,9);
     chprintf((BaseSequentialStream *)&SD3, "%.02f L/h",gazel.EngineFuelRate);
     gotoxy(40,10);
@@ -73,16 +69,8 @@ void TestCanRouting ( void )
     gotoxy(40,11);
     chprintf((BaseSequentialStream *)&SD3, "%.02f %%",gazel.EngineThrottleValve);
     gotoxy(40,12);
-    chprintf((BaseSequentialStream *)&SD3, "%i A",gazel.NetBatteryCurrent);
-    gotoxy(40,13);
-    chprintf((BaseSequentialStream *)&SD3, "%d A",gazel.AlternatorCurrent);
-    gotoxy(40,14);
-    chprintf((BaseSequentialStream *)&SD3, "%.02f V",gazel.AlternatorPotential);
-    gotoxy(40,15);
-    chprintf((BaseSequentialStream *)&SD3, "%.02f V",gazel.ElectricalPotential);
-    gotoxy(40,16);
     chprintf((BaseSequentialStream *)&SD3, "%.02f V   ",gazel.BatteryPotential);
-    gotoxy(40,17);
+    gotoxy(40,13);
     chprintf((BaseSequentialStream *)&SD3, "%.02f  %",gazel.BrakePedalPosition);
     chThdSleepMilliseconds( 100 );
     }
