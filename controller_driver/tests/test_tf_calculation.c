@@ -12,7 +12,7 @@ static const SerialConfig sdcfg = {
 
 /* Transfer function state initialization*/
 TFConf_t tfconf = {
-                   .k             = 1,
+                   .k             = 4095,
                    .T             = 1.5,
                    .prev_output   = 0.0,
                    .output        = 0.0,
@@ -35,7 +35,7 @@ float out_array[205] = {0.0};
 static void gpt3_callback (GPTDriver *gptp)
 {
     (void)gptp;
-    tfconf.input = commonADC1UnitGetValue ( 2 );
+    tfconf.input = palReadPad(GPIOC, 13);//commonADC1UnitGetValue ( 2 );
     tfOutCalculation ( p_tfconf );
     dacPutChannelX( &DACD1, 0 ,(int32_t)tfconf.output);
     gpt_callback_counter ++;
@@ -58,7 +58,7 @@ static void gpt3_callback (GPTDriver *gptp)
  * calculation.
  */
 static const GPTConfig gpt3cfg1 = {
-  .frequency =  10000U,        /*  10kHz*/
+  .frequency =  1000000U,        /*  1MHz*/
   .callback  =  gpt3_callback,
   .cr2       =  TIM_CR2_MMS_1,  /* MMS = 010 = TRGO on Update Event.        */
   .dier      =  0U
@@ -86,17 +86,18 @@ void testTFCalcRouting ( void )
 
     while ( 1 )
     {
-      chprintf( (BaseSequentialStream *)&SD3, "k= %d\t T = %d,ms\t  input = %d\t prev_out = %d\t y = %d\n\r",
-                (uint16_t) (tfconf.k),
-                (uint16_t) (tfconf.T*1000),
-                (uint16_t) (tfconf.input),
-                (int32_t) (tfconf.prev_output),
-                (int32_t) (tfconf.output) );
+      chprintf( (BaseSequentialStream *)&SD3, "y = %d DAC: %d\n\r", //k= %d\t T = %d,ms\t  input = %d\t prev_out = %d\t
+//                (uint16_t) (tfconf.k),
+//                (uint16_t) (tfconf.T*1000),
+//                (uint16_t) (tfconf.input),
+//                (int32_t) (tfconf.prev_output),
+                (int32_t) (tfconf.output),
+      	  	  	(uint16_t) commonADC1UnitGetValue ( 2 ));
       //(int32_t) (tfconf.output * 1000))
 
        // chprintf( (BaseSequentialStream *)&SD7, "y = :  %d\r\n", (int32_t) (tfconf.output * 10000) );
       //tfconf.input = palReadPad(GPIOC,13);
-      chThdSleepMilliseconds( 500 );
+      chThdSleepMilliseconds( 10 );
 
     }
 }
