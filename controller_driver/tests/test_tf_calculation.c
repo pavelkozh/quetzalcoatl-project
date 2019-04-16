@@ -12,11 +12,11 @@ static const SerialConfig sdcfg = {
 
 /* Transfer function state initialization*/
 TFConf_t tfconf = {
-                   .k             = 4095,
-                   .T             = 1.5,
+                   .k             = 1,
+                   .T             = 0.1,
                    .prev_output   = 0.0,
                    .output        = 0.0,
-                   .input         = 1,
+                   .input         = 0,
 				   .a             = 0,
 				   .b             = 0
 };
@@ -26,7 +26,9 @@ TFConf_t *p_tfconf = &tfconf;
 
 
 uint16_t gpt_callback_counter = 0, i = 0;
-float out_array[205] = {0.0};
+float out_array[10000] = {0.0};
+uint32_t cnt = 0;
+bool start = 0;
 
 /* Difference equation calculation on timer trigger event (overflow)
  * Ones in (time interval = 500 times * timer period) calculated value
@@ -35,20 +37,14 @@ float out_array[205] = {0.0};
 static void gpt3_callback (GPTDriver *gptp)
 {
     (void)gptp;
-    tfconf.input = palReadPad(GPIOC, 13);//commonADC1UnitGetValue ( 2 );
+    //tfconf.input = palReadPad(GPIOC, 13);//commonADC1UnitGetValue ( 2 );
     tfOutCalculation ( p_tfconf );
     dacPutChannelX( &DACD1, 0 ,(int32_t)tfconf.output);
     gpt_callback_counter ++;
-    if ( gpt_callback_counter == 500 )
+    if ( start == 1 )
     {
-        gpt_callback_counter = 0;
-        if ( i <= 204 )
-        {
-            out_array[i] = tfconf.output;
-            i++;
-        }else{
-        	i=0;
-        }
+            out_array[cnt] = tfconf.output;
+            cnt++;
     }
 
 }
@@ -83,21 +79,21 @@ void testTFCalcRouting ( void )
     gptStart(&GPTD3, &gpt3cfg1);
     gptStartContinuous(&GPTD3, gpt3cfg1.frequency / 1000); //Timer period = 1ms
 
+    uint8_t sd_buff[5];
 
     while ( 1 )
     {
-      chprintf( (BaseSequentialStream *)&SD3, "y = %d DAC: %d\n\r", //k= %d\t T = %d,ms\t  input = %d\t prev_out = %d\t
-//                (uint16_t) (tfconf.k),
-//                (uint16_t) (tfconf.T*1000),
-//                (uint16_t) (tfconf.input),
-//                (int32_t) (tfconf.prev_output),
-                (int32_t) (tfconf.output),
-      	  	  	(uint16_t) commonADC1UnitGetValue ( 2 ));
-      //(int32_t) (tfconf.output * 1000))
+    sdReadTimeout( &SD3, sd_buff, 5, TIME_IMMEDIATE);
 
-       // chprintf( (BaseSequentialStream *)&SD7, "y = :  %d\r\n", (int32_t) (tfconf.output * 10000) );
-      //tfconf.input = palReadPad(GPIOC,13);
-      chThdSleepMilliseconds( 10 );
-
+     if(sd_buff[4]=='s'){
+    	 start = 1;
+    	 cnt = 0;
+    	 tfconf.input = atoi(sd_buff);
+    	 chprintf( (BaseSequentialStream *)&SD3, "y = %d \n\r",(int32_t) (tfconf.output)); //k= %d\t T = %d,ms\t  input = %d\t prev_out = %d\t
+     }else{
+    	 if(start==1) sdWrite(&SD3, &out_array , cnt );
+    	 start=0;
+     }
+     chThdSleepMilliseconds( 10 );
     }
 }
