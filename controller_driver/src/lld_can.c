@@ -1,7 +1,6 @@
 #include <lld_can.h>
 
 
-void can_handler(CANRxFrame msg);
 
 static const CANConfig cancfg= {
 CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP,
@@ -10,6 +9,28 @@ CAN_BTR_TS1(5) | CAN_BTR_BRP(26)
 };
 
 
+
+
+/*0b100 - Data with EID or (0b110 - RemoteFrame with EID)*/
+#define set_can_eid_data(x) ((x << 3)|0b100)
+
+/*0b110 - Mask enable for EID/SID and DATA/RTR*/
+#define set_can_eid_mask(x) ((x << 3)|0b110)
+
+
+extern  gazelParam gazel = {
+  .EngineSpeed = 0.0 ,
+  .DriverIsDemandEnginePercentTorque = 0,
+  .ActualEnginePercentTorque  = 0,
+  .Speed = 0,
+  .AcceleratorPedalPosition = 0,
+  .PercentLoadAtCurrentSpeed = 0,
+  .EngineFuelRate = 0 ,
+  .EngineInstantaneousFuelEconomy = 0 ,
+  .EngineThrottleValve = 0 ,
+  .BatteryPotential = 0 ,
+  .BrakePedalPosition=0
+};
 
 /*
  * Receiver thread.
@@ -70,27 +91,6 @@ static THD_FUNCTION(can_tx, p) {
 }
 
 
-/*0b100 - Data with EID or (0b110 - RemoteFrame with EID)*/
-#define set_can_eid_data(x) ((x << 3)|0b100)
-
-/*0b110 - Mask enable for EID/SID and DATA/RTR*/
-#define set_can_eid_mask(x) ((x << 3)|0b110)
-
-
-extern  gazelParam gazel = {
-  .EngineSpeed = 0.0 ,
-  .DriverIsDemandEnginePercentTorque = 0,
-  .ActualEnginePercentTorque  = 0,
-  .Speed = 0,
-  .AcceleratorPedalPosition = 0,
-  .PercentLoadAtCurrentSpeed = 0,
-  .EngineFuelRate = 0 ,
-  .EngineInstantaneousFuelEconomy = 0 ,
-  .EngineThrottleValve = 0 ,
-  .BatteryPotential = 0 ,
-  .BrakePedalPosition=0
-};
-
 void can_init ( void )
 {
   //Setting pin mode
@@ -115,7 +115,7 @@ void can_init ( void )
     //start Can
     canStart(&CAND1, &cancfg);
     chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 7, can_rx, NULL);
-    chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 6, can_tx, NULL);
+    //chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 6, can_tx, NULL);
 
 }
 

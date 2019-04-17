@@ -13,7 +13,7 @@
  *  CANRX (PD_0), CANTX (PD_1)
  *  Direct control of PA0 - led
  */
-void TestCanRouting ( void );
+void TestEngineSpeedRouting ( void );
 
 
 
@@ -22,9 +22,9 @@ void TestCanRouting ( void );
 
 static inline void testsRoutines( void )
 {
-#if (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_CAN)
+#if (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ENGINE_SPEED)
 
-    TestCanRouting();
+    TestEngineSpeedRouting();
 
 #endif
 }

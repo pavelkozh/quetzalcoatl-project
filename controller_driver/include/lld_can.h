@@ -32,18 +32,22 @@
 
 
 void can_init ( void );
+
+void can_handler(CANRxFrame msg);
+
+
 static CANRxFrame rxmsg;
 static CANTxFrame txmsg;
 
 typedef struct 
 {
-	double EngineSpeed ;
+	float EngineSpeed ;
 	int8_t DriverIsDemandEnginePercentTorque;
 	int8_t ActualEnginePercentTorque ;
 	double Speed;
 	uint8_t BrakeSwitch;
 	uint8_t ClutchSwitch;
-	double AcceleratorPedalPosition;
+	float AcceleratorPedalPosition;
 	int8_t PercentLoadAtCurrentSpeed;
 	double EngineFuelRate;
 	double EngineInstantaneousFuelEconomy;
