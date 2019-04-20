@@ -11,46 +11,90 @@
  * PWM (pin PE9) uses TIM1
  * PE11, PF14 uses as general outputs.
  */
+
+
+
 /******************/
-/*** Define ***/
+/***** Define *****/
+/******************/
+#define MOTOR_STOPED            0
+#define MOTOR_MOVING            1
+#define MOTOR_MODE_SHOT         2
+#define MOTOR_MODE_TRACKING     3
+#define MOTOR_MODE_CONTINUOUS   4
+#define MOTOR_MODE_CALIBRATION  5
+
+
+
+
+/******************/
+/*** Structure ***/
 /******************/
 
+typedef struct {
+ 
+ /**
+  * @brief:  pointer to a @p PWMDriver object for motor control.
+  */
+    PWMDriver           *pwmd;
+
+ /**
+  * @brief:  Rising edge callback. 
+  * @note:  This callback is invoked on PWM counter reset. If set to
+  *        @p NULL then the callback is disabled.
+  */
+    pwmcallback_t       rising_edge_cb;
+ 
+ /**
+  * @brief:  Falling edge callback. 
+  * @note:  This callback is invoked on the channel compare event after service callback. If set to
+  *        @p NULL then the callback is disabled.
+  */
+    pwmcallback_t       falling_edge_cb;
+ /**
+  * @brief: Absolute position in ticks of encoder relative to the zero point. 
+  * @note:  Read only, but you can use resetPosition() to set 0 value. Motor can
+  *         move 0 to max_position
+  */
+    int32_t             position;
+ /**
+  * @brief: Max motor position. 
+  */
+    int32_t             max_position;
+
+ /**
+  * @brief: Tracking motor position. 
+  * @note:  Use with MOTOR_RUN_TRACKING state 
+  */
+    int32_t             tracked_position;
 
 
-//PWM define
-#define DRIVE_PWMD 						&PWMD3 		// PWM Driver
-#define DRIVE_PWM_FREQ      			50000000 	// PWM clock frequency [Hz]
-#define DRIVE_PWM_PERIOD				500   		// PWM period[tics]  
-#define DRIVE_PWM_PIN					6			// pwm pin
-#define DRIVE_PWM_PORT					GPIOC		// pwm pin port
-#define DRIVE_PWM_PAL_MODE_ALTERNATE	2			// Alternate mod ffor pwm pin
-#define DRIVE_GPTD						&GPTD5		// Driver for count pwm pulse
-#define DRIVE_GPTD_TIM_REG_SMCR			TIM_SMCR_SMS_0 | TIM_SMCR_SMS_1 | TIM_SMCR_SMS_2 | TIM_SMCR_TS_0 //Settings for Slave mode PWMD
+ /**
+  * @brief: speed of motor ( Period of PWM timer )
+  */
+    //uint16_t          speed;
 
-//Drive
-#define DRIVE_INVERT_ROTATION_DIRECTION		FALSE		// Invert rotation direction 
-#define DRIVE_DIRECTION_PIN 				8			// Pin of set directions 
-#define DRIVE_DIRECTION_PIN_PORT			GPIOB		// Pin port set directions
-
-
-//Limit Switch
-#define DRIVE_LIMIT_SWITCH_USE              FALSE
-#define DRIVE_LIMIT_SWITCH_1_PIN            9
-#define DRIVE_LIMIT_SWITCH_1_PIN_PORT       GPIOB
-#define DRIVE_LIMIT_SWITCH_1_EXT_MODE_GPIO  EXT_MODE_GPIOB
-#define DRIVE_LIMIT_SWITCH_2_PIN            15
-#define DRIVE_LIMIT_SWITCH_2_PIN_PORT       GPIOB
-#define DRIVE_LIMIT_SWITCH_2_EXT_MODE_GPIO  EXT_MODE_GPIOB
+ /**
+  * @brief: direction of rotation.
+  */
+    //bool              dir;
+ 
+ /**
+  * @brief: line for control direction of rotation.
+  */
+    ioline_t                dir_line;
 
 
-// Motor define
-#define DRIVE_MAX_ANG                   160000      // 40 revolution or 20cm (5mm per revolution)
-#define DRIVE_MAX_SPEED                 100000      // 100Khz or 1500 rpm
-#define DRIVE_MIN_PULSE_WIDTH           (uint32_t)DRIVE_PWM_FREQ / DRIVE_MAX_SPEED
+  /**
+  * @brief: state of motor.
+  */
+    bool                state;
 
-//Desired pwm impulses quantity (send to driver)
-#define DRIVE_PWM_IMPULSE_QUANTITY    4000 // 200 for stepper motor
-
+  /**
+  * @brief: Mode of motor control.
+  */
+    uint8_t               mode;
+} MotorDriver;
 
 
 
@@ -58,7 +102,18 @@
 /*** Prototypes ***/
 /******************/
 
-
+/*
+* @brief:  Rising callcallback for all motor driver.
+* @note:  It need to include in user callback
+* @param:  mtd - Motor Driver
+*/
+void risingEdgeCb(MotorDriver *mtd);
+/*
+* @brief:  Falling callback for all motor driver.
+* @note:   It need to include in user callback
+* @param:  mtd - Motor Driver
+*/
+void fallingEdgeCb(MotorDriver *mtd);
 
 /*
  * @brief: lld control module initialization
@@ -66,49 +121,64 @@
  *                                    left/right direction)
  *         setup PUL, DIR, EN control pins
  */
-void drivelldControlInit( void );
+void MotorlldControlInit ( MotorDriver *mtd );
 
 
 /*
  * @brief:   enable PWM channel if enable button pressed
  * @note :   duty cycle always 50%
- * @param:   dir - direction
+ * @param:   mtd - Motor Driver
+ *           dir - direction
  *           ang - angle [pulse] (4000 pulse per revolution)
  */
-void driveRun (bool dir, uint32_t ang, uint16_t speed);
+void MotorRunContinuous( MotorDriver *mtd, bool dir, uint16_t speed);
+
+
+/*
+ * @brief :  drive run in tracking mode
+ * @params:  mtd - Motor Driver
+ *           speed - speed of rotutuion in ticks of pwm timer
+ */
+void MotorRunTracking(MotorDriver *mtd, uint16_t speed);
+
+/*
+ * @brief :  drive run in tracking mode
+ * @params:  mtd - Motor Driver
+ *           dir - direction rotation
+ *           speed - speed of rotutuion in ticks of pwm timer
+ *           pulses - impulses of the position to be shifted
+ */
+void MotorRunCaclibration( MotorDriver *mtd, bool dir, uint16_t speed, uint32_t pulses);
 
 /*
  * @brief :  set motor's rotation direction
- * @params:  dir - direction
+ * @params:  mtd - Motor Driver
+ *           dir - direction rotation
  */
-void driveRunSetDirection ( bool dir );
-
-/**
- * @brief :  pwm has callback on pwm timer reset
- *           in collback function increments pwm pulses counter
- * @return : function return pwm pulses counter
- */
-uint32_t drivegetPwmCounter ( void );
+void MotorSetDirection( MotorDriver *mtd, bool dir );
 
 /**
  * @brief : function resets pwm pulses counter
  */
-void driveresetPwmCounter ( void );
+void MotoresetPwmCounter ( void );
 
 /*
  * @brief :  set motor's rotation speed
- * @params:  speed - speed of rotation (max speed - 100kHz)
+ * @params:  speed - speed of rotation (max speed - 100kHz = 1500rpm)
  */
-uint16_t driveSetSpeed(uint16_t speed);
+void MotorSetSpeed( MotorDriver *mtd, uint16_t speed );
 
 /*
  * @brief :  drive stop
+ * @params:  mtd - Motor Driver
  */
-void driveStop(void);
+void MotorStop( MotorDriver *mtd );
+
 
 /*
- * @brief :  return drive state. 0 - drive stoped, 1 - drive run
+ * @brief :  Reset position and tracked_position
+ * @params:  mtd - Motor Driver
  */
-bool driveState();
+void MotorResetPotision ( MotorDriver *mtd );
 
-#endif
+#endif /* INCLUDE_LLD_CONTROL_H */

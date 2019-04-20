@@ -9,6 +9,12 @@
 #define CSErrorDeadzoneHalfwidth 1
 
 
+void RisingMTD1Callback(PWMDriver *pwmd);
+
+void fallingMTD1Callback(PWMDriver *pwmd);
+
+
+
 //float       EngineSpeed = 770.0;
 uint8_t     val = 55;  //50 = 1V
 float       es = 770.0;
@@ -22,6 +28,35 @@ static PIDControllerContext_t  pidCtx = {
     .kd   = 0,
     .integrLimit  = 4000
 };
+
+MotorDriver MTD1 = {
+    .pwmd            =   &PWMD3,
+    .dir_line        =   PAL_LINE(GPIOB, 8),
+    .rising_edge_cb  =   RisingMTD1Callback,
+    .falling_edge_cb =   fallingMTD1Callback,
+    .max_position    =   8000
+};
+
+
+
+void RisingMTD1Callback(PWMDriver *pwmd){
+
+    (void) pwmd;
+    risingEdgeCb(&MTD1);
+    palToggleLine(PAL_LINE(GPIOB,7));
+
+}
+void fallingMTD1Callback(PWMDriver *pwmd){
+
+    (void) pwmd;
+    fallingEdgeCb(&MTD1);
+    palToggleLine(PAL_LINE(GPIOB,14));
+
+//Code when motor must stop
+
+}
+
+
 
 uint32_t map(uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_min, uint32_t out_max)
 {
@@ -84,7 +119,7 @@ static THD_FUNCTION(pid, arg) {
             val = engineSpeedControl(( uint32_t ) es);
         }
         else{
-            val = 55;
+            //val = 55;
                 pidCtx.err        = 0;
                 pidCtx.prevErr    = 0;
                 pidCtx.integrSum  = 0;
@@ -108,38 +143,56 @@ void TestEngineSpeedRouting ( void )
     can_init();
     extDacInit();
     chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO + 10, pid, NULL);
-    drivelldControlInit();
+
+      /*MotoR driver Setting */
+  palSetLineMode( PAL_LINE( GPIOC, 6),  PAL_MODE_ALTERNATE(2) );
+  palSetLineMode( MTD1.dir_line, PAL_MODE_OUTPUT_PUSHPULL);
+  palSetLine(MTD1.dir_line);
+  MotorlldControlInit( &MTD1 );
 
 
     uint32_t CPSpeed = 5000;
     uint32_t steps = 4000;
-    driveSetSpeed(CPSpeed);
+    uint16_t speed = 4000;
 
     static char  sd_buff[10] ;
     while(1) {
 
-        sdReadTimeout( &SD3, sd_buff, 5, TIME_IMMEDIATE);
+      sdReadTimeout( &SD3, sd_buff, 6, TIME_IMMEDIATE   );
 
-        if(sd_buff[4]=='r') { steps = 4000 * atoi(sd_buff); driveSetDirection(1); driveRun(NULL,steps,CPSpeed);}
-        if(sd_buff[4]=='l') { steps = 4000 * atoi(sd_buff); driveSetDirection(0); driveRun(NULL,steps,CPSpeed);}
-        if(sd_buff[4]=='z') { CPSpeed = atoi(sd_buff); driveSetSpeed(CPSpeed);}
-        if(sd_buff[4]=='c')  driveStop();
-        if(sd_buff[4]==']')  driveSetDirection(1);
-        if(sd_buff[4]=='[')  driveSetDirection(0);
+      if(sd_buff[5]=='q') {
+        speed = atoi(sd_buff);
+        MotorSetSpeed( &MTD1, speed); 
+      }
 
-        if(sd_buff[4]=='p') pidCtx.kp = atoi(sd_buff)/100.0;
-        if(sd_buff[4]=='i') pidCtx.ki = atoi(sd_buff)/100.0;
-        if(sd_buff[4]=='d') pidCtx.kd = atoi(sd_buff)/100.0;
-        if(sd_buff[4]=='m') { control_start = 0; val = atoi(sd_buff); }
-        if(sd_buff[4]=='e') es = atoi(sd_buff);
-        //if(sd_buff[4]=='g') EngineSpeed = atoi(sd_buff);
-        if(sd_buff[0]=='s') control_start = 0;
+
+
+      if(sd_buff[0]=='r') MotorRunContinuous( &MTD1, 1, speed);
+      if(sd_buff[0]=='l') MotorRunContinuous( &MTD1, 0, speed);
+      if(sd_buff[0]=='t') MotorRunTracking( &MTD1, speed);
+      if(sd_buff[5]=='o') MTD1.tracked_position = atoi(sd_buff);
+      if(sd_buff[0]=='c') MotorStop( &MTD1 );
+      if(sd_buff[0]=='m') MTD1.max_position = MTD1.position;
+      if(sd_buff[0]=='e') {if(MTD1.state == MOTOR_MOVING) MotorStop( &MTD1 ); MotorResetPotision( &MTD1);}
+      if(sd_buff[5]=='h') MotorRunCaclibration( &MTD1, 1, speed, atoi(sd_buff) );
+      if(sd_buff[5]=='j') MotorRunCaclibration( &MTD1, 0, speed, atoi(sd_buff) );
+      if(sd_buff[5]=='z') MTD1.max_position = atoi(sd_buff);
+
+        if(sd_buff[5]=='p') pidCtx.kp = atoi(sd_buff)/100.0;
+        if(sd_buff[5]=='i') pidCtx.ki = atoi(sd_buff)/100.0;
+        if(sd_buff[5]=='d') pidCtx.kd = atoi(sd_buff)/100.0;
+        if(sd_buff[5]=='v') { control_start = 0; val = atoi(sd_buff); }
+        if(sd_buff[0]=='s') { control_start = 0; val = 55; }
+        if(sd_buff[5]=='b') es = atoi(sd_buff);
         if(sd_buff[0]=='a') control_start = 1;
         
         extDacSetValue(( uint8_t)(val*0.55),val);
+      for (int i = 0; i < 9; i++)
+      {
+        sd_buff[i]='?';
+      }
 
-
-        chprintf( (BaseSequentialStream *)&SD3, "A: %d Pedal: %.1f ESpeed: %.02f  VSeed: %.2f _________es: %d Kp: %.02f ki: %.02f Kd:%.02f  ISum: %.3f ______CPSpeed: %d \r\n", val, gazel.AcceleratorPedalPosition, gazel.EngineSpeed, gazel.Speed ,es, pidCtx.kp, pidCtx.ki, pidCtx.kd,pidCtx.integrSum, CPSpeed);
+        chprintf( (BaseSequentialStream *)&SD3, "A: %d Pedal: %.1f ESpeed: %.02f  VSeed: %.2f _________es: %d Kp: %.02f ki: %.02f Kd:%.02f  ISum: %.3f ___________ State: %d  Mode: %d  Position: %d Max: %d Track:\r\n", val, gazel.AcceleratorPedalPosition, gazel.EngineSpeed, gazel.Speed ,es, pidCtx.kp, pidCtx.ki, pidCtx.kd,pidCtx.integrSum, MTD1.state , MTD1.mode, MTD1.position ,MTD1.max_position , MTD1.tracked_position);
         chThdSleepMilliseconds( 500 );
     }
 }
