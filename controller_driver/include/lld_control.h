@@ -12,16 +12,6 @@
  * PE11, PF14 uses as general outputs.
  */
 
-/******************/
-/*** Prototypes ***/
-/******************/
-
-/* @brief: starts PWM Driver.
- *         Not enable. Enabling with certain duty cycle
- *         need to be done separately.
- */
-void PWMUnitInit ( void );
-
 
 
 /******************/

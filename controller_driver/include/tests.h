@@ -15,8 +15,15 @@
  */
 void TestEngineSpeedRouting ( void );
 
+void TestADCRouting(void);
 
+void TestPWMRouting(void);
 
+void testTFCalcRouting(void);
+
+void TestEncoderRouting(void);
+
+void TestMtControl ( void );
 
 
 
@@ -39,9 +46,13 @@ static inline void testsRoutines( void )
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ENCODER)
 
     TestEncoderRouting();
-#if (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ENGINE_SPEED)
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ENGINE_SPEED)
 
     TestEngineSpeedRouting();
+
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_MT_CONTROL)
+
+    TestMtControl();
 
 #endif
 }

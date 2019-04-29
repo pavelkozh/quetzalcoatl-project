@@ -1,11 +1,8 @@
 
 
-PROJECT_MODULES =	src/lld_can.c \
-					src/lld_ext_dac.c \
-					src/controllers.c  \
-					src/lld_control.c 
+PROJECT_MODULES =	src/lld_control.c         \
 
-PROJECT_TESTS   =	tests/lld_engine_speed_test.c   
+PROJECT_TESTS   =	tests/test_mt_control.c   \
 
 
 PROJECT_CSRC    =	src/main.c src/common.c \

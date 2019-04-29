@@ -20,6 +20,7 @@
 
 
 //Limit Switch
+#define DRIVE_LIMIT_SWITCH_USE              FALSE
 #define DRIVE_LIMIT_SWITCH_1_PIN            9
 #define DRIVE_LIMIT_SWITCH_1_PIN_PORT       GPIOB
 #define DRIVE_LIMIT_SWITCH_1_EXT_MODE_GPIO  EXT_MODE_GPIOB
