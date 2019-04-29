@@ -48,8 +48,10 @@ void PWMUnitInit ( MotorDriver *mtd );
 /***************************/
 /*********  PWM  ***********/
 /***************************/
+uint8_t pwm_conf_cnt = 0;
+PWMConfig pwm_conf_arr[14];
 
-PWMConfig pwm1conf = {
+PWMConfig pwmconf = {
 
         .frequency = DRIVE_PWM_FREQ,
 
@@ -114,16 +116,19 @@ void fallingEdgeCb(MotorDriver *mtd){
                 mtd -> position--;
             else
                 mtd -> position++;
-            if( (mtd -> position  >=  mtd -> max_position) || (mtd -> position  <= 0) )  MotorStop( mtd); 
+            if( (mtd -> position  >=  mtd -> max_position) || (mtd -> position  <= 0) ){
+                MotorStop( mtd) ; 
+            }
             break;
 
         case MOTOR_MODE_CALIBRATION:
             if(mtd->position == mtd -> tracked_position){
                 MotorStop( mtd);
+                MotorResetPotision(mtd); 
             }
             else{
-                if( ( (mtd->position - mtd -> tracked_position) > 0) )     { pwmEnableChannel( mtd -> pwmd, 0, DRIVE_PWM_PULSE_WIDTH); mtd -> state = MOTOR_MOVING;}
-                if( ( (mtd->position - mtd -> tracked_position) < 0) )     { pwmEnableChannel( mtd -> pwmd, 0, DRIVE_PWM_PULSE_WIDTH); mtd -> state = MOTOR_MOVING;}
+                if( mtd->position > mtd -> tracked_position )     { pwmEnableChannel( mtd -> pwmd, 0, DRIVE_PWM_PULSE_WIDTH); mtd -> state = MOTOR_MOVING;}
+                if( mtd->position < mtd -> tracked_position )     { pwmEnableChannel( mtd -> pwmd, 0, DRIVE_PWM_PULSE_WIDTH); mtd -> state = MOTOR_MOVING;}
                 if( palReadLine(mtd->dir_line) ) 
                     mtd -> position--;
                 else
@@ -140,10 +145,10 @@ void fallingEdgeCb(MotorDriver *mtd){
 
 
 void PWMUnitInit ( MotorDriver *mtd ){
-
-        pwm1conf.callback = mtd -> rising_edge_cb;
-        pwm1conf.channels[0].callback = mtd -> falling_edge_cb;
-        pwmStart( mtd -> pwmd , &pwm1conf);
+        pwm_conf_arr[ pwm_conf_cnt ] = pwmconf;
+        pwm_conf_arr[ pwm_conf_cnt ].callback = mtd -> rising_edge_cb;
+        pwm_conf_arr[ pwm_conf_cnt ].channels[0].callback = mtd -> falling_edge_cb;
+        pwmStart( mtd -> pwmd , &pwm_conf_arr[ pwm_conf_cnt++ ]);
         // pwmEnablePeriodicNotification(mtd->pwmd);
         // pwmEnableChannelNotification(mtd->pwmd,0);
 }
