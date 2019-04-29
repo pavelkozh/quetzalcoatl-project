@@ -195,8 +195,8 @@ void TestEngineSpeedRouting ( void )
     while(1) {
 
         sdReadTimeout( &SD3, sd_buff, 6, TIME_IMMEDIATE   );
-        sdReadTimeout( &SD7, sd_buff2, 6, TIME_IMMEDIATE   );
-        sd_buff2[9] = 0;
+        //sdReadTimeout( &SD7, sd_buff2, 6, TIME_IMMEDIATE   );
+        //sd_buff2[9] = 0;
 
         if(sd_buff2[5]=='q') ClutchM.tracked_position = atoi(sd_buff);
         if(sd_buff2[5]=='w') BreakM.tracked_position = atoi(sd_buff);
@@ -243,9 +243,9 @@ void TestEngineSpeedRouting ( void )
         
         extDacSetValue(( uint8_t)(val*0.55),val);
 
-        chprintf( (BaseSequentialStream *)&SD3, "A: %d Pedal: %.1f ESpeed: %.02f  VSeed: %.2f _________es: %d Kp: %.02f ki: %.04f Kd:%.02f  ISum: %.3f CSE: %d___________ State: %d  Mode: %d  Position: %d Max: %d Track: %d_____sd_buff: %s \r\n", val, gazel.AcceleratorPedalPosition, gazel.EngineSpeed, gazel.Speed ,es, pidCtx.kp, pidCtx.ki, pidCtx.kd,pidCtx.integrSum,CSErrorDeadzoneHalfwidth, ClutchM.state , ClutchM.mode, ClutchM.position ,ClutchM.max_position , ClutchM.tracked_position,sd_buff2);
-        chprintf( (BaseSequentialStream *)&SD7,"{%d,%d,%d,%d}",ClutchM.position,BreakM.position,speed,speed);
-                for (int i = 0; i < 9; i++)
+        chprintf( (BaseSequentialStream *)&SD3, "State: %d State: %d  Mode: %d  Position1: %d  Position2: %d Max1: %d Max2: %d Track1: %d Track2: %d \r\n",ClutchM.state,BreakM.state , ClutchM.mode, ClutchM.position ,BreakM.position ,ClutchM.max_position ,BreakM.max_position , ClutchM.tracked_position,BreakM.tracked_position);
+        //chprintf( (BaseSequentialStream *)&SD7,"{%d,%d,%d,%d}",ClutchM.position,BreakM.position,speed,speed);
+         for (int i = 0; i < 9; i++)
         {
           sd_buff[i]='?';
           sd_buff2[i]='?';
