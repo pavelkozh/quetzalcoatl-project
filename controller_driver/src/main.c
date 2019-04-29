@@ -3,13 +3,11 @@
 #include <chprintf.h>
 
 
-
 int main(void)
 {
     chSysInit();
     halInit();
 
-    //commonExtDriverInit();
 
     #if (MAIN_PROGRAM_ROUTINE != PROGRAM_ROUTINE_MASTER) // need fixing
 
@@ -20,4 +18,5 @@ int main(void)
 
 
     #endif
+
 }

@@ -1,153 +1,169 @@
 #include <lld_control.h>
-#include <math.h>
-
-/* BUTTONS*/
-#define DRIVE_START_BUTTON_PORT       GPIOE
-#define DRIVE_START_BUTTON_PIN        4
-
-#define DRIVE_DIR_BUTTON_PORT         GPIOE
-#define DRIVE_DIR_BUTTON_PIN          5
-
-#define DRIVE_ENABLE_BUTTON_PORT      GPIOE
-#define DRIVE_ENABLE_BUTTON_PIN       6
 
 
-/*Control pins*/
-#define CONTROL_DRIVE_ENABLE_PORT     GPIOF
-#define CONTROL_DRIVE_ENABLE_PIN      14
 
-#define CONTROL_DRIVE_DIR_PORT        GPIOE
-#define CONTROL_DRIVE_DIR_PIN         11
+//PWM define
+#define DRIVE_PWMD            &PWMD3    // PWM Driver
+#define DRIVE_PWM_FREQ            50000000   // PWM clock frequency [Hz]
+#define DRIVE_PWM_PERIOD        500       // PWM period[tics]  
+#define DRIVE_PWM_PULSE_WIDTH        100       // PWM pulse width   
+#define DRIVE_PWM_PIN         6     // pwm pin
+#define DRIVE_PWM_PORT          GPIOC   // pwm pin port
+#define DRIVE_PWM_PAL_MODE_ALTERNATE  2     // Alternate mod ffor pwm pin
+#define DRIVE_GPTD            &GPTD5    // Driver for count pwm pulse
+#define DRIVE_GPTD_TIM_REG_SMCR     TIM_SMCR_SMS_0 | TIM_SMCR_SMS_1 | TIM_SMCR_SMS_2 | TIM_SMCR_TS_0 //Settings for Slave mode PWMD
 
+//Drive
+#define DRIVE_INVERT_ROTATION_DIRECTION   FALSE   // Invert rotation direction 
+#define DRIVE_DIRECTION_PIN         8     // Pin of set directions 
+#define DRIVE_DIRECTION_PIN_PORT      GPIOB   // Pin port set directions
+
+
+//Limit Switch
+#define DRIVE_LIMIT_SWITCH_1_PIN            9
+#define DRIVE_LIMIT_SWITCH_1_PIN_PORT       GPIOB
+#define DRIVE_LIMIT_SWITCH_1_EXT_MODE_GPIO  EXT_MODE_GPIOB
+#define DRIVE_LIMIT_SWITCH_2_PIN            15
+#define DRIVE_LIMIT_SWITCH_2_PIN_PORT       GPIOB
+#define DRIVE_LIMIT_SWITCH_2_EXT_MODE_GPIO  EXT_MODE_GPIOB
+
+
+// Motor define
+#define DRIVE_MAX_ANG                   160000      // 40 revolution or 20cm (5mm per revolution)
+#define DRIVE_MAX_SPEED                 100000      // 100Khz or 1500 rpm
+#define DRIVE_MIN_PULSE_WIDTH           (uint32_t)DRIVE_PWM_FREQ / DRIVE_MAX_SPEED
+
+//Desired pwm impulses quantity (send to driver)
+#define DRIVE_PWM_IMPULSE_QUANTITY    17 // 200 for stepper motor
+
+
+/* @brief: starts PWM Driver.
+ */
+void PWMUnitInit ( MotorDriver *mtd );
 /* Variables */
-static volatile bool  drive_dir = 0, drive_enable = 0, drive_start = 0;
+// static volatile bool  drive_dir = 0, drive_enable = 0, drive_start = 0;
+// static  uint32_t pwm_pulses_counter = 0;
+// static bool drive_state = 0; //0 - drive stoped, 1 - drive run
 
 
+/***************************/
+/*********  PWM  ***********/
+/***************************/
+uint8_t pwm_conf_cnt = 0;
+PWMConfig pwm_conf_arr[14];
 
+PWMConfig pwmconf = {
 
-/********************************/
-/*********  PWM Unit    *********/
-/********************************/
+        .frequency = DRIVE_PWM_FREQ,
 
-#define PWM_FREQ           10000000  /* PWM clock frequency [Hz] */
-#define PWM_PERIOD         200      /* PWM period[tics]  */
-
-PWMConfig pwm1conf = {
-    /* 10kHz PWM clock frequency.   */
-    .frequency = PWM_FREQ,
-
-    /* PWM period (ticks). PWM_period[s] = PWM_period[ticks]/PWM_frequency */
-    .period    = PWM_PERIOD,
-    .callback  = NULL,
-    .channels  = {
-                  {.mode = PWM_OUTPUT_ACTIVE_HIGH, .callback = NULL}, // Channel 1 is working (CH1 = PE9)
-                  {.mode = PWM_OUTPUT_DISABLED,    .callback = NULL},
-                  {.mode = PWM_OUTPUT_DISABLED,    .callback = NULL},
-                  {.mode = PWM_OUTPUT_DISABLED,    .callback = NULL}
-                  },
-    .cr2        = 0,
-    .dier       = 0
+        /* PWM period (ticks). PWM_period[s] = PWM_period[ticks]/PWM_frequency */
+        .period    = DRIVE_PWM_PERIOD,
+        .callback  = NULL,
+        .channels  = {
+                        {.mode = PWM_OUTPUT_ACTIVE_HIGH, .callback = NULL}, // Channel 1 is working (CH1 = PC6)
+                        {.mode = PWM_OUTPUT_DISABLED,    .callback = NULL},
+                        {.mode = PWM_OUTPUT_DISABLED,    .callback = NULL},
+                        {.mode = PWM_OUTPUT_DISABLED,    .callback = NULL}
+                    },
+        .cr2        = 0, //TIM_CR2_MMS_2, Master Mode OC1REF -> TRGO
+        .dier       = 0
 };
 
+/*
+* @brief:  Rising callcallback for all motor driver.
+* @note:  It need to include in user callback
+* @param: mtd - Motor Driver
+*/
+void risingEdgeCb(MotorDriver *mtd){
+    return;
+}
 
-void PWMUnitInit ( void )
-{
-    palSetLineMode( PAL_LINE( GPIOE, 9 ),  PAL_MODE_ALTERNATE(1) );
-    pwmStart( &PWMD1, &pwm1conf );
+/*
+* @brief:  Falling callback for all motor driver.
+* @note:   It need to include in user callback
+* @param:  mtd - Motor Driver
+*/
+void fallingEdgeCb(MotorDriver *mtd){
+
+
+    switch(mtd->mode){
+
+        case MOTOR_MODE_TRACKING: 
+
+                if(mtd -> tracked_position > mtd -> max_position) mtd -> tracked_position = mtd -> max_position;
+                if(mtd -> tracked_position < 0) mtd -> tracked_position = 0;
+
+                if( mtd->position > mtd -> tracked_position )
+                    { MotorSetDirection(mtd,1); pwmEnableChannel( mtd -> pwmd, 0, DRIVE_PWM_PULSE_WIDTH); mtd -> state = MOTOR_MOVING; }
+                if( mtd->position < mtd -> tracked_position )
+                    { MotorSetDirection(mtd,0); pwmEnableChannel( mtd -> pwmd, 0, DRIVE_PWM_PULSE_WIDTH); mtd -> state = MOTOR_MOVING; }
+
+                if(mtd->position == mtd -> tracked_position){
+                    pwmEnableChannel( mtd -> pwmd, 0, 0);
+                    mtd -> state = MOTOR_STOPED;
+                }else{
+
+                if( palReadLine(mtd->dir_line) ) 
+                    mtd -> position--;
+                else
+                    mtd -> position++;
+            }
+                break;
+
+            break;
+
+        case MOTOR_MODE_CONTINUOUS:
+            if( palReadLine(mtd->dir_line) )
+                mtd -> position--;
+            else
+                mtd -> position++;
+            if( (mtd -> position  >=  mtd -> max_position) || (mtd -> position  <= 0) ){
+                MotorStop( mtd) ; 
+            }
+            break;
+
+        case MOTOR_MODE_CALIBRATION:
+            if(mtd->position == mtd -> tracked_position){
+                MotorStop( mtd);
+                MotorResetPotision(mtd); 
+            }
+            else{
+                if( mtd->position > mtd -> tracked_position )     { pwmEnableChannel( mtd -> pwmd, 0, DRIVE_PWM_PULSE_WIDTH); mtd -> state = MOTOR_MOVING;}
+                if( mtd->position < mtd -> tracked_position )     { pwmEnableChannel( mtd -> pwmd, 0, DRIVE_PWM_PULSE_WIDTH); mtd -> state = MOTOR_MOVING;}
+                if( palReadLine(mtd->dir_line) ) 
+                    mtd -> position--;
+                else
+                    mtd -> position++;
+            }
+        break;
+
+        default:
+            if( (mtd -> position  >=  mtd -> max_position) || (mtd -> position  <= 0) )  MotorStop( mtd); 
+            break;
+    }
+
 }
 
 
-/* EXT Driver callback
- * Motor driver control ENABLE button change state:
- * (0->1: drive enable)
- * (1->0: drive disable)
- */
-static void extcb_en_button( EXTDriver *extp, expchannel_t channel )
-{
-    /* to avoid warnings */
-    (void)extp;
-    (void)channel;
-
-    if ( palReadPad ( DRIVE_ENABLE_BUTTON_PORT, DRIVE_ENABLE_BUTTON_PIN ) )
-    {
-        drive_enable = 0;
-
-        /* to indicate "enable" button state */
-        palClearLine( LINE_LED1 );
-
-        /* to control driver's "enable" pin */
-        palSetPad ( CONTROL_DRIVE_ENABLE_PORT, CONTROL_DRIVE_ENABLE_PIN );
-    }
-    else
-    {
-        drive_enable = 1;
-
-        /* to indicate "enable" button state */
-        palSetLine( LINE_LED1 );
-
-        /* to control driver's "enable" pin */
-        palClearPad ( CONTROL_DRIVE_ENABLE_PORT, CONTROL_DRIVE_ENABLE_PIN );
-    }
-
+void PWMUnitInit ( MotorDriver *mtd ){
+        pwm_conf_arr[ pwm_conf_cnt ] = pwmconf;
+        pwm_conf_arr[ pwm_conf_cnt ].callback = mtd -> rising_edge_cb;
+        pwm_conf_arr[ pwm_conf_cnt ].channels[0].callback = mtd -> falling_edge_cb;
+        pwmStart( mtd -> pwmd , &pwm_conf_arr[ pwm_conf_cnt++ ]);
+        // pwmEnablePeriodicNotification(mtd->pwmd);
+        // pwmEnableChannelNotification(mtd->pwmd,0);
 }
 
 
-/* Driver START/STOP button (latching) change state:
- * (0->1: drive start)
- * (1->0: drive stop )
- */
-static void extcb_start_button( EXTDriver *extp, expchannel_t channel )
-{
-    /* to avoid warnings */
-    (void)extp;
-    (void)channel;
 
-    palToggleLine(LINE_LED3);
-
-    if ( palReadPad ( DRIVE_START_BUTTON_PORT, DRIVE_START_BUTTON_PIN ) )
-    {
-        drive_start = 1;
-        palSetLine(LINE_LED3);
-    }
-    else
-    {
-        drive_start = 0;
-        palClearLine(LINE_LED3);
-    }
+static void limit_switch_1_cb( EXTDriver *extp, expchannel_t channel ){
+     (void) extp ;
+     (void) channel ;
 
 }
-
-/* Driver DIRECTION toggle button changing state occure:
- * (0->1: right direction)
- * (1->0: left direction )
- */
-static void extcb_dir_button( EXTDriver *extp, expchannel_t channel )
-{
-    /* to avoid warnings */
-    (void)extp;
-    (void)channel;
-
-    if ( palReadPad (DRIVE_DIR_BUTTON_PORT, DRIVE_DIR_BUTTON_PIN) )
-    {
-        //left_dir = 0;
-        //right_dir = 1;
-        drive_dir = 1; // clockwise
-        palClearLine( LINE_LED2 );
-
-        /* to control driver's "direction" pin */
-        palSetPad ( CONTROL_DRIVE_DIR_PORT, CONTROL_DRIVE_DIR_PIN );
-
-    }
-    else
-    {
-        //right_dir = 0;
-        //left_dir = 1;
-        drive_dir = 0; // counterclockwise
-        palSetLine( LINE_LED2 );
-
-        /* to control driver's "direction" pin */
-        palClearPad (  CONTROL_DRIVE_DIR_PORT, CONTROL_DRIVE_DIR_PIN );
-    }
+static void limit_switch_2_cb( EXTDriver *extp, expchannel_t channel ){
+    (void) extp ;
+    (void) channel ;
 }
 
 static bool         lld_control_Initialized       = false;
@@ -156,153 +172,154 @@ static bool         lld_control_Initialized       = false;
  * @brief   Initialize periphery that used for control motor
  * @note    Stable for repeated calls
  */
-void lldControlInit ( void )
-{
-      if ( lld_control_Initialized )
-                return;
 
-      /*EXT driver initialization*/
-      commonExtDriverInit();
+void MotorlldControlInit ( MotorDriver *mtd ){
+            //if ( lld_control_Initialized ) return;
 
-      /* Define channel config structure */
-      EXTChannelConfig en_b_ch_conf, start_b_ch_conf, dir_b_ch_conf;
+#if DRIVE_LIMIT_SWITCH_USE
+            /*EXT driver initialization*/
+            commonExtDriverInit();
 
-      /* Fill in configuration for channel */
-      en_b_ch_conf.mode  = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOE;
-      en_b_ch_conf.cb    = extcb_en_button;
+            EXTChannelConfig limit_switch_1_conf,limit_switch_2_conf;
 
-      start_b_ch_conf.mode  = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOE;
-      start_b_ch_conf.cb    = extcb_start_button;
+            limit_switch_1_conf.mode  = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | DRIVE_LIMIT_SWITCH_1_EXT_MODE_GPIO;
+            limit_switch_1_conf.cb    = limit_switch_1_cb;
 
-      dir_b_ch_conf.mode  = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOE;
-      dir_b_ch_conf.cb    = extcb_dir_button;
+            limit_switch_2_conf.mode  = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | DRIVE_LIMIT_SWITCH_1_EXT_MODE_GPIO;
+            limit_switch_2_conf.cb    = limit_switch_2_cb;
 
-      /* Set up EXT channels hardware pin mode as digital input.
-       * Needs to be set up before set EXT channel mode! */
-      palSetPadMode( GPIOE, DRIVE_START_BUTTON_PIN,  PAL_MODE_INPUT_PULLDOWN ); // enable button
-      palSetPadMode( GPIOE, DRIVE_ENABLE_BUTTON_PIN, PAL_MODE_INPUT_PULLDOWN ); // enable button
-      palSetPadMode( GPIOE, DRIVE_DIR_BUTTON_PIN,    PAL_MODE_INPUT_PULLDOWN ); // direction button
+            palSetLineMode( PAL_LINE(DRIVE_LIMIT_SWITCH_1_PIN_PORT,DRIVE_LIMIT_SWITCH_1_PIN), PAL_MODE_INPUT_PULLUP);
+            palSetLineMode( PAL_LINE(DRIVE_LIMIT_SWITCH_2_PIN_PORT,DRIVE_LIMIT_SWITCH_2_PIN), PAL_MODE_INPUT_PULLUP);
 
-      /* Set channel (second arg) mode with filled configuration */
-      extSetChannelMode( &EXTD1, DRIVE_ENABLE_BUTTON_PIN, &en_b_ch_conf    );
-      extSetChannelMode( &EXTD1, DRIVE_START_BUTTON_PIN,  &start_b_ch_conf );
-      extSetChannelMode( &EXTD1, DRIVE_DIR_BUTTON_PIN,    &dir_b_ch_conf   );
+            extSetChannelMode( &EXTD1, DRIVE_LIMIT_SWITCH_1_PIN, &limit_switch_1_conf );
+            extSetChannelMode( &EXTD1, DRIVE_LIMIT_SWITCH_2_PIN, &limit_switch_2_conf );
+#endif
+
+            mtd -> state = MOTOR_STOPED;
+            mtd -> position = 0;
+            mtd -> tracked_position = 0;
+
+            /* PWM Unit initialization */
+            PWMUnitInit( mtd);
+            /* Set initialization flag */
+
+            //-------------START SETTINGS!------------//
 
 
-      /* Set up hardware pin mode as digital output  */
-      palSetPadMode( GPIOE, CONTROL_DRIVE_DIR_PIN,    PAL_MODE_OUTPUT_PUSHPULL ); // direction output (control signal)
-      palSetPadMode( GPIOF, CONTROL_DRIVE_ENABLE_PIN, PAL_MODE_OUTPUT_PUSHPULL ); // enable output (control signal)
-
-      /* PWM Unit initialization */
-      PWMUnitInit();
-
-      /* Set initialization flag */
-      lld_control_Initialized = true;
+            //lld_control_Initialized = true;
 }
 
-bool ifDriverEnable ( void )
-{
-    if ( drive_start  )                return 1;
-    else                               return 0;
+/*
+ * @brief :  drive run in continuous mode
+ * @params:  mtd - Motor Driver
+ *           dir - direction rotation
+ *           speed - speed of rotutuion in ticks of pwm timer
+ */
+void MotorRunContinuous( MotorDriver *mtd, bool dir, uint16_t speed){
+
+    mtd -> mode = MOTOR_MODE_CONTINUOUS;
+    if(dir == 0 && mtd -> position >= mtd -> max_position)  return;
+    if(dir == 1 && mtd -> position <= 0)                    return;
+    MotorSetDirection( mtd , dir);
+    MotorSetSpeed( mtd, speed);
+    pwmEnableChannel( mtd -> pwmd, 0, DRIVE_PWM_PULSE_WIDTH);
+    pwmEnablePeriodicNotification(mtd->pwmd);
+    pwmEnableChannelNotification(mtd->pwmd,0);
+    mtd -> state = MOTOR_MOVING;
+
 }
 
-void motorRun ( void )
-{
-    bool motor_run_enable = 0;
+/*
+ * @brief :  drive run in tracking mode
+ * @params:  mtd - Motor Driver
+ *           speed - speed of rotutuion in ticks of pwm timer
+ */
 
-    motor_run_enable   =  ifDriverEnable ();
-    if ( motor_run_enable )
-    {
-        pwmEnableChannel( &PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH ( &PWMD1, 5000 ) );
-    }
+void MotorRunTracking(MotorDriver *mtd, uint16_t speed){
+    bool dir = 0;
+
+    if(mtd->mode != MOTOR_MODE_TRACKING)  mtd -> tracked_position = mtd -> position;
+        mtd -> mode = MOTOR_MODE_TRACKING;
+    if(mtd -> tracked_position > mtd -> max_position) mtd -> tracked_position = mtd -> max_position;
+    if(mtd -> tracked_position < 0) mtd -> tracked_position = 0;
+    // if( (mtd -> position - mtd -> tracked_position) > 0)  dir = 1;
+    // if( (mtd -> position - mtd -> tracked_position) < 0)  dir = 0;
+
+    // if(dir == 0 && mtd -> position >= mtd -> max_position)  return;
+    // if(dir == 1 && mtd -> position <= 0)                    return;
+    MotorSetDirection( mtd , dir);
+    MotorSetSpeed( mtd, speed);
+    pwmEnableChannel( mtd -> pwmd, 0, DRIVE_PWM_PULSE_WIDTH);
+    pwmEnablePeriodicNotification(mtd->pwmd);
+    pwmEnableChannelNotification(mtd->pwmd,0);
+    mtd -> state = MOTOR_MOVING;
+
+}
+
+/*
+ * @brief :  drive run in tracking mode
+ * @params:  mtd - Motor Driver
+ *           dir - direction rotation
+ *           speed - speed of rotutuion in ticks of pwm timer
+ *           pulses - impulses of the position to be shifted
+ */
+void MotorRunCaclibration( MotorDriver *mtd, bool dir, uint16_t speed, uint32_t pulses){
+
+    MotorSetDirection( mtd , dir);
+    MotorSetSpeed( mtd, speed);
+
+    if(mtd->mode != MOTOR_MODE_CALIBRATION)  mtd -> tracked_position = mtd -> position;
+    mtd -> mode = MOTOR_MODE_CALIBRATION;
+
+    //mtd -> position = 0;
+    if(dir)
+        mtd -> tracked_position -= pulses;
     else
-    {
-        pwmEnableChannel( &PWMD1, 0, 0 );
-    }
+        mtd -> tracked_position += pulses;
+
+    pwmEnableChannel( mtd -> pwmd, 0, DRIVE_PWM_PULSE_WIDTH);
+    pwmEnablePeriodicNotification(mtd->pwmd);
+    pwmEnableChannelNotification(mtd->pwmd,0);
+    mtd -> state = MOTOR_MOVING;
 }
-
-
-#define MAX_MOTOR_SPEED_RPM          4000    /*Maximal frequency of Motor (rpm)*/
-#define MAX_DRIVE_SPEED_HZ           100000  /*Maximal driver frequency (Hz)*/
-
 
 /*
- * @brief :    The function converts the motor speed specified as a percentage
- *             to the PWM period (number of ticks).
- * @params:    v - may take values in the range ( 0%...100% );
- *             PWMConfig - PWM unit configuration structure
- * @return:    PWM period in ticks
+ * @brief :  drive stop
+ * @params:  mtd - Motor Driver
  */
-pwmcnt_t mSpeed2pwmPeriodRecalc ( uint8_t v )
-{
-    pwmcnt_t ticks = 0;
+void MotorStop( MotorDriver *mtd ){
 
-    //if(v > 100 || v < -100) v = 100; //Check for going beyond the zone from -100 to 100
-    //if(v == 0) return ticks = 0; //If the speed is 0, the ticks are 0
-    //else if(v < 0) v *= -1; //If the speed is negative then make it positive
-
-    ticks = pwm1conf.frequency / (MAX_DRIVE_SPEED_HZ / 100 * v ); //Ticks calculation
-
-    return ticks;
+    pwmDisableChannel(mtd->pwmd,0);
+    pwmDisablePeriodicNotification(mtd->pwmd);
+    pwmDisableChannelNotification(mtd->pwmd,0);
+    mtd -> state = MOTOR_STOPED;
 }
-
-
-/*
- * @brief :  directly change PWM period
- * @params:  desired PWM period in ticks
- */
-void setPwmPeriod ( uint16_t pwm_period_ticks )
-{
-    pwmChangePeriod(&PWMD1, pwm_period_ticks);
-}
-
-
-/*
- * @brief : function set PWM period to control speed of rotation
- *          and set hardware pins which controls direction of rotation.
- * @params: speed in the range -100%...100% (sign specify direction)
- * @note  :
- */
-void mSetSpeed ( int8_t speed )
-{
-    pwmcnt_t pwm_period_ticks = 0;
-
-    /* Check for going beyond the range -100...100 */
-    if ( speed > 100 || speed < -100 ) speed = 100;
-
-    /* If the speed is 0, the ticks are 0 */
-    if ( speed < 0 )
-    {
-        drive_dir = 0;
-        mSetDirection ( drive_dir );
-        speed = speed * (-1); //If the speed is negative then make it positive
-    }
-    else
-    {
-        drive_dir = 1;
-        mSetDirection ( drive_dir );
-    }
-    pwm_period_ticks = mSpeed2pwmPeriodRecalc ( speed );
-    setPwmPeriod ( pwm_period_ticks );
-
-}
-
 
 
 /*
  * @brief :  set motor's rotation direction
- * @params:  dir = 1 ->> clockwise rotation
- *           dir = 0 ->> counterclockwise rotation
+ * @params:  mtd - Motor Driver
+ *           dir - direction rotation
  */
-void mSetDirection ( bool dir )
-{
-    if ( dir )  palSetPad ( CONTROL_DRIVE_DIR_PORT, CONTROL_DRIVE_DIR_PIN );
-    else        palClearPad ( CONTROL_DRIVE_DIR_PORT, CONTROL_DRIVE_DIR_PIN );
+void MotorSetDirection( MotorDriver *mtd, bool dir ){
+
+            palWriteLine(mtd->dir_line, dir);
+}
+
+/*
+ * @brief :  set motor's rotation speed
+ * @params:  speed - speed of rotation (max speed = 300 ticks of pwm timer)
+ */
+void MotorSetSpeed( MotorDriver *mtd, uint16_t speed ){
+//  if(speed >100 ) speed =100;
+//  speed = (uint16_t)( 65534 - speed*(65534- DRIVE_MIN_PULSE_WIDTH )/100 );
+
+    if(speed < DRIVE_PWM_PULSE_WIDTH * 2) speed =DRIVE_PWM_PULSE_WIDTH * 2;
+    pwmChangePeriod( mtd -> pwmd, speed );
 }
 
 
-
-
-
-
-
+void MotorResetPotision ( MotorDriver *mtd ){
+    mtd -> position = 0;
+    mtd -> tracked_position = 0;
+}
