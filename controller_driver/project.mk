@@ -1,6 +1,7 @@
 
 
 PROJECT_MODULES =	src/lld_control.c         \
+                    src/mt_control.c          \
 
 PROJECT_TESTS   =	tests/test_mt_control.c   \
 
