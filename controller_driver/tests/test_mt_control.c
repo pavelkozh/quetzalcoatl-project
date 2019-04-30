@@ -19,7 +19,7 @@ MotorDriver m_vertical = {
                           .dir_line          = PAL_LINE (GPIOG, 1 ),
                           .rising_edge_cb    = risingEdgeMTVerticalCallback,
                           .falling_edge_cb   = fallingEdgeMTVerticalCallback,
-                          .max_position      = 4000
+                          .max_position      = 54000
 };
 
 void risingEdgeMTVerticalCallback(PWMDriver *pwmd)
@@ -42,7 +42,7 @@ MotorDriver m_gorisontal = {
                           .dir_line          = PAL_LINE (GPIOE, 3 ),
                           .rising_edge_cb    = risingEdgeMTGorisontalCallback,
                           .falling_edge_cb   = fallingEdgeMTGorisontalCallback,
-                          .max_position      = 4000
+                          .max_position      = 54000
 };
 
 void risingEdgeMTGorisontalCallback(PWMDriver *pwmd)
@@ -88,7 +88,7 @@ void TestMtControl ( void )
 
         //*****MOTOR CONTROL*******//
 
-        if(sd_buff[5]=='n') {
+        if(sd_buff[5]=='v') {
           speed = atoi(sd_buff);
           MotorSetSpeed( &m_vertical, speed);
         }
@@ -115,6 +115,49 @@ void TestMtControl ( void )
 
         if(sd_buff[5]=='z') m_vertical.max_position = atoi(sd_buff);
         if(sd_buff[5]=='x') m_gorisontal.max_position = atoi(sd_buff);
+
+        if(sd_buff[0]=='n')
+        {
+            m_vertical.tracked_position   =  m_vertical.max_position/2;
+            m_gorisontal.tracked_position =  m_gorisontal.max_position/2;
+        }
+
+        /* Gear selection */
+        if(sd_buff[0]=='1')
+        {
+            m_vertical.tracked_position   =  m_vertical.max_position;
+            m_gorisontal.tracked_position =  m_gorisontal.max_position;
+        }
+
+        if(sd_buff[0]=='2')
+        {
+            m_vertical.tracked_position   =  0;
+            m_gorisontal.tracked_position =  m_gorisontal.max_position;
+        }
+
+        if(sd_buff[0]=='3')
+        {
+            m_vertical.tracked_position   =  m_vertical.max_position;
+            m_gorisontal.tracked_position =  m_gorisontal.max_position/2;
+        }
+
+        if(sd_buff[0]=='4')
+        {
+            m_vertical.tracked_position   =  0;
+            m_gorisontal.tracked_position =  m_gorisontal.max_position/2;
+        }
+
+        if(sd_buff[0]=='5')
+        {
+            m_vertical.tracked_position   =  m_vertical.max_position;
+            m_gorisontal.tracked_position =  0;
+        }
+
+        if(sd_buff[0]=='p') // back
+        {
+            m_vertical.tracked_position   =  0;
+            m_gorisontal.tracked_position =  0;
+        }
 
         chprintf( (BaseSequentialStream *)&SD3, "State_v: %d State_g: %d  Mode_v: %d Mode_g: %d  Position_v: %d  Position_g: %d Max_v: %d Max_g: %d Track_v: %d Track_g: %d \r\n",m_vertical.state,m_gorisontal.state , m_vertical.mode,m_gorisontal.mode, m_vertical.position ,m_gorisontal.position ,m_vertical.max_position ,m_gorisontal.max_position , m_vertical.tracked_position,m_gorisontal.tracked_position);
 
