@@ -142,12 +142,12 @@ void TestMtControl ( void )
         switch ( command )
         {
             case 'n':  shiftMTToNeutral (); break;
-            case '1':  shiftToFirstGear(); break;
-            case '2':  shiftToSecondGear(); break;
-            case '3':  shiftToThirdGear(); break;
-            case '4':  shiftToForthGear(); break;
-            case '5':  shiftToFifthGear(); break;
-            case 'p':  shiftToReverseGear(); break;
+            case '1':  shiftMTToNextGear (1, 4000); break;
+            case '2':  shiftMTToNextGear (2, 4000); break;
+            case '3':  shiftMTToNextGear (3, 4000); break;
+            case '4':  shiftMTToNextGear (4, 4000); break;
+            case '5':  shiftMTToNextGear (5, 4000); break;
+            case 'p':  shiftMTToNextGear (6, 4000); break;
 
         }
 
