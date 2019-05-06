@@ -215,7 +215,7 @@ void shiftMTToNeutral ( void )
     {
         m_gorisontal.tracked_position =  points_array[0].x;
     }
-    if ( m_gorisontal.position == m_gorisontal.tracked_position)
+    if ( ( m_gorisontal.position == m_gorisontal.tracked_position) && ( m_vertical.position == m_vertical.tracked_position) )
     {
         currently_selected_gear = 0;
         palSetLine(LINE_LED1);
@@ -253,8 +253,14 @@ void shiftMTToNextGear (int8_t gear_num, uint16_t speed)
 }
 
 
+/* Debug function */
+void resetLEDs ( void )
+{
+    palClearLine(LINE_LED1);
+    palClearLine(LINE_LED2);
+    palClearLine(LINE_LED3);
 
-
+}
 
 
 

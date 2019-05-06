@@ -141,13 +141,13 @@ void TestMtControl ( void )
 
         switch ( command )
         {
-            case 'n':  shiftMTToNeutral (); break;
-            case '1':  shiftMTToNextGear (1, 4000); break;
-            case '2':  shiftMTToNextGear (2, 4000); break;
-            case '3':  shiftMTToNextGear (3, 4000); break;
-            case '4':  shiftMTToNextGear (4, 4000); break;
-            case '5':  shiftMTToNextGear (5, 4000); break;
-            case 'p':  shiftMTToNextGear (6, 4000); break;
+            case 'n':   shiftMTToNeutral (); break;
+            case '1':   shiftMTToNextGear (1, 2000); break;
+            case '2':   shiftMTToNextGear (2, 2000); break;
+            case '3':   shiftMTToNextGear (3, 2000); break;
+            case '4':   shiftMTToNextGear (4, 2000); break;
+            case '5':   shiftMTToNextGear (5, 2000); break;
+            case 'p':   shiftMTToNextGear (6, 2000); break;
 
         }
 
@@ -162,7 +162,7 @@ void TestMtControl ( void )
        {
          sd_buff[i]='?';
        }
-        chThdSleepMilliseconds( 500 );
+        chThdSleepMilliseconds( 100 );
 
 
     };

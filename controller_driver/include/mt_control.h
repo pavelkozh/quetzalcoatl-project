@@ -5,7 +5,8 @@
 
 
 
-
+/* Debug function */
+void resetLEDs ( void );
 
 /*
  * @brief     perephery initialization
