@@ -61,7 +61,10 @@ typedef struct {
   * @brief: Max motor position. 
   */
     int32_t             max_position;
-
+ /**
+  * @brief: Min motor position. 
+  */
+    int32_t             min_position;
  /**
   * @brief: Tracking motor position. 
   * @note:  Use with MOTOR_RUN_TRACKING state 

@@ -90,7 +90,7 @@ void fallingEdgeCb(MotorDriver *mtd){
         case MOTOR_MODE_TRACKING: 
 
                 if(mtd -> tracked_position > mtd -> max_position) mtd -> tracked_position = mtd -> max_position;
-                if(mtd -> tracked_position < 0) mtd -> tracked_position = 0;
+                if(mtd -> tracked_position <  mtd -> min_position) mtd -> tracked_position = mtd -> min_position;
 
                 if( mtd->position > mtd -> tracked_position )
                     { MotorSetDirection(mtd,1); pwmEnableChannel( mtd -> pwmd, 0, DRIVE_PWM_PULSE_WIDTH); mtd -> state = MOTOR_MOVING; }
@@ -116,7 +116,7 @@ void fallingEdgeCb(MotorDriver *mtd){
                 mtd -> position--;
             else
                 mtd -> position++;
-            if( (mtd -> position  >=  mtd -> max_position) || (mtd -> position  <= 0) ){
+            if( (mtd -> position  >=  mtd -> max_position) || (mtd -> position  <= mtd -> min_position) ){
                 MotorStop( mtd) ; 
             }
             break;
@@ -137,7 +137,7 @@ void fallingEdgeCb(MotorDriver *mtd){
         break;
 
         default:
-            if( (mtd -> position  >=  mtd -> max_position) || (mtd -> position  <= 0) )  MotorStop( mtd); 
+            if( (mtd -> position  >=  mtd -> max_position) || (mtd -> position  <= mtd -> min_position) )  MotorStop( mtd); 
             break;
     }
 
@@ -217,7 +217,7 @@ void MotorRunContinuous( MotorDriver *mtd, bool dir, uint16_t speed){
 
     mtd -> mode = MOTOR_MODE_CONTINUOUS;
     if(dir == 0 && mtd -> position >= mtd -> max_position)  return;
-    if(dir == 1 && mtd -> position <= 0)                    return;
+    if(dir == 1 && mtd -> position <= mtd -> min_position)  return;
     MotorSetDirection( mtd , dir);
     MotorSetSpeed( mtd, speed);
     pwmEnableChannel( mtd -> pwmd, 0, DRIVE_PWM_PULSE_WIDTH);
@@ -239,7 +239,7 @@ void MotorRunTracking(MotorDriver *mtd, uint16_t speed){
     if(mtd->mode != MOTOR_MODE_TRACKING)  mtd -> tracked_position = mtd -> position;
         mtd -> mode = MOTOR_MODE_TRACKING;
     if(mtd -> tracked_position > mtd -> max_position) mtd -> tracked_position = mtd -> max_position;
-    if(mtd -> tracked_position < 0) mtd -> tracked_position = 0;
+    if(mtd -> tracked_position < mtd -> min_position) mtd -> tracked_position = mtd -> min_position;
     // if( (mtd -> position - mtd -> tracked_position) > 0)  dir = 1;
     // if( (mtd -> position - mtd -> tracked_position) < 0)  dir = 0;
 

@@ -38,7 +38,8 @@ MotorDriver ClutchM = {
     .dir_line        =   PAL_LINE(GPIOB, 8),
     .rising_edge_cb  =   RisingEdgeClutchMCallback,
     .falling_edge_cb =   fallingEdgeClutchMCallback,
-    .max_position    =   1000
+    .max_position    =   1000,
+    .min_position    =  -1000
 };
 
 
