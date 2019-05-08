@@ -15,18 +15,41 @@
  */
 void TestEngineSpeedRouting ( void );
 
-
-
+/* @brief test fuzzy_logic
+* 
+*/
+void TestFLRouting(void);
 
 
 
 static inline void testsRoutines( void )
 {
-#if (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ENGINE_SPEED)
+
+#if (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ADC)
+
+    TestADCRouting();
+
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_PWM)
+
+    TestPWMRouting();
+
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_TRANSFER_FUNC)
+
+    testTFCalcRouting();
+
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ENCODER)
+
+    TestEncoderRouting();
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_FUZZY_LOGIC)
+
+    TestFLRouting();
+
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ENGINE_SPEED)
 
     TestEngineSpeedRouting();
 
 #endif
+
 }
 
 
