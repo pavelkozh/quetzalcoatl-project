@@ -61,7 +61,10 @@ typedef struct {
   * @brief: Max motor position. 
   */
     int32_t             max_position;
-
+ /**
+  * @brief: Min motor position.
+  */
+    int32_t             min_position;
  /**
   * @brief: Tracking motor position. 
   * @note:  Use with MOTOR_RUN_TRACKING state 
@@ -115,14 +118,12 @@ void risingEdgeCb(MotorDriver *mtd);
 */
 void fallingEdgeCb(MotorDriver *mtd);
 
-
 /*
  * @brief: lld control module initialization
  *         EXT driver initialization (buttons enable/disable, start/stop,
  *                                    left/right direction)
  *         setup PUL, DIR, EN control pins
  */
-
 void MotorlldControlInit ( MotorDriver *mtd );
 
 

@@ -23,7 +23,7 @@ void TestMtControl ( void )
     mtControlInit ();
 
     static char  sd_buff[10] ;
-    uint16_t speed = 2500;
+    uint16_t speed = 10000;
 
     int32_t     v_pos = 0,
                 g_pos = 0,
@@ -48,7 +48,7 @@ void TestMtControl ( void )
     while(1)
     {
 
-        sdReadTimeout( &SD3, sd_buff, 6, TIME_IMMEDIATE   );
+        sdReadTimeout( &SD3, sd_buff, 7, TIME_IMMEDIATE   );
 
         v_pos        = getVerticalPosition ();
         g_pos        = getGorisontalPosition ();
@@ -78,23 +78,32 @@ void TestMtControl ( void )
 //        if(sd_buff[0]=='t') MotorRunContinuous( &m_gorisontal, 1, speed);
 //        if(sd_buff[0]=='g') MotorRunContinuous( &m_gorisontal, 0, speed);
 //
-//        if(sd_buff[0]=='u') { MotorRunTracking( &m_vertical, speed); MotorRunTracking( &m_gorisontal, speed);}
+        if(sd_buff[0]=='u') setTrackedMode( speed, speed );
 //
-//        if(sd_buff[5]=='q') m_vertical.tracked_position = atoi(sd_buff);
-//        if(sd_buff[5]=='w') m_gorisontal.tracked_position = atoi(sd_buff);
+        if(sd_buff[6]=='q') setTrackedModePositionVerticalMotor ( atoi(sd_buff) );
+        if(sd_buff[6]=='w') setTrackedModePositionGorisontalMotor ( atoi(sd_buff) );
 //
-//        if(sd_buff[0]=='c') { MotorStop( &m_vertical );  MotorStop( &m_gorisontal ); }
+        if(sd_buff[0]=='c') {  verticalMotorStop ();  gorisontalMotorStop (); }
 //
 //
-        if(sd_buff[5]=='e') { command = ' '; verticalCaclibration (1, speed, atoi(sd_buff));}
-        if(sd_buff[5]=='d') { command = ' '; verticalCaclibration (0, speed, atoi(sd_buff));}
-        if(sd_buff[5]=='y') { command = ' '; gorisontalCaclibration (1, speed, atoi(sd_buff));}
-        if(sd_buff[5]=='h') { command = ' '; gorisontalCaclibration (0, speed, atoi(sd_buff));}
-//
-//        if(sd_buff[5]=='z') m_vertical.max_position = atoi(sd_buff);
-//        if(sd_buff[5]=='x') m_gorisontal.max_position = atoi(sd_buff);
+        if(sd_buff[6]=='e') { command = ' '; verticalCaclibration (1, speed, atoi(sd_buff));}
+        if(sd_buff[6]=='d') { command = ' '; verticalCaclibration (0, speed, atoi(sd_buff));}
+        if(sd_buff[6]=='y') { command = ' '; gorisontalCaclibration (1, speed, atoi(sd_buff));}
+        if(sd_buff[6]=='h') { command = ' '; gorisontalCaclibration (0, speed, atoi(sd_buff));}
+
+        if(sd_buff[6]=='z') setVerticalMotorMaxPosition ( atoi(sd_buff) ) ;
+        if(sd_buff[6]=='x') setGorisontalMotorMaxPosition ( atoi(sd_buff) );
 
 
+
+        /*
+         * (0,0)-neutral
+         * 1 gear (vertical) = 12500 // 1 gear (gorisontal) = 13000
+         * 2 gear (gorisontal) = -17000
+         * 3 gear   (gorisontal) = 13000
+         *
+         *
+         * */
 
         /* Gear selection */
         if(sd_buff[0]=='n')
@@ -103,31 +112,31 @@ void TestMtControl ( void )
             //shiftMTToNeutral ();
         }
 
-        if(sd_buff[0]=='1')
+        if(sd_buff[0]=='i')
         {
             command = '1';
             //shiftToFirstGear ();
         }
 
-        if(sd_buff[0]=='2')
+        if(sd_buff[0]=='o')
         {
             command = '2';
             //shiftToSecondGear ();
         }
 
-        if(sd_buff[0]=='3')
+        if(sd_buff[0]=='k')
         {
             command = '3';
             //shiftToThirdGear ();
         }
 
-        if(sd_buff[0]=='4')
+        if(sd_buff[0]=='l')
         {
             command = '4';
             //shiftToForthGear ();
         }
 
-        if(sd_buff[0]=='5')
+        if(sd_buff[0]=='m')
         {
             command = '5';
             //shiftToFifthGear ();
@@ -141,13 +150,13 @@ void TestMtControl ( void )
 
         switch ( command )
         {
-            case 'n':   shiftMTToNeutral (); break;
-            case '1':   shiftMTToNextGear (1, 2000); break;
-            case '2':   shiftMTToNextGear (2, 2000); break;
-            case '3':   shiftMTToNextGear (3, 2000); break;
-            case '4':   shiftMTToNextGear (4, 2000); break;
-            case '5':   shiftMTToNextGear (5, 2000); break;
-            case 'p':   shiftMTToNextGear (6, 2000); break;
+            case 'n':   shiftMTToNeutral ( 1000 ); break;
+            case '1':   shiftMTToNextGear (1, 1000); break;
+            case '2':   shiftMTToNextGear (2, 1000); break;
+            case '3':   shiftMTToNextGear (3, 1000); break;
+            case '4':   shiftMTToNextGear (4, 1000); break;
+            case '5':   shiftMTToNextGear (5, 1000); break;
+            case 'p':   shiftMTToNextGear (6, 1000); break;
 
         }
 

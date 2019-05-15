@@ -11,11 +11,13 @@ void fallingEdgeMTGorisontalCallback(PWMDriver *pwmd);
 
 
 MotorDriver m_vertical = {
-                          .pwmd              = &PWMD11,
-                          .dir_line          = PAL_LINE (GPIOG, 1 ),
-                          .rising_edge_cb    = risingEdgeMTVerticalCallback,
-                          .falling_edge_cb   = fallingEdgeMTVerticalCallback,
-                          .max_position      = 54000
+                          .pwmd              = &PWMD14,
+                          .dir_line          = PAL_LINE (GPIOE, 3 ),
+                          .rising_edge_cb    = risingEdgeMTGorisontalCallback,
+                          .falling_edge_cb   = fallingEdgeMTGorisontalCallback,
+                          .max_position      = 18000,
+                          .min_position      = -18000
+
 
 };
 
@@ -35,11 +37,12 @@ void fallingEdgeMTVerticalCallback(PWMDriver *pwmd)
 
 
 MotorDriver m_gorisontal = {
-                          .pwmd              = &PWMD14,
-                          .dir_line          = PAL_LINE (GPIOE, 3 ),
-                          .rising_edge_cb    = risingEdgeMTGorisontalCallback,
-                          .falling_edge_cb   = fallingEdgeMTGorisontalCallback,
-                          .max_position      = 54000
+                              .pwmd              = &PWMD11,
+                              .dir_line          = PAL_LINE (GPIOG, 1 ),
+                              .rising_edge_cb    = risingEdgeMTVerticalCallback,
+                              .falling_edge_cb   = fallingEdgeMTVerticalCallback,
+                              .max_position      = 13000,
+                              .min_position      = -13000
 };
 
 void risingEdgeMTGorisontalCallback(PWMDriver *pwmd)
@@ -80,49 +83,49 @@ void mtControlInit ( void )
     palSetPadMode( GPIOB, 7, PAL_MODE_OUTPUT_PUSHPULL );    //Led 2
     palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );    //Led 3
 
-//    /*neutral gear coordinates*/
-//    points_array[0].x = 0; //neutral gear horizontal coordinate
-//    points_array[0].y = 0; //neutral gear vertical coordinate
-//    /*first gear coordinates*/
-//    points_array[1].x = m_gorisontal.max_position / 2; //first gear horizontal coordinate
-//    points_array[1].y = m_vertical.max_position / 2; //first gear vertical coordinate
-//    /*second gear coordinates*/
-//    points_array[2].x = m_gorisontal.max_position / 2; //second gear horizontal coordinate
-//    points_array[2].y = -m_vertical.max_position / 2; //second gear vertical coordinate
-//    /*third gear coordinates*/
-//    points_array[3].x = 0; //third gear horizontal coordinate
-//    points_array[3].y = m_vertical.max_position / 2; //third gear vertical coordinate
-//    /*fourth gear coordinates*/
-//    points_array[4].x = 0; //fourth gear horizontal coordinate
-//    points_array[4].y = -m_vertical.max_position / 2; //fourth gear vertical coordinate
-//    /*fifth gear coordinates*/
-//    points_array[5].x = -m_gorisontal.max_position / 2; //fifth gear horizontal coordinate
-//    points_array[5].y = m_vertical.max_position / 2; //fifth gear vertical coordinate
-//    /*reverse gear coordinates*/
-//    points_array[6].x = -m_gorisontal.max_position / 2; //reverse gear horizontal coordinate
-//    points_array[6].y = -m_vertical.max_position / 2; //reverse gear vertical coordinate
-
     /*neutral gear coordinates*/
-     points_array[0].x = m_gorisontal.max_position/2; //neutral gear horizontal coordinate
-     points_array[0].y = m_vertical.max_position/2; //neutral gear vertical coordinate
-     /*first gear coordinates*/
-     points_array[1].x = m_gorisontal.max_position; //first gear horizontal coordinate
-     points_array[1].y = m_vertical.max_position; //first gear vertical coordinate
-     /*second gear coordinates*/
-     points_array[2].x = m_gorisontal.max_position; //second gear horizontal coordinate
-     points_array[2].y = 0; //second gear vertical coordinate
-     /*third gear coordinates*/
-     points_array[3].x = m_gorisontal.max_position / 2; //third gear horizontal coordinate
-     points_array[3].y = m_vertical.max_position; //third gear vertical coordinate
-     /*fourth gear coordinates*/
-     points_array[4].x = m_gorisontal.max_position / 2; //fourth gear horizontal coordinate
-     points_array[4].y = 0; //fourth gear vertical coordinate
-     /*fifth gear coordinates*/
-     points_array[5].x = 0; //fifth gear horizontal coordinate
-     points_array[5].y = m_vertical.max_position; //fifth gear vertical coordinate
-     /*reverse gear coordinates*/
-     points_array[6].x = 0; //reverse gear horizontal coordinate
-     points_array[6].y = 0; //reverse gear vertical coordinate
+    points_array[0].x = 0; //neutral gear horizontal coordinate
+    points_array[0].y = 0; //neutral gear vertical coordinate
+    /*first gear coordinates*/
+    points_array[1].x = -12500; //first gear horizontal coordinate
+    points_array[1].y = 15000; //first gear vertical coordinate
+    /*second gear coordinates*/
+    points_array[2].x = -12500; //second gear horizontal coordinate
+    points_array[2].y = -18000; //second gear vertical coordinate
+    /*third gear coordinates*/
+    points_array[3].x = 0; //third gear horizontal coordinate
+    points_array[3].y = 13000; //third gear vertical coordinate
+    /*fourth gear coordinates*/
+    points_array[4].x = 0; //fourth gear horizontal coordinate
+    points_array[4].y = -18000; //fourth gear vertical coordinate
+    /*fifth gear coordinates*/
+    points_array[5].x = 12500; //fifth gear horizontal coordinate
+    points_array[5].y = 13000; //fifth gear vertical coordinate
+    /*reverse gear coordinates*/
+    points_array[6].x = 13000; //reverse gear horizontal coordinate
+    points_array[6].y = -18000; //reverse gear vertical coordinate
+
+//    /*neutral gear coordinates*/
+//     points_array[0].x = m_gorisontal.max_position/2; //neutral gear horizontal coordinate
+//     points_array[0].y = m_vertical.max_position/2; //neutral gear vertical coordinate
+//     /*first gear coordinates*/
+//     points_array[1].x = m_gorisontal.max_position; //first gear horizontal coordinate
+//     points_array[1].y = m_vertical.max_position; //first gear vertical coordinate
+//     /*second gear coordinates*/
+//     points_array[2].x = m_gorisontal.max_position; //second gear horizontal coordinate
+//     points_array[2].y = 0; //second gear vertical coordinate
+//     /*third gear coordinates*/
+//     points_array[3].x = m_gorisontal.max_position / 2; //third gear horizontal coordinate
+//     points_array[3].y = m_vertical.max_position; //third gear vertical coordinate
+//     /*fourth gear coordinates*/
+//     points_array[4].x = m_gorisontal.max_position / 2; //fourth gear horizontal coordinate
+//     points_array[4].y = 0; //fourth gear vertical coordinate
+//     /*fifth gear coordinates*/
+//     points_array[5].x = 0; //fifth gear horizontal coordinate
+//     points_array[5].y = m_vertical.max_position; //fifth gear vertical coordinate
+//     /*reverse gear coordinates*/
+//     points_array[6].x = 0; //reverse gear horizontal coordinate
+//     points_array[6].y = 0; //reverse gear vertical coordinate
 
 }
 
@@ -130,6 +133,36 @@ void setTrackedMode ( uint16_t vertical_speed, uint16_t gorisontal_speed )
 {
     MotorRunTracking( &m_vertical,   vertical_speed);
     MotorRunTracking( &m_gorisontal, gorisontal_speed);
+}
+
+void setTrackedModePositionVerticalMotor ( int32_t pos )
+{
+    m_vertical.tracked_position = pos;
+}
+
+void setTrackedModePositionGorisontalMotor ( int32_t pos )
+{
+    m_gorisontal.tracked_position = pos;
+}
+
+void verticalMotorStop ( void )
+{
+    MotorStop( &m_vertical );
+}
+
+void gorisontalMotorStop ( void )
+{
+    MotorStop( &m_gorisontal );
+}
+
+void setVerticalMotorMaxPosition ( int32_t max_pos )
+{
+    m_vertical.max_position = max_pos;
+}
+
+void setGorisontalMotorMaxPosition ( int32_t max_pos )
+{
+    m_gorisontal.max_position = max_pos;
 }
 
 void verticalCaclibration( bool dir, uint16_t speed, uint16_t step )
@@ -207,9 +240,9 @@ uint16_t getVerticalSpeed ( void )
 static bool neutral_gear_flag = false;
 int8_t currently_selected_gear = -1;
 
-void shiftMTToNeutral ( void )
+void shiftMTToNeutral ( uint16_t speed )
 {
-    setTrackedMode ( 4000, 4000 );
+    setTrackedMode ( speed, speed );
     m_vertical.tracked_position   =  points_array[0].y;
     if ( m_vertical.position == m_vertical.tracked_position)
     {
@@ -232,7 +265,16 @@ void shiftMTToNextGear (int8_t gear_num, uint16_t speed)
     {
         if ( currently_selected_gear != 0 ) //currently selected gear is not a neutral gear
         {
-            shiftMTToNeutral (); // firstly disable currently selected gear
+//            if ( ( (( currently_selected_gear == 1 ) && (gear_num == 2)) == false ) || ( (( currently_selected_gear == 2 ) && (gear_num == 1)) == false ) )
+//            {
+//                shiftMTToNeutral ( speed ); // firstly disable currently selected gear
+//            }
+//            else
+//            {
+//                currently_selected_gear = 0;
+//            }
+            shiftMTToNeutral ( speed ); // firstly disable currently selected gear
+
         }
         else
         {

@@ -1,7 +1,6 @@
 #include <lld_control.h>
 
 
-
 //PWM define
 #define DRIVE_PWMD            &PWMD3    // PWM Driver
 #define DRIVE_PWM_FREQ            50000000   // PWM clock frequency [Hz]
@@ -20,7 +19,6 @@
 
 
 //Limit Switch
-#define DRIVE_LIMIT_SWITCH_USE              FALSE
 #define DRIVE_LIMIT_SWITCH_1_PIN            9
 #define DRIVE_LIMIT_SWITCH_1_PIN_PORT       GPIOB
 #define DRIVE_LIMIT_SWITCH_1_EXT_MODE_GPIO  EXT_MODE_GPIOB
@@ -92,7 +90,7 @@ void fallingEdgeCb(MotorDriver *mtd){
         case MOTOR_MODE_TRACKING: 
 
                 if(mtd -> tracked_position > mtd -> max_position) mtd -> tracked_position = mtd -> max_position;
-                if(mtd -> tracked_position < 0) mtd -> tracked_position = 0;
+                if(mtd -> tracked_position <  mtd -> min_position) mtd -> tracked_position = mtd -> min_position;
 
                 if( mtd->position > mtd -> tracked_position )
                     { MotorSetDirection(mtd,1); pwmEnableChannel( mtd -> pwmd, 0, DRIVE_PWM_PULSE_WIDTH); mtd -> state = MOTOR_MOVING; }
@@ -118,7 +116,7 @@ void fallingEdgeCb(MotorDriver *mtd){
                 mtd -> position--;
             else
                 mtd -> position++;
-            if( (mtd -> position  >=  mtd -> max_position) || (mtd -> position  <= 0) ){
+            if( (mtd -> position  >=  mtd -> max_position) || (mtd -> position  <= mtd -> min_position) ){
                 MotorStop( mtd) ; 
             }
             break;
@@ -139,7 +137,7 @@ void fallingEdgeCb(MotorDriver *mtd){
         break;
 
         default:
-            if( (mtd -> position  >=  mtd -> max_position) || (mtd -> position  <= 0) )  MotorStop( mtd); 
+            if( (mtd -> position  >=  mtd -> max_position) || (mtd -> position  <= mtd -> min_position) )  MotorStop( mtd);
             break;
     }
 
@@ -173,7 +171,6 @@ static bool         lld_control_Initialized       = false;
  * @brief   Initialize periphery that used for control motor
  * @note    Stable for repeated calls
  */
-
 void MotorlldControlInit ( MotorDriver *mtd ){
             //if ( lld_control_Initialized ) return;
 
@@ -220,7 +217,7 @@ void MotorRunContinuous( MotorDriver *mtd, bool dir, uint16_t speed){
 
     mtd -> mode = MOTOR_MODE_CONTINUOUS;
     if(dir == 0 && mtd -> position >= mtd -> max_position)  return;
-    if(dir == 1 && mtd -> position <= 0)                    return;
+    if(dir == 1 && mtd -> position <= mtd -> min_position)  return;
     MotorSetDirection( mtd , dir);
     MotorSetSpeed( mtd, speed);
     pwmEnableChannel( mtd -> pwmd, 0, DRIVE_PWM_PULSE_WIDTH);
@@ -242,7 +239,7 @@ void MotorRunTracking(MotorDriver *mtd, uint16_t speed){
     if(mtd->mode != MOTOR_MODE_TRACKING)  mtd -> tracked_position = mtd -> position;
         mtd -> mode = MOTOR_MODE_TRACKING;
     if(mtd -> tracked_position > mtd -> max_position) mtd -> tracked_position = mtd -> max_position;
-    if(mtd -> tracked_position < 0) mtd -> tracked_position = 0;
+    if(mtd -> tracked_position < mtd -> min_position) mtd -> tracked_position = mtd -> min_position;
     // if( (mtd -> position - mtd -> tracked_position) > 0)  dir = 1;
     // if( (mtd -> position - mtd -> tracked_position) < 0)  dir = 0;
 
@@ -324,3 +321,4 @@ void MotorResetPotision ( MotorDriver *mtd ){
     mtd -> position = 0;
     mtd -> tracked_position = 0;
 }
+
