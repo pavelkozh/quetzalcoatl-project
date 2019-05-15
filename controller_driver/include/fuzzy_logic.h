@@ -1,3 +1,4 @@
+
 #ifndef FUZZY_LOGIC_H
 #define FUZZY_LOGIC_H
 
@@ -7,75 +8,75 @@ typedef struct {
 /*
 *
 */
-	float		ln;
+	double		ln;
 /*
 *
 */
-	float		mn;
+	double		mn;
 /*
 *
 */
-	float		sn;
+	double		sn;
 /*
 *
 */
-	float		no;
+	double		no;
 /*
 *
 */
-	float		sp;
+	double		sp;
 /*
 *
 */
-	float		mp;
+	double		mp;
 /*
 *
 */
-	float		lp;
+	double		lp;
 } FuzzyficationVal;
 
 typedef struct {
 /*
 * @brief minimal value
 */
-	float				min_val;
+	double				min_val;
 /*
 * @brief maxmum value
 */
-	float				max_val;
+	double				max_val;
 /*
 *
 */
-	float		ln;
+	double		ln;
 /*
 *
 */
-	float		mn;
+	double		mn;
 /*
 *
 */
-	float		sn;
+	double		sn;
 /*
 *
 */
-	float		no;
+	double		no;
 /*
 *
 */
-	float		sp;
+	double		sp;
 /*
 *
 */
-	float		mp;
+	double		mp;
 /*
 *
 */
-	float		lp;
+	double		lp;
 /*
 * @brief step for term value.
 * @note: Read only
 */
-	float				step;
+	double				step;
 /*
 * @brief fazzyfication output value.
 * @note: Read only
@@ -85,13 +86,13 @@ typedef struct {
 } FuzzyVar;
 
 typedef struct {
-	float A;
-	float op1;
-	float B;
-	float op2;
-	float C;
-	float then1;
-	float then2;
+	double A;
+	double op1;
+	double B;
+	double op2;
+	double C;
+	double then1;
+	double then2;
 } rule;
 
 
@@ -103,6 +104,6 @@ void fuzzyVarInit(FuzzyVar * fv);
 /*
 *	@brief fuzzyfication
 */
-void fuzzyfication(FuzzyVar *fv, float input_val);
+void fuzzyfication(FuzzyVar *fv, double input_val);
 
 #endif /* FUZZY_LOGIC_H */

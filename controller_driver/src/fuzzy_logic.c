@@ -67,8 +67,8 @@ void fuzzyVarInit(FuzzyVar * fv){
 };
 
 
-float fuzzyficationTerm(FuzzyVar *fv,float val){
-	float res = 0.0;
+double fuzzyficationTerm(FuzzyVar *fv,double val){
+	double res = 0.0;
 	if(val <= 0.0) 
 		res = (1.0/fv->step) * val+1.0;
 	else
@@ -77,7 +77,7 @@ float fuzzyficationTerm(FuzzyVar *fv,float val){
 	return res;
 }
 
-void fuzzyfication(FuzzyVar * fv, float input_val){
+void fuzzyfication(FuzzyVar * fv, double input_val){
 
 	fv->output_val.ln = 0.0;
 	fv->output_val.mn = 0.0;
@@ -103,7 +103,7 @@ void fuzzyfication(FuzzyVar * fv, float input_val){
 	}
 }
 
-void addRule(float A, float op1,float B, float op2, float C, float then1, float then2){
+void addRule(double A, bool op1, double B, bool op2, double C, double then1, double then2){
 	rules[rule_cnt].A = A;
 	rules[rule_cnt].op1 = op1;
 	rules[rule_cnt].B = B;
@@ -114,8 +114,30 @@ void addRule(float A, float op1,float B, float op2, float C, float then1, float 
 	rule_cnt++;
 }
 
-void calculateFLReg(FuzzyVar A, FuzzyVar B, FuzzyVar C, ){
+void calculateFLReg(double _VSpeed_err, double _dVSpeed_err, double _Clutch_pos, double _Break_pos){
+	double sum_ch1=0,sum_ch2=0,sum_zn=0;
+	fuzzyfication(&VSpeed_err,_VSpeed_err);
+	fuzzyfication(&dVSpeed_err,_dVSpeed_err);
+	fuzzyfication(&Clutch_pos,_Clutch_pos);
+	fuzzyfication(&Break_pos,_Break_pos);
 
+	for(uint8_t i=0; i<rule_cnt; i++){
+		double alpha = 0;
+		if(op1){
+			if(op2){
+				alpha = 
+			}else{
+				alpha = 
+			}
+		}else{
+			if(op2){
+				alpha = 
+			}else{
+				alpha = MIN( MIN(), );
+			}
+
+		}
+	};
 }
 
 

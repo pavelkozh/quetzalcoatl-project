@@ -205,7 +205,6 @@ void TestFLRouting ( void )
     while(1) {
 
         sdReadTimeout( &SD3, sd_buff, 5, TIME_IMMEDIATE   );
-        if(sd_buff[4]=='r'){ testvar=atoi(sd_buff)/100.0; fuzzyfication(&fuzzy_speed,testvar); }
         //sdReadTimeout( &SD7, sd_buff2, 6, TIME_IMMEDIATE   );
         // //sd_buff2[9] = 0;
 
@@ -261,7 +260,7 @@ void TestFLRouting ( void )
         //   sd_buff[i]='?';
         //   sd_buff2[i]='?';
         // }
-        chprintf( (BaseSequentialStream *)&SD3,"val: %.02f ,ln: %.02f,mn: %.02f,sn: %.02f,no: %.02f,sp: %.02f,mp: %.02f,lp: %.02f \n\r", testvar_out, fuzzy_speed.output_val.ln,fuzzy_speed.output_val.mn,fuzzy_speed.output_val.sn,fuzzy_speed.output_val.no,fuzzy_speed.output_val.sp,fuzzy_speed.output_val.mp,fuzzy_speed.output_val.lp);
+        //chprintf( (BaseSequentialStream *)&SD3,"val: %.02f ,ln: %.02f,mn: %.02f,sn: %.02f,no: %.02f,sp: %.02f,mp: %.02f,lp: %.02f \n\r", testvar_out, fuzzy_speed.output_val.ln,fuzzy_speed.output_val.mn,fuzzy_speed.output_val.sn,fuzzy_speed.output_val.no,fuzzy_speed.output_val.sp,fuzzy_speed.output_val.mp,fuzzy_speed.output_val.lp);
         chThdSleepMilliseconds( 500 );
     }
 }
