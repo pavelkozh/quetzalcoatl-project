@@ -258,7 +258,7 @@ void shiftMTToNeutral ( uint16_t speed )
 }
 
 
-void shiftMTToNextGear (int8_t gear_num, uint16_t speed)
+int8_t shiftMTToNextGear (int8_t gear_num, uint16_t speed)
 {
     setTrackedMode ( speed, speed );
     if ( currently_selected_gear != gear_num )
@@ -292,6 +292,7 @@ void shiftMTToNextGear (int8_t gear_num, uint16_t speed)
             }
         }
     }
+    return currently_selected_gear;
 }
 
 
