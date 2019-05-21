@@ -11,8 +11,33 @@ void fuzzylogicInit(){
     fuzzyVarInit(&Clutch_speed);
     fuzzyVarInit(&Break_speed);
 
-    addRule(VSpeed_err.ln, AND, dVSpeed_err.mn, AND, Clutch_pos.sn, AND, Break_pos.no, Clutch_speed.sp,Break_speed.mp);
-    addRule(VSpeed_err.lp, AND, dVSpeed_err.mp, AND, Clutch_pos.sp, AND, Break_pos.no, Clutch_speed.sn,Break_speed.mn);
+addRule(VSpeed_err.no, dVSpeed_err.no, Clutch_speed.no, Break_speed.no);
+addRule(VSpeed_err.no, dVSpeed_err.mn, Clutch_speed.mn, Break_speed.no);
+addRule(VSpeed_err.no, dVSpeed_err.ln, Clutch_speed.ln, Break_speed.no);
+addRule(VSpeed_err.no, dVSpeed_err.mp, Clutch_speed.lp, Break_speed.no);
+addRule(VSpeed_err.no, dVSpeed_err.lp, Clutch_speed.lp, Break_speed.mn);
+addRule(VSpeed_err.mn, dVSpeed_err.no, Clutch_speed.mn, Break_speed.mn);
+addRule(VSpeed_err.mn, dVSpeed_err.mp, Clutch_speed.no, Break_speed.mn);
+addRule(VSpeed_err.mn, dVSpeed_err.lp, Clutch_speed.mp, Break_speed.mn);
+addRule(VSpeed_err.mn, dVSpeed_err.mn, Clutch_speed.mn, Break_speed.mn);
+addRule(VSpeed_err.mn, dVSpeed_err.ln, Clutch_speed.ln, Break_speed.ln);
+addRule(VSpeed_err.ln, dVSpeed_err.no, Clutch_speed.ln, Break_speed.mn);
+addRule(VSpeed_err.ln, dVSpeed_err.mp, Clutch_speed.mn, Break_speed.mn);
+addRule(VSpeed_err.ln, dVSpeed_err.lp, Clutch_speed.no, Break_speed.mn);
+addRule(VSpeed_err.ln, dVSpeed_err.mn, Clutch_speed.ln, Break_speed.mn);
+addRule(VSpeed_err.ln, dVSpeed_err.ln, Clutch_speed.ln, Break_speed.ln);
+addRule(VSpeed_err.mp, dVSpeed_err.no, Clutch_speed.mp, Break_speed.no);
+addRule(VSpeed_err.mp, dVSpeed_err.mn, Clutch_speed.no, Break_speed.mn);
+addRule(VSpeed_err.mp, dVSpeed_err.ln, Clutch_speed.mn, Break_speed.mn);
+addRule(VSpeed_err.mp, dVSpeed_err.mp, Clutch_speed.lp, Break_speed.mn);
+addRule(VSpeed_err.mp, dVSpeed_err.lp, Clutch_speed.lp, Break_speed.mn);
+addRule(VSpeed_err.lp, dVSpeed_err.no, Clutch_speed.lp, Break_speed.mp);
+addRule(VSpeed_err.lp, dVSpeed_err.mp, Clutch_speed.lp, Break_speed.lp);
+addRule(VSpeed_err.lp, dVSpeed_err.lp, Clutch_speed.lp, Break_speed.lp);
+addRule(VSpeed_err.lp, dVSpeed_err.mn, Clutch_speed.mp, Break_speed.mn);
+addRule(VSpeed_err.lp, dVSpeed_err.ln, Clutch_speed.no, Break_speed.mn);
+
+
 
 }
 
@@ -20,14 +45,15 @@ void fuzzylogicInit(){
 *   @brief evenly splits the interval into 6 segments
 */
 void fuzzyVarInit(FuzzyVar * fv){
-        fv->step = (fv->max_val - fv->min_val)/3.0;
+        fv->step = (fv->max_val - fv->min_val)/4.0;
         fv->ln = fv->min_val;
         fv->mn = fv->step   + fv->min_val;
-        fv->sn = fv->step*2 + fv->min_val;
-        fv->no = fv->step*3 + fv->min_val;
-        fv->sp = fv->step*4 + fv->min_val;
-        fv->mp = fv->step*5 + fv->min_val;
+        // fv->sn = fv->step*2 + fv->min_val;
+        fv->no = fv->step*2 + fv->min_val;
+        // fv->sp = fv->step*4 + fv->min_val;
+        fv->mp = fv->step*3 + fv->min_val;
         fv->lp = fv->max_val;
+        
         // fv->output_val.ln = 0.0;
         // fv->output_val.mn = 0.0;
         // fv->output_val.sn = 0.0;
@@ -73,17 +99,17 @@ double fuzzyficationTerm(FuzzyVar *fv,double val){
 //     }
 // }
 
-void addRule(double Vs,  double dVs,  double Cp, double Bp, double Cs, double Bs){
+void addRule(double Vs,  double dVs,  double Cs, double Bs){
     rules[rule_cnt].Vs = Vs;
     rules[rule_cnt].dVs = dVs;
-    rules[rule_cnt].Cp = Cp;
-    rules[rule_cnt].Bp = Bp;
+    // rules[rule_cnt].Cp = Cp;
+    // rules[rule_cnt].Bp = Bp;
     rules[rule_cnt].Cs = Cs;
     rules[rule_cnt].Bs = Bs;
     rule_cnt++;
 }
 
-void calculateFLReg(double _VSpeed_err, double _dVSpeed_err, double _Clutch_pos, double _Break_pos, double *res_buff){
+void calculateFLReg(double _VSpeed_err, double _dVSpeed_err, double *res_buff){
     double sum_ch1=0,sum_ch2=0,sum_al=0;
     // fuzzyfication(&VSpeed_err,_VSpeed_err);
     // fuzzyfication(&dVSpeed_err,_dVSpeed_err);
@@ -94,22 +120,17 @@ void calculateFLReg(double _VSpeed_err, double _dVSpeed_err, double _Clutch_pos,
         double alpha = 0;
         double  Vs=0,dVs=0,Cp=0,Bp=0;
         Vs = fuzzyficationTerm(&VSpeed_err,_VSpeed_err - rules[i].Vs);
-        chprintf( (BaseSequentialStream *)&SD3,"Vs = %.2f \r\n",rules[i].Vs);
         alpha = Vs;
         dVs = fuzzyficationTerm(&dVSpeed_err,_dVSpeed_err - rules[i].dVs);
-         chprintf( (BaseSequentialStream *)&SD3,"dVs = %.2f \r\n",rules[i].dVs);
         if(dVs < alpha) alpha = dVs;
-        Cp = fuzzyficationTerm(&Clutch_pos,_Clutch_pos - rules[i].Cp);
-         chprintf( (BaseSequentialStream *)&SD3,"Cp = %.2f \r\n",rules[i].Cp);
-        if(Cp < alpha) alpha = Cp;
-        Bp = fuzzyficationTerm(&Break_pos,_Break_pos - rules[i].Bp);+
-         chprintf( (BaseSequentialStream *)&SD3,"Bp = %.2f \r\n",rules[i].Bp);
-        if(Bp < alpha) alpha = Bp;
+        // Cp = fuzzyficationTerm(&Clutch_pos,_Clutch_pos - rules[i].Cp);
+        // if(Cp < alpha) alpha = Cp;
+        // Bp = fuzzyficationTerm(&Break_pos,_Break_pos - rules[i].Bp);
+        // if(Bp < alpha) alpha = Bp;
         sum_ch1 += alpha * rules[i].Cs;
         sum_ch2 += alpha * rules[i].Bs;
         sum_al += alpha;
     }
-    chprintf( (BaseSequentialStream *)&SD3,"res buf = %.4f / %.4f \r\n\r\n",sum_ch1, sum_al);
     res_buff[0] = sum_ch1/sum_al;
     res_buff[1] = sum_ch2/sum_al;
 }

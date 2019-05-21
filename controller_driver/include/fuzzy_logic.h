@@ -55,7 +55,7 @@ typedef struct {
 /*
 *
 */
-    double      sn;
+    // double      sn;
 /*
 *
 */
@@ -63,7 +63,7 @@ typedef struct {
 /*
 *
 */
-    double      sp;
+    // double      sp;
 /*
 *
 */
@@ -153,12 +153,12 @@ void fuzzyfication(FuzzyVar *fv, double input_val);
 /*
 *   @brief add rulle for fuzzy regulator
 */
-void addRule(double Vs,  double dVs,  double Cp, double Bp, double Cs, double Bs);
+void addRule(double Vs,  double dVs, double Cs, double Bs);
 
 /*
 *   @brief calculate fuzzy regulator
 */
-void calculateFLReg(double _VSpeed_err, double _dVSpeed_err, double _Clutch_pos, double _Break_pos, double *res_buff);
+void calculateFLReg(double _VSpeed_err, double _dVSpeed_err, double *res_buff);
 
 
 #endif /* FUZZY_LOGIC_H */

@@ -174,13 +174,13 @@ void TestFLRouting ( void )
         //*****Fuzzy CONTROL*******//
 
         if(sd_buff[5]=='q') Vs_e  = atoi(sd_buff)/100.0-5; 
-        if(sd_buff[0]=='w') { dVs_e = Vs_e-VSpeed_prev; VSpeed_prev = Vs_e;}
+        if(sd_buff[5]=='w') dVs_e = atoi(sd_buff)/1000.0-0.3; 
         if(sd_buff[5]=='e') Cl_pos  = atoi(sd_buff) ;
         if(sd_buff[5]=='r') B_pos   = atoi(sd_buff) ;
-        if(sd_buff[0]=='s') calculateFLReg(Vs_e,dVs_e,Cl_pos,B_pos,&res_buff);
+        if(sd_buff[0]=='s') {Vs_e = Vs_e+dVs_e; calculateFLReg(Vs_e,dVs_e,&res_buff);}
 
         // chprintf( (BaseSequentialStream *)&SD3, "State: %d State: %d  Mode: %d  Position1: %d  Position2: %d Max1: %d Max2: %d Track1: %d Track2: %d \r\n",ClutchM.state,BreakM.state , ClutchM.mode, ClutchM.position ,BreakM.position ,ClutchM.max_position ,BreakM.max_position , ClutchM.tracked_position,BreakM.tracked_position);
-        chprintf( (BaseSequentialStream *)&SD3,"VSpeed_err: %.2f, dVSpeed_err: %.2f, Clutch_pos: %d, Break_pos: %d, Cs: %.2f, Bs: %.2f \n\r",Vs_e,dVs_e,Cl_pos,B_pos,res_buff[0],res_buff[1]);
+        chprintf( (BaseSequentialStream *)&SD3,"VSpeed_err: %.2f, dVSpeed_err: %.3f, Cs: %.2f, Bs: %.2f \n\r",Vs_e,dVs_e,res_buff[0],res_buff[1]);
          for (int i = 0; i < 9; i++)
         {
           sd_buff[i]='?';
