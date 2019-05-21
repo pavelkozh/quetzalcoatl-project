@@ -18,11 +18,11 @@ void mtControlInit ( void );
 /*
  * @brief    move carriage to neutral position
  */
-void shiftMTToNeutral ( uint16_t speed );
+int8_t shiftMTToNeutral ( uint16_t speed );
 /*
  * @brief    move carriage to position corresponding to selected gear
  */
-void shiftMTToNextGear (int8_t gear_num, uint16_t speed);
+int8_t shiftMTToNextGear (int8_t gear_num, uint16_t speed);
 
 #if 0
 void shiftToFirstGear ( void );

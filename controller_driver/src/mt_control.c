@@ -15,8 +15,8 @@ MotorDriver m_vertical = {
                           .dir_line          = PAL_LINE (GPIOE, 3 ),
                           .rising_edge_cb    = risingEdgeMTGorisontalCallback,
                           .falling_edge_cb   = fallingEdgeMTGorisontalCallback,
-                          .max_position      = 18000,
-                          .min_position      = -18000
+                          .max_position      = 15000,
+                          .min_position      = -25000
 
 
 };
@@ -87,11 +87,11 @@ void mtControlInit ( void )
     points_array[0].x = 0; //neutral gear horizontal coordinate
     points_array[0].y = 0; //neutral gear vertical coordinate
     /*first gear coordinates*/
-    points_array[1].x = -13000; //first gear horizontal coordinate
+    points_array[1].x = -12000; //first gear horizontal coordinate
     points_array[1].y = 15000; //first gear vertical coordinate
     /*second gear coordinates*/
-    points_array[2].x = -13000; //second gear horizontal coordinate
-    points_array[2].y = -18000; //second gear vertical coordinate
+    points_array[2].x = -12000; //second gear horizontal coordinate
+    points_array[2].y = -22000; //second gear vertical coordinate
     /*third gear coordinates*/
     points_array[3].x = 0; //third gear horizontal coordinate
     points_array[3].y = 13000; //third gear vertical coordinate
@@ -103,7 +103,7 @@ void mtControlInit ( void )
     points_array[5].y = 13000; //fifth gear vertical coordinate
     /*reverse gear coordinates*/
     points_array[6].x = 13000; //reverse gear horizontal coordinate
-    points_array[6].y = -18000; //reverse gear vertical coordinate
+    points_array[6].y = -24000; //reverse gear vertical coordinate
 
 //    /*neutral gear coordinates*/
 //     points_array[0].x = m_gorisontal.max_position/2; //neutral gear horizontal coordinate
@@ -137,11 +137,13 @@ void setTrackedMode ( uint16_t vertical_speed, uint16_t gorisontal_speed )
 
 void setTrackedModePositionVerticalMotor ( int32_t pos )
 {
+    setTrackedMode ( 10000, 10000 );
     m_vertical.tracked_position = pos;
 }
 
 void setTrackedModePositionGorisontalMotor ( int32_t pos )
 {
+    setTrackedMode ( 10000, 10000 );
     m_gorisontal.tracked_position = pos;
 }
 
@@ -240,7 +242,7 @@ uint16_t getVerticalSpeed ( void )
 static bool neutral_gear_flag = false;
 int8_t currently_selected_gear = -1;
 
-void shiftMTToNeutral ( uint16_t speed )
+int8_t shiftMTToNeutral ( uint16_t speed )
 {
     setTrackedMode ( speed, speed );
     m_vertical.tracked_position   =  points_array[0].y;
@@ -254,7 +256,7 @@ void shiftMTToNeutral ( uint16_t speed )
         palSetLine(LINE_LED1);
     }
 
-
+    return currently_selected_gear;
 }
 
 
