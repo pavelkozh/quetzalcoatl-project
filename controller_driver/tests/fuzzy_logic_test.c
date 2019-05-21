@@ -20,21 +20,8 @@ void fallingEdgeBreakMCallback(PWMDriver *pwmd);
 
 
 
-//float       EngineSpeed = 770.0;
-uint8_t     val = 55;  //50 = 1V
-float       es = 770.0;
-bool        control_start = 0;
-uint8_t CSErrorDeadzoneHalfwidth = 0;
-
 
 extern  gazelParam gazel;
-
-static PIDControllerContext_t  pidCtx = {
-    .kp   = 1,
-    .ki   = 0.01,
-    .kd   = 0,
-    .integrLimit  = 8000
-};
 
 MotorDriver ClutchM = {
     .pwmd            =   &PWMD3,
@@ -69,8 +56,6 @@ MotorDriver BreakM = {
     .max_position    =   1000
 };
 
-
-
 void RisingEdgeBreakMCallback(PWMDriver *pwmd){
 
     (void) pwmd;
@@ -85,79 +70,10 @@ void fallingEdgeBreakMCallback(PWMDriver *pwmd){
 //Code when motor must stop
 }
 
-
-
-uint32_t map(uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_min, uint32_t out_max)
-{
-  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
-
-
 static const SerialConfig sdcfg = {
   .speed = 115200,
   .cr1 = 0, .cr2 = 0, .cr3 = 0
 };
-
-/**
- * @brief   Control system of steering implementation
- * @param   position        - reference position
- * @return  controlValue    - control signal value [-100 100] ( in percent )
- */
-uint32_t engineSpeedControl( uint32_t engine_speed_rpm )
-{
-
-    engine_speed_rpm = map(engine_speed_rpm,0,5000,0,5000);
-
-    //engine_speed_rpm  = CLIP_VALUE( engine_speed_rpm, 0, 100 );
-
-    int16_t current_engine_speed = map(gazel.EngineSpeed,0,5000,0,5000);
-
-    int16_t error = engine_speed_rpm - current_engine_speed;
-    
-    /* Dead zone for (p) error */
-    if ( abs(error) < CSErrorDeadzoneHalfwidth )
-    {
-        pidCtx.err = 0;
-    }
-    else
-    {
-        pidCtx.err = error;
-    }
-
-    uint32_t controlValue    = PIDControlResponse( &pidCtx );
-
-
-    /*  roughly reset integral */
-    controlValue = CLIP_VALUE(controlValue,0,420);// 55 -> 215; 107 -> 420
-    controlValue = map(controlValue,0,5000,77,255);
-
-    return controlValue;
-
-}
-
-static THD_WORKING_AREA(pid_wa, 64);
-static THD_FUNCTION(pid, arg) {
-    
-    (void)arg;
-
-    PIDControlInit( &pidCtx );
-    palSetPad(GPIOB,0);
-    
-    while(1){
-        if (control_start ){
-            val = engineSpeedControl(( uint32_t ) es);
-        }
-        else{
-            //val = 55;
-                pidCtx.err        = 0;
-                pidCtx.prevErr    = 0;
-                pidCtx.integrSum  = 0;
-        }
-        
-
-        chThdSleepMilliseconds( 20 );
-    }
-}
 
 void TestFLRouting ( void )
 {
@@ -176,7 +92,7 @@ void TestFLRouting ( void )
     palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
     can_init();
     extDacInit();
-    chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO + 10, pid, NULL);
+    // chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO + 10, pid, NULL);
 
       /*MotoR driver Setting */
     palSetLineMode( PAL_LINE( GPIOC, 6),  PAL_MODE_ALTERNATE(2) );
@@ -188,23 +104,25 @@ void TestFLRouting ( void )
     palSetLineMode( BreakM.dir_line, PAL_MODE_OUTPUT_PUSHPULL);
     MotorlldControlInit( &BreakM );
 
-
+    /*Fuzzy logic controller*/
     fuzzylogicInit();
-
 
     uint32_t CPSpeed = 5000;
     uint32_t steps = 4000;
     uint16_t speed = 4000;
 
-    float testvar = 0.0;
-    float testvar_out = 0.0;
 
-    static char  sd_buff[10] = {0,0,0,0,0,0,0,0,0,0} ;
-    static char  sd_buff2[10] ;
+    static char  sd_buff[10] = {'?','?','?','?','?','?','?','?','?','?'} ;
+    static double res_buff[2] = {1.0,1.0};
+    float  Vs_e  = -5.0;
+    float VSpeed_prev = -2.5;
+    float  dVs_e = -2.5;
+    uint32_t  Cl_pos  = 38300;
+    uint32_t  B_pos   = 13100;
 
     while(1) {
 
-        sdReadTimeout( &SD3, sd_buff, 5, TIME_IMMEDIATE   );
+        sdReadTimeout( &SD3, sd_buff, 6, TIME_IMMEDIATE   );
         //sdReadTimeout( &SD7, sd_buff2, 6, TIME_IMMEDIATE   );
         // //sd_buff2[9] = 0;
 
@@ -253,13 +171,20 @@ void TestFLRouting ( void )
         
         // extDacSetValue(( uint8_t)(val*0.55),val);
 
+        //*****Fuzzy CONTROL*******//
+
+        if(sd_buff[5]=='q') Vs_e  = atoi(sd_buff)/100.0-5; 
+        if(sd_buff[0]=='w') { dVs_e = Vs_e-VSpeed_prev; VSpeed_prev = Vs_e;}
+        if(sd_buff[5]=='e') Cl_pos  = atoi(sd_buff) ;
+        if(sd_buff[5]=='r') B_pos   = atoi(sd_buff) ;
+        if(sd_buff[0]=='s') calculateFLReg(Vs_e,dVs_e,Cl_pos,B_pos,&res_buff);
+
         // chprintf( (BaseSequentialStream *)&SD3, "State: %d State: %d  Mode: %d  Position1: %d  Position2: %d Max1: %d Max2: %d Track1: %d Track2: %d \r\n",ClutchM.state,BreakM.state , ClutchM.mode, ClutchM.position ,BreakM.position ,ClutchM.max_position ,BreakM.max_position , ClutchM.tracked_position,BreakM.tracked_position);
-        // //chprintf( (BaseSequentialStream *)&SD7,"{%d,%d,%d,%d}",ClutchM.position,BreakM.position,speed,speed);
-        //  for (int i = 0; i < 9; i++)
-        // {
-        //   sd_buff[i]='?';
-        //   sd_buff2[i]='?';
-        // }
+        chprintf( (BaseSequentialStream *)&SD3,"VSpeed_err: %.2f, dVSpeed_err: %.2f, Clutch_pos: %d, Break_pos: %d, Cs: %.2f, Bs: %.2f \n\r",Vs_e,dVs_e,Cl_pos,B_pos,res_buff[0],res_buff[1]);
+         for (int i = 0; i < 9; i++)
+        {
+          sd_buff[i]='?';
+        }
         //chprintf( (BaseSequentialStream *)&SD3,"val: %.02f ,ln: %.02f,mn: %.02f,sn: %.02f,no: %.02f,sp: %.02f,mp: %.02f,lp: %.02f \n\r", testvar_out, fuzzy_speed.output_val.ln,fuzzy_speed.output_val.mn,fuzzy_speed.output_val.sn,fuzzy_speed.output_val.no,fuzzy_speed.output_val.sp,fuzzy_speed.output_val.mp,fuzzy_speed.output_val.lp);
         chThdSleepMilliseconds( 500 );
     }
