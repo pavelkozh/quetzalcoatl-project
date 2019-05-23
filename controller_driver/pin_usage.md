@@ -1,19 +1,12 @@
 # Controller periphery usage
 
-## Encoder unit for clutch pedal actuator 
-Driver | Pins | Input / Output | Description
--------|------|----------------|----------
-EXT1   | PF7  | Input          | channel A
-EXT1   | PF8  | Input          | channel B
-GPT3   | Timer| -              | -       
-
 ## Throttle position (DAC)
 Driver | Pins | Input / Output | Description
 -------|------|----------------|----------
-SPI    | PA5 |                | clock
-SPI    | PA6 |                | MISO
-SPI    | PA7 |                | MOSI
-SPI    | PD14|               | CS
+SPI    | PA5  |                | clock
+SPI    | PA6  |                | MISO
+SPI    | PA7  |                | MOSI
+SPI    | PD14 |                | CS
 
 
 ## CAN 
@@ -27,24 +20,32 @@ CAN1   | PD0  |                |CAN TX
 Driver | Pins | Input / Output | Description
 -------|------|----------------|----------
 PWM3   | PC6  | Output         |   
-PAL    | PB8 | Output         | Direction
+PAL    | PB8  | Output         | Direction
 
 
 
 ## Brake pedal actuator control unit 
 Driver | Pins | Input / Output  | Description
--------|------|-------
-PWM4   | PD12  | Output         |   
+-------|------|-----------------|------------
+PWM4   | PD12 | Output          |   
 PAL    | PD11 | Output          | Direction
 
 
-## Transmition control unit 
+## Transmission control unit 
 Driver | Pins | Input / Output | Description
--------|------|-------         |
-PWM11  | PF7  |                | vertical
-PWM14  | PF9  |                | gorisontal
-PAL    | PG1  |                | vertical Direction
-PAL    | PE3  |                | gorisontal Direction
+-------|------|----------------|------------
+PWM11  | PF7  | Output         | vertical
+PWM14  | PF9  | Output         | horizontal
+PAL    | PG1  | Output         | vertical Direction
+PAL    | PE3  | Output         | horizontal Direction
+
+## Transmission calibration sensors 
+Driver | Pins | Input / Output | Description
+-------|------|----------------|------------
+EXT1   |PG2   | Input          | horizontal axis right sensor
+EXT1   |PG3   | Input          | horizontal axis left sensor
+EXT1   |PC14  | Input          | vertical   axis upper sensor
+EXT1   |PC15  | Input          | vertical   axis lower sensor   
 
 
 ## Steer actuator control unit 

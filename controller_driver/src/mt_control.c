@@ -1,5 +1,19 @@
 #include <mt_control.h>
 #include <lld_control.h>
+#include <common.h>
+
+/* LS - Limit Switch */
+#define VERTICAL_UPPER_LS_PAD 14
+#define VERTICAL_UPPER_LS_LINE PAL_LINE( GPIOG, VERTICAL_UPPER_LS_PAD )
+
+#define VERTICAL_LOWER_LS_PAD 15
+#define VERTICAL_LOWER_LS_LINE PAL_LINE( GPIOG, VERTICAL_LOWER_LS_PAD )
+
+#define HORIZONTAL_RIGHT_LS_PAD 2
+#define HORIZONTAL_RIGHT_LS_LINE PAL_LINE( GPIOG, HORIZONTAL_RIGHT_LS_PAD )
+
+#define HORIZONTAL_LEFT_LS_PAD 3
+#define HORIZONTAL_LEFT_LS_LINE PAL_LINE( GPIOG, HORIZONTAL_LEFT_LS_PAD )
 
 
 
@@ -104,29 +118,6 @@ void mtControlInit ( void )
     /*reverse gear coordinates*/
     points_array[6].x = 13000; //reverse gear horizontal coordinate
     points_array[6].y = -24000; //reverse gear vertical coordinate
-
-//    /*neutral gear coordinates*/
-//     points_array[0].x = m_gorisontal.max_position/2; //neutral gear horizontal coordinate
-//     points_array[0].y = m_vertical.max_position/2; //neutral gear vertical coordinate
-//     /*first gear coordinates*/
-//     points_array[1].x = m_gorisontal.max_position; //first gear horizontal coordinate
-//     points_array[1].y = m_vertical.max_position; //first gear vertical coordinate
-//     /*second gear coordinates*/
-//     points_array[2].x = m_gorisontal.max_position; //second gear horizontal coordinate
-//     points_array[2].y = 0; //second gear vertical coordinate
-//     /*third gear coordinates*/
-//     points_array[3].x = m_gorisontal.max_position / 2; //third gear horizontal coordinate
-//     points_array[3].y = m_vertical.max_position; //third gear vertical coordinate
-//     /*fourth gear coordinates*/
-//     points_array[4].x = m_gorisontal.max_position / 2; //fourth gear horizontal coordinate
-//     points_array[4].y = 0; //fourth gear vertical coordinate
-//     /*fifth gear coordinates*/
-//     points_array[5].x = 0; //fifth gear horizontal coordinate
-//     points_array[5].y = m_vertical.max_position; //fifth gear vertical coordinate
-//     /*reverse gear coordinates*/
-//     points_array[6].x = 0; //reverse gear horizontal coordinate
-//     points_array[6].y = 0; //reverse gear vertical coordinate
-
 }
 
 void setTrackedMode ( uint16_t vertical_speed, uint16_t gorisontal_speed )
@@ -176,6 +167,18 @@ void gorisontalCaclibration( bool dir, uint16_t speed, uint16_t step )
 {
     MotorRunCaclibration( &m_gorisontal, dir, speed, step );
 }
+
+void verticalMotorRunContinuous (bool direction, uint16_t speed)
+{
+    MotorRunContinuous( &m_vertical, direction, speed);
+}
+
+void gorisontalMotorRunContinuous (bool direction, uint16_t speed)
+{
+    MotorRunContinuous( &m_gorisontal, direction, speed);
+}
+
+
 
 int32_t getVerticalPosition ( void )
 {
@@ -239,7 +242,7 @@ uint16_t getVerticalSpeed ( void )
     return m_vertical.pwmd->period;
 }
 
-static bool neutral_gear_flag = false;
+//static bool neutral_gear_flag = false;
 int8_t currently_selected_gear = -1;
 
 int8_t shiftMTToNeutral ( uint16_t speed )
@@ -298,206 +301,128 @@ int8_t shiftMTToNextGear (int8_t gear_num, uint16_t speed)
 }
 
 
-/* Debug function */
-void resetLEDs ( void )
+/***     channel processing     ***/
+static void extcb_vertical_upper_sensor(EXTDriver *extp, expchannel_t channel)
 {
-    palClearLine(LINE_LED1);
-    palClearLine(LINE_LED2);
-    palClearLine(LINE_LED3);
+    (void)extp;
+    (void)channel;
+
+    verticalMotorStop ();
+    verticalCaclibration( 1, 20000, 2000 );
+}
+
+/***     channel processing     ***/
+static void extcb_vertical_lower_sensor(EXTDriver *extp, expchannel_t channel)
+{
+    (void)extp;
+    (void)channel;
+
+    verticalMotorStop ();
+    verticalCaclibration( 0, 20000, 2000 );
+}
+
+/***     channel processing     ***/
+static void extcb_horizontal_left_sensor(EXTDriver *extp, expchannel_t channel)
+{
+    (void)extp;
+    (void)channel;
+
+    gorisontalMotorStop ();
+    gorisontalCaclibration( 0, 20000, 2000 );
+}
+
+/***     channel processing     ***/
+static void extcb_horizontal_right_sensor(EXTDriver *extp, expchannel_t channel)
+{
+    (void)extp;
+    (void)channel;
+
+    gorisontalMotorStop ();
+    gorisontalCaclibration( 1, 20000, 2000 );
+}
+
+
+void calibrationMTInit ( void )
+{
+    /*EXT driver initialization*/
+    commonExtDriverInit();
+
+    /* Define channel config structure
+     * ch1_conf stands for vertical upper limit switch
+     * ch2_conf stands for vertical lower limit switch
+     * ch3_conf stands for horizontal left limit switch
+     * ch4_conf stands for horizontal right limit switch*/
+    EXTChannelConfig ch1_conf,ch2_conf,ch3_conf,ch4_conf;
+
+    /* Fill in configuration for channels */
+    ch1_conf.mode     = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC;
+    ch1_conf.cb       = extcb_vertical_upper_sensor;
+
+    ch2_conf.mode     = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC;
+    ch2_conf.cb       = extcb_vertical_lower_sensor;
+
+    ch3_conf.mode     = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOG;
+    ch3_conf.cb       = extcb_horizontal_left_sensor;
+
+    ch4_conf.mode     = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOG;
+    ch4_conf.cb       = extcb_horizontal_right_sensor;
+
+    /* Set up EXT channel hardware pin mode as digital input  */
+    palSetLineMode( VERTICAL_UPPER_LS_LINE,   PAL_MODE_INPUT_PULLUP );
+    palSetLineMode( VERTICAL_LOWER_LS_LINE,   PAL_MODE_INPUT_PULLUP );
+    palSetLineMode( HORIZONTAL_LEFT_LS_LINE,  PAL_MODE_INPUT_PULLUP );
+    palSetLineMode( HORIZONTAL_RIGHT_LS_LINE, PAL_MODE_INPUT_PULLUP );
+
+    /* Set channel (second arg) mode with filled configuration */
+    extSetChannelMode( &EXTD1, VERTICAL_UPPER_LS_PAD,   &ch1_conf );
+    extSetChannelMode( &EXTD1, VERTICAL_LOWER_LS_PAD,   &ch2_conf );
+    extSetChannelMode( &EXTD1, HORIZONTAL_LEFT_LS_PAD,  &ch3_conf );
+    extSetChannelMode( &EXTD1, HORIZONTAL_RIGHT_LS_PAD, &ch4_conf );
 
 }
 
 
-
-#if 0
-
-void shiftToFirstGear ( void )
+void doCalibrationMT ( void )
 {
-    setTrackedMode ( 4000, 4000 );
-    if ((m_vertical.position != m_vertical.max_position ) || (m_gorisontal.position != m_gorisontal.max_position ))
-    {
-        if ( !neutral_gear_flag )
-        {
-            shiftMTToNeutral ();
-        }
+    /* MT motors control initialization*/
+    mtControlInit ();
 
-        if ((m_vertical.position == m_vertical.max_position / 2) && (m_gorisontal.position == m_gorisontal.max_position / 2))
-        {
-            neutral_gear_flag = true;
-        }
-        if ( neutral_gear_flag )
-        {
-            m_gorisontal.tracked_position =  m_gorisontal.max_position;
-            if ( m_gorisontal.position == m_gorisontal.tracked_position )
-            {
-                m_vertical.tracked_position   =  m_vertical.max_position;
-                palToggleLine(LINE_LED2);
-                if ( m_vertical.position >= m_vertical.tracked_position-100 )
-                {
-                    neutral_gear_flag = false;
-                    palToggleLine(LINE_LED2);
-                }
-            }
-        }
+    /*EXT Init, EXT interrupt enable */
+    calibrationMTInit ();
+
+    /* check vertical axis upper and lower sensors PADs */
+    /*if upper sensor is on -> move down until lower sensor external interrupt occur
+     *if lower sensor is on -> move up until upper sensor external interrupt occur */
+    if ( palReadLine( VERTICAL_UPPER_LS_LINE ) )
+    {
+        verticalMotorRunContinuous (0, 20000);
     }
-}
-
-void shiftToSecondGear ( void )
-{
-    setTrackedMode ( 4000, 4000 );
-    //neutral_gear_flag = false;
-
-    if ((m_vertical.position != 0 ) || (m_gorisontal.position != m_gorisontal.max_position ))
-        {
-            if ( !neutral_gear_flag )
-            {
-                shiftMTToNeutral ();
-            }
-
-            if ((m_vertical.position == m_vertical.max_position / 2) && (m_gorisontal.position == m_gorisontal.max_position / 2))
-            {
-                neutral_gear_flag = true;
-            }
-            if ( neutral_gear_flag )
-            {
-                m_gorisontal.tracked_position =  m_gorisontal.max_position;
-                if ( m_gorisontal.position == m_gorisontal.tracked_position )
-                {
-                    m_vertical.tracked_position   =  0;
-                    if ( m_vertical.position == m_vertical.tracked_position )
-                    {
-                        neutral_gear_flag = false;
-                    }
-                }
-            }
-        }
-}
-
-void shiftToThirdGear ( void )
-{
-    setTrackedMode ( 4000, 4000 );
-
-    if ((m_vertical.position != m_vertical.max_position ) || (m_gorisontal.position != m_gorisontal.max_position/2 ))
-        {
-            if ( !neutral_gear_flag )
-            {
-                shiftMTToNeutral ();
-            }
-
-            if ((m_vertical.position == m_vertical.max_position / 2) && (m_gorisontal.position == m_gorisontal.max_position / 2))
-            {
-                neutral_gear_flag = true;
-            }
-            if ( neutral_gear_flag )
-            {
-                m_gorisontal.tracked_position =  m_gorisontal.max_position/2;
-                if ( m_gorisontal.position == m_gorisontal.tracked_position )
-                {
-                    m_vertical.tracked_position   =  m_vertical.max_position;
-                    if ( m_vertical.position == m_vertical.tracked_position )
-                    {
-                        neutral_gear_flag = false;
-                    }
-                }
-            }
-        }
-}
-
-void shiftToForthGear ( void )
-{
-    setTrackedMode ( 4000, 4000 );
-
-    if ((m_vertical.position != 0 ) || (m_gorisontal.position != m_gorisontal.max_position/2 ))
+    if ( palReadLine( VERTICAL_LOWER_LS_LINE ) )
     {
-        if ( !neutral_gear_flag )
-        {
-            shiftMTToNeutral ();
-        }
-
-        if ((m_vertical.position == m_vertical.max_position / 2) && (m_gorisontal.position == m_gorisontal.max_position / 2))
-        {
-            neutral_gear_flag = true;
-        }
-        if ( neutral_gear_flag )
-        {
-            m_gorisontal.tracked_position =  m_gorisontal.max_position/2;
-            if ( m_gorisontal.position == m_gorisontal.tracked_position )
-            {
-                m_vertical.tracked_position   =  0;
-                if ( m_vertical.position == m_vertical.tracked_position )
-                {
-                    neutral_gear_flag = false;
-                }
-            }
-        }
+        verticalMotorRunContinuous (1, 20000);
     }
 
+    /* check horizontal axis left and right sensors PADs
+     * if left sensor is on -> move to the right until right sensor external interrupt occur
+     * if right sensor is on -> move to the left until left sensor external interrupt occur */
 
-
-}
-
-void shiftToFifthGear ( void )
-{
-    setTrackedMode ( 4000, 4000 );
-
-    if ((m_vertical.position != m_vertical.max_position ) || (m_gorisontal.position != 0 ))
+    if ( palReadLine( HORIZONTAL_RIGHT_LS_LINE ) )
     {
-        if ( !neutral_gear_flag )
-        {
-            shiftMTToNeutral ();
-        }
-
-        if ((m_vertical.position == m_vertical.max_position / 2) && (m_gorisontal.position == m_gorisontal.max_position / 2))
-        {
-            neutral_gear_flag = true;
-        }
-        if ( neutral_gear_flag )
-        {
-            m_gorisontal.tracked_position =  0;
-            if ( m_gorisontal.position == m_gorisontal.tracked_position )
-            {
-                m_vertical.tracked_position   =  m_vertical.max_position;
-                if ( m_vertical.position == m_vertical.tracked_position )
-                {
-                    neutral_gear_flag = false;
-                }
-            }
-        }
+        gorisontalMotorRunContinuous (0, 20000);
+    }
+    if ( palReadLine( HORIZONTAL_LEFT_LS_LINE ) )
+    {
+        gorisontalMotorRunContinuous (1, 20000);
     }
 
-}
-
-void shiftToReverseGear ( void )
-{
-    setTrackedMode ( 4000, 4000 );
-   // neutral_gear_flag = false;
-
-    if ((m_vertical.position != 0 ) || (m_gorisontal.position != 0 ))
-    {
-        if ( !neutral_gear_flag )
-        {
-            shiftMTToNeutral ();
-        }
-
-        if ((m_vertical.position == m_vertical.max_position / 2) && (m_gorisontal.position == m_gorisontal.max_position / 2))
-        {
-            neutral_gear_flag = true;
-        }
-        if ( neutral_gear_flag )
-        {
-            m_gorisontal.tracked_position =  0;
-            if ( m_gorisontal.position == m_gorisontal.tracked_position )
-            {
-                m_vertical.tracked_position   =  0;
-                if ( m_vertical.position == m_vertical.tracked_position )
-                {
-                    neutral_gear_flag = false;
-                }
-            }
-        }
-    }
-
+    /* Disable EXT interrupts */
+    extChannelDisable(&EXTD1, HORIZONTAL_RIGHT_LS_PAD);
+    extChannelDisable(&EXTD1, HORIZONTAL_LEFT_LS_PAD);
+    extChannelDisable(&EXTD1, VERTICAL_UPPER_LS_PAD);
+    extChannelDisable(&EXTD1, VERTICAL_LOWER_LS_PAD);
 
 }
 
-#endif
+
+
+

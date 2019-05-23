@@ -24,23 +24,36 @@ int8_t shiftMTToNeutral ( uint16_t speed );
  */
 int8_t shiftMTToNextGear (int8_t gear_num, uint16_t speed);
 
-#if 0
-void shiftToFirstGear ( void );
-void shiftToSecondGear ( void );
-void shiftToThirdGear ( void );
-void shiftToForthGear ( void );
-void shiftToFifthGear ( void );
-void shiftToReverseGear ( void );
-#endif
+/*
+ * @brief    External interrupts initialization for calibration
+ * @note     For calibration used 4 limit switches
+ */
+void calibrationMTInit ( void );
+
+/*
+ * @brief    moving carriage to the center
+ */
+void doCalibrationMT ( void );
 
 
+
+
+
+
+
+/*
+ * @brief    Service functions
+ */
 void verticalCaclibration( bool dir, uint16_t speed, uint16_t step );
 void gorisontalCaclibration( bool dir, uint16_t speed, uint16_t step );
 void setTrackedMode ( uint16_t vertical_speed, uint16_t gorisontal_speed );
 void setTrackedModePositionVerticalMotor ( int32_t pos );
 void setTrackedModePositionGorisontalMotor ( int32_t pos );
+void verticalMotorRunContinuous (bool direction, uint16_t speed);
+void gorisontalMotorRunContinuous (bool direction, uint16_t speed);
 void verticalMotorStop ( void );
 void gorisontalMotorStop ( void );
+
 void setVerticalMotorMaxPosition ( int32_t max_pos );
 void setGorisontalMotorMaxPosition ( int32_t max_pos );
 

@@ -1,5 +1,4 @@
 #include <lld_encoder.h>
-#include <lld_encoder.h>
 
 /***    ENCODER CONFIGURATION ***/
 /* Specify encoder impulses quantity per revolution*/
