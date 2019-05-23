@@ -22,7 +22,7 @@ extern  gazelParam gazel = {
   .EngineSpeed = 0.0 ,
   .DriverIsDemandEnginePercentTorque = 0,
   .ActualEnginePercentTorque  = 0,
-  .Speed = 0,
+  .Speed = 0.0,
   .AcceleratorPedalPosition = 0,
   .PercentLoadAtCurrentSpeed = 0,
   .EngineFuelRate = 0 ,
@@ -128,7 +128,7 @@ void can_handler(CANRxFrame msg){
       gazel.ActualEnginePercentTorque = msg.data8[2]-125;
       break;
     case PGN_CRUISE_CONTROL_AND_VEHICL_SPEED:
-      gazel.Speed = ((msg.data8[2]<<8)|msg.data8[1])/256;
+      gazel.Speed = ((msg.data8[2]<<8)|msg.data8[1])/256.0;
       gazel.BrakeSwitch = (msg.data8[4]>>4) & 0x03;
       gazel.ClutchSwitch =(msg.data8[4]>>6) & 0x03;
       break;

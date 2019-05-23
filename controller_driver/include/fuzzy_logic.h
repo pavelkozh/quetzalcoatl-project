@@ -110,13 +110,13 @@ static rule rules[100];
 static uint8_t rule_cnt = 0;
 
 static FuzzyVar VSpeed_err = {
-        .min_val = -5.0,
-        .max_val = 5.0
+        .min_val = -6.0,
+        .max_val = 6.0
 };
 
 static FuzzyVar dVSpeed_err = {
-        .min_val = -0.3,
-        .max_val = 0.3
+        .min_val = -1.3,
+        .max_val = 1.3
 };
 
 static FuzzyVar Clutch_pos = {
