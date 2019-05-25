@@ -55,8 +55,8 @@ MotorDriver m_gorisontal = {
                               .dir_line          = PAL_LINE (GPIOG, 1 ),
                               .rising_edge_cb    = risingEdgeMTVerticalCallback,
                               .falling_edge_cb   = fallingEdgeMTVerticalCallback,
-                              .max_position      = 13000,
-                              .min_position      = -13000
+                              .max_position      = 14000,
+                              .min_position      = -14000
 };
 
 void risingEdgeMTGorisontalCallback(PWMDriver *pwmd)
@@ -101,11 +101,11 @@ void mtControlInit ( void )
     points_array[0].x = 0; //neutral gear horizontal coordinate
     points_array[0].y = 0; //neutral gear vertical coordinate
     /*first gear coordinates*/
-    points_array[1].x = -12000; //first gear horizontal coordinate
+    points_array[1].x = -10000; //first gear horizontal coordinate
     points_array[1].y = 15000; //first gear vertical coordinate
     /*second gear coordinates*/
-    points_array[2].x = -12000; //second gear horizontal coordinate
-    points_array[2].y = -22000; //second gear vertical coordinate
+    points_array[2].x = -13000; //second gear horizontal coordinate
+    points_array[2].y = -24000; //second gear vertical coordinate
     /*third gear coordinates*/
     points_array[3].x = 0; //third gear horizontal coordinate
     points_array[3].y = 13000; //third gear vertical coordinate

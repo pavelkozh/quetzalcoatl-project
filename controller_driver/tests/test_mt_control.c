@@ -157,7 +157,7 @@ static THD_FUNCTION(pid, arg) {
                 pidCtxV.prevErr    = 0;
                 pidCtxV.integrSum  = 0;
                 VehicleControl = 0;
-                val =56;
+                val = 58;
 
 
         }
@@ -186,7 +186,7 @@ static THD_FUNCTION(gearshift, arg) {
         case 6: gear_num = shiftMTToNextGear(6,1000); break;
         }
 
-            if ( ( gazel.EngineSpeed >= 1200 ) && (gear_shift_control == 1) && ( gear_num != 2 ) )
+            if ( ( gazel.EngineSpeed >= 1500 ) && (gear_shift_control == 1) && ( gear_num != 2 ) )
             //if ( ( eng_speed_debug >= 1200 ) && (gear_shift_control == 1) )
             {
                 shift_enable_flag = 1;
@@ -311,7 +311,7 @@ void TestMtControl ( void )
         if(sd_buff[5]=='t') eng_speed_debug = atoi(sd_buff);
 
         //chprintf( (BaseSequentialStream *)&SD3, "Clutch: %d Brake: %d \r\n",gazel.ClutchSwitch, gazel.BrakeSwitch );
-        chprintf( (BaseSequentialStream *)&SD3, "err: %.2f Control: %d A: %d Pedal: %.1f ESpeed: %.02f ESpeed_debug: %.02f  VSeed: %.2f ________ Kp: %.02f ki: %.04f Kd:%.02f  ISum: %.3f ______INTEGZONE: %.3f  GearControl %d ClutchState %d  \r\n", pidCtxV.err, VehicleControl, (uint8_t)val, gazel.AcceleratorPedalPosition, gazel.EngineSpeed, gazel.Speed ,eng_speed_debug, pidCtxV.kp, pidCtxV.ki, pidCtxV.kd,pidCtxV.integrSum, pidCtxV.integZone_abs, gear, ClutchM.state );
+        chprintf( (BaseSequentialStream *)&SD3, "err: %.2f Control: %d A: %d Pedal: %.1f ESpeed: %.02f  VSeed: %.2f ________ Kp: %.02f ki: %.04f Kd:%.02f  ISum: %.3f ______INTEGZONE: %.3f  GearControl %d ClutchState %d  \r\n", pidCtxV.err, VehicleControl, (uint8_t)val, gazel.AcceleratorPedalPosition, gazel.EngineSpeed, gazel.Speed , pidCtxV.kp, pidCtxV.ki, pidCtxV.kd,pidCtxV.integrSum, pidCtxV.integZone_abs, gear, ClutchM.state );
         //chprintf( (BaseSequentialStream *)&SD7,"{%d,%d,%d,%d}",ClutchM.position,BreakM.position,speed,speed);
 
         for (int i = 0; i < 9; i++)

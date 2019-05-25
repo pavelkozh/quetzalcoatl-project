@@ -128,7 +128,7 @@ void can_handler(CANRxFrame msg){
       gazel.ActualEnginePercentTorque = msg.data8[2]-125;
       break;
     case PGN_CRUISE_CONTROL_AND_VEHICL_SPEED:
-      gazel.Speed = ((msg.data8[2]<<8)|msg.data8[1])/256;
+      gazel.Speed = ((msg.data8[2]<<8)|msg.data8[1])/256.0;
       gazel.BrakeSwitch = (msg.data8[3]>>4) & 0x03;
       gazel.ClutchSwitch =(msg.data8[3]>>6) & 0x03;
       break;
