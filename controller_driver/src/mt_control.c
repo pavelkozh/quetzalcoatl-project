@@ -382,7 +382,7 @@ void calibrationMTInit ( void )
 }
 
 
-void doCalibrationMT ( void )
+void doCalibrationMT ( bool vupLS_state, bool vlowLS_state, bool hlLS_state,  bool hrLS_state )
 {
     /* MT motors control initialization*/
     mtControlInit ();
@@ -393,11 +393,13 @@ void doCalibrationMT ( void )
     /* check vertical axis upper and lower sensors PADs */
     /*if upper sensor is on -> move down until lower sensor external interrupt occur
      *if lower sensor is on -> move up until upper sensor external interrupt occur */
-    if ( palReadLine( VERTICAL_UPPER_LS_LINE ) )
+    //if ( palReadLine( VERTICAL_UPPER_LS_LINE ) )
+    if ( vupLS_state )
     {
         verticalMotorRunContinuous (0, 20000);
     }
-    if ( palReadLine( VERTICAL_LOWER_LS_LINE ) )
+    //if ( palReadLine( VERTICAL_LOWER_LS_LINE ) )
+    if ( vlowLS_state )
     {
         verticalMotorRunContinuous (1, 20000);
     }
@@ -406,14 +408,18 @@ void doCalibrationMT ( void )
      * if left sensor is on -> move to the right until right sensor external interrupt occur
      * if right sensor is on -> move to the left until left sensor external interrupt occur */
 
-    if ( palReadLine( HORIZONTAL_RIGHT_LS_LINE ) )
+    //if ( palReadLine( HORIZONTAL_RIGHT_LS_LINE ) )
+    if ( hrLS_state )
     {
         gorisontalMotorRunContinuous (0, 20000);
     }
-    if ( palReadLine( HORIZONTAL_LEFT_LS_LINE ) )
+    //if ( palReadLine( HORIZONTAL_LEFT_LS_LINE ) )
+    if ( hlLS_state )
     {
         gorisontalMotorRunContinuous (1, 20000);
     }
+
+
 
     /* Disable EXT interrupts */
     extChannelDisable(&EXTD1, HORIZONTAL_RIGHT_LS_PAD);

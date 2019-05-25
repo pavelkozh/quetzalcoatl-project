@@ -248,6 +248,8 @@ void TestMtControl ( void )
     static char  sd_buff[10] ;
    // static char  sd_buff2[10] ;
 
+    bool vupLS_state = 0, vlowLS_state = 0, hlLS_state = 0, hrLS_state = 0;
+
     while(1) {
 
         sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
@@ -261,33 +263,26 @@ void TestMtControl ( void )
         }
 
         //*****MOTOR CONTROL*******//
-
-        //if(sd_buff[0]=='r') MotorRunContinuous( &ClutchM, 1, speed);
-        //if(sd_buff[0]=='f') MotorRunContinuous( &ClutchM, 0, speed);
-        //if(sd_buff[0]=='t') MotorRunContinuous( &BreakM, 1, speed);
-        //if(sd_buff[0]=='g') MotorRunContinuous( &BreakM, 0, speed);
-
         if(sd_buff[0]=='u') { MotorRunTracking( &ClutchM, speed); MotorRunTracking( &BreakM, speed);}
 
-        if(sd_buff[6]=='q') {
-                                gear = -1;
-                                setTrackedModePositionVerticalMotor ( atoi(sd_buff) ); //ClutchM.tracked_position = atoi(sd_buff);
-                            }
+        if(sd_buff[6]=='q')
+        {
+            gear = -1;
+            setTrackedModePositionVerticalMotor ( atoi(sd_buff) );
+        }
 
         if(sd_buff[6]=='w')
-            {
-                gear = -1;
-                setTrackedModePositionGorisontalMotor ( atoi(sd_buff) );
-            }
+        {
+            gear = -1;
+            setTrackedModePositionGorisontalMotor ( atoi(sd_buff) );
+        }
 
         if(sd_buff[0]=='c') { MotorStop( &ClutchM );  MotorStop( &BreakM ); }
-
         if(sd_buff[5]=='z') ClutchM.max_position = atoi(sd_buff);
         if(sd_buff[5]=='x') BreakM.max_position = atoi(sd_buff);
 
 
         //*****PID CONTROL*******//
-
         if(sd_buff[5]=='p') pidCtxV.kp = atoi(sd_buff)/100.0;
         if(sd_buff[5]=='i') pidCtxV.ki = atoi(sd_buff)/1000.0;
         if(sd_buff[5]=='m') pidCtxV.kd = atoi(sd_buff)/1000.0;
@@ -300,19 +295,32 @@ void TestMtControl ( void )
         if(sd_buff[5]=='k') CSErrorDeadzoneHalfwidth = atoi(sd_buff);
 
 
-        //**** Gear Shift command ****//
+        //**** Gear Shift commands ****//
+//        if(sd_buff[0]=='e') gear = 0;
+//        if(sd_buff[0]=='d') gear = 1;
+//        if(sd_buff[0]=='r') gear = 2;
+//        if(sd_buff[0]=='g') gear = 6;
+//        if(sd_buff[0]=='y') gear_shift_control = 1;
+//        if(sd_buff[0]=='h') gear_shift_control = 0;
+//        if(sd_buff[5]=='t') eng_speed_debug = atoi(sd_buff);
 
-        if(sd_buff[0]=='e') gear = 0;
-        if(sd_buff[0]=='d') gear = 1;
-        if(sd_buff[0]=='r') gear = 2;
-        if(sd_buff[0]=='g') gear = 6;
-        if(sd_buff[0]=='y') gear_shift_control = 1;
-        if(sd_buff[0]=='h') gear_shift_control = 0;
-        if(sd_buff[5]=='t') eng_speed_debug = atoi(sd_buff);
+        //chprintf( (BaseSequentialStream *)&SD3, "err: %.2f Control: %d A: %d Pedal: %.1f ESpeed: %.02f  VSeed: %.2f ________ Kp: %.02f ki: %.04f Kd:%.02f  ISum: %.3f ______INTEGZONE: %.3f  GearControl %d ClutchState %d  \r\n", pidCtxV.err, VehicleControl, (uint8_t)val, gazel.AcceleratorPedalPosition, gazel.EngineSpeed, gazel.Speed , pidCtxV.kp, pidCtxV.ki, pidCtxV.kd,pidCtxV.integrSum, pidCtxV.integZone_abs, gear, ClutchM.state );
 
-        //chprintf( (BaseSequentialStream *)&SD3, "Clutch: %d Brake: %d \r\n",gazel.ClutchSwitch, gazel.BrakeSwitch );
-        chprintf( (BaseSequentialStream *)&SD3, "err: %.2f Control: %d A: %d Pedal: %.1f ESpeed: %.02f  VSeed: %.2f ________ Kp: %.02f ki: %.04f Kd:%.02f  ISum: %.3f ______INTEGZONE: %.3f  GearControl %d ClutchState %d  \r\n", pidCtxV.err, VehicleControl, (uint8_t)val, gazel.AcceleratorPedalPosition, gazel.EngineSpeed, gazel.Speed , pidCtxV.kp, pidCtxV.ki, pidCtxV.kd,pidCtxV.integrSum, pidCtxV.integZone_abs, gear, ClutchM.state );
-        //chprintf( (BaseSequentialStream *)&SD7,"{%d,%d,%d,%d}",ClutchM.position,BreakM.position,speed,speed);
+        //*****Calibration testing*****//
+        #if 1
+        if(sd_buff[0]=='e') vupLS_state  = !vupLS_state;
+        if(sd_buff[0]=='d') vlowLS_state = !vlowLS_state;
+        if(sd_buff[0]=='r') hlLS_state   = !hlLS_state;
+        if(sd_buff[0]=='g') hrLS_state   = !hrLS_state;
+        doCalibrationMT (vupLS_state, vlowLS_state, hlLS_state, hrLS_state );
+        uint8_t vm_state = getVerticalState();
+        uint8_t gm_state = getGorisontalState ();
+        int32_t v_motor_position = getVerticalPosition();
+        int32_t g_motor_position = getGorisontalPosition();
+
+        chprintf( (BaseSequentialStream *)&SD3, "vupLS_state:  %d vlowLS_state:  %d hlLS_state:  %d hrLS_state :  %d  v_pos:  %d  h_pos:  %d  vm_state: %d hm_state: %d \r\n",vupLS_state, vlowLS_state, hlLS_state, hrLS_state, v_motor_position, g_motor_position, vm_state, gm_state);
+        #endif
+
 
         for (int i = 0; i < 9; i++)
         {
@@ -335,199 +343,3 @@ void TestMtControl ( void )
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-///****************************************************************************
-#if 0
-#include <tests.h>
-#include <lld_control.h>
-#include <chprintf.h>
-#include <mt_control.h>
-
-
-static const SerialConfig sdcfg = {
-  .speed = 115200,
-  .cr1 = 0, .cr2 = 0, .cr3 = 0
-};
-
-
-
-
-
-
-void TestMtControl ( void )
-{
-    sdStart( &SD3, &sdcfg );
-    palSetPadMode( GPIOD, 8, PAL_MODE_ALTERNATE(7) );   // TX
-    palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
-
-
-    mtControlInit ();
-
-    static char  sd_buff[10] ;
-    uint16_t speed = 10000;
-
-    int32_t     v_pos = 0,
-                g_pos = 0,
-                v_max_pos = 0,
-                g_max_pos = 0,
-                v_target_pos = 0,
-                g_target_pos = 0;
-
-    bool        v_state = false,
-                g_state = false;
-
-    uint8_t     v_mode = 0,
-                g_mode = 0;
-
-    uint16_t    v_speed = 0,
-                g_speed = 0;
-
-    char        command = ' ';
-
-
-
-    while(1)
-    {
-
-        sdReadTimeout( &SD3, sd_buff, 7, TIME_IMMEDIATE   );
-
-        v_pos        = getVerticalPosition ();
-        g_pos        = getGorisontalPosition ();
-        v_max_pos    = getVerticalMaxPosition ();
-        g_max_pos    = getGorisontalMaxPosition ();
-        v_target_pos = getVerticalTargetPosition ();
-        g_target_pos = getGorisontalTargetPosition ();
-        v_state      = getVerticalState ();
-        g_state      = getGorisontalState ();
-        v_mode       = getVerticalMode ();
-        g_mode       = getGorisontalMode ();
-        v_speed      = getVerticalSpeed ();
-        g_speed      = getGorisontalSpeed ();
-
-
-//        //*****MOTOR CONTROL*******//
-//
-//        if(sd_buff[5]=='v') {
-//          speed = atoi(sd_buff);
-//          MotorSetSpeed( &m_vertical, speed);
-//        }
-//
-//
-//
-//        if(sd_buff[0]=='r') MotorRunContinuous( &m_vertical, 1, speed);
-//        if(sd_buff[0]=='f') MotorRunContinuous( &m_vertical, 0, speed);
-//        if(sd_buff[0]=='t') MotorRunContinuous( &m_gorisontal, 1, speed);
-//        if(sd_buff[0]=='g') MotorRunContinuous( &m_gorisontal, 0, speed);
-//
-        if(sd_buff[0]=='u') setTrackedMode( speed, speed );
-//
-        if(sd_buff[6]=='q') setTrackedModePositionVerticalMotor ( atoi(sd_buff) );
-        if(sd_buff[6]=='w') setTrackedModePositionGorisontalMotor ( atoi(sd_buff) );
-//
-        if(sd_buff[0]=='c') {  verticalMotorStop ();  gorisontalMotorStop (); }
-//
-//
-        if(sd_buff[6]=='e') { command = ' '; verticalCaclibration (1, speed, atoi(sd_buff));}
-        if(sd_buff[6]=='d') { command = ' '; verticalCaclibration (0, speed, atoi(sd_buff));}
-        if(sd_buff[6]=='y') { command = ' '; gorisontalCaclibration (1, speed, atoi(sd_buff));}
-        if(sd_buff[6]=='h') { command = ' '; gorisontalCaclibration (0, speed, atoi(sd_buff));}
-
-        if(sd_buff[6]=='z') setVerticalMotorMaxPosition ( atoi(sd_buff) ) ;
-        if(sd_buff[6]=='x') setGorisontalMotorMaxPosition ( atoi(sd_buff) );
-
-
-
-        /*
-         * (0,0)-neutral
-         * 1 gear (vertical) = 12500 // 1 gear (gorisontal) = 13000
-         * 2 gear (gorisontal) = -17000
-         * 3 gear   (gorisontal) = 13000
-         *
-         *
-         * */
-
-        /* Gear selection */
-        if(sd_buff[0]=='n')
-        {
-            command = 'n';
-            //shiftMTToNeutral ();
-        }
-
-        if(sd_buff[0]=='i')
-        {
-            command = '1';
-            //shiftToFirstGear ();
-        }
-
-        if(sd_buff[0]=='o')
-        {
-            command = '2';
-            //shiftToSecondGear ();
-        }
-
-        if(sd_buff[0]=='k')
-        {
-            command = '3';
-            //shiftToThirdGear ();
-        }
-
-        if(sd_buff[0]=='l')
-        {
-            command = '4';
-            //shiftToForthGear ();
-        }
-
-        if(sd_buff[0]=='m')
-        {
-            command = '5';
-            //shiftToFifthGear ();
-        }
-
-        if(sd_buff[0]=='p') // back
-        {
-            command = 'p';
-            //shiftToReverseGear ();
-        }
-
-        switch ( command )
-        {
-            case 'n':   shiftMTToNeutral ( 1000 ); break;
-            case '1':   shiftMTToNextGear (1, 1000); break;
-            case '2':   shiftMTToNextGear (2, 1000); break;
-            case '3':   shiftMTToNextGear (3, 1000); break;
-            case '4':   shiftMTToNextGear (4, 1000); break;
-            case '5':   shiftMTToNextGear (5, 1000); break;
-            case 'p':   shiftMTToNextGear (6, 1000); break;
-
-        }
-
-
-
-        chprintf( (BaseSequentialStream *)&SD3, "State_v: %d State_g: %d  Mode_v: %d Mode_g: %d  "
-                "Position_v: %d  Position_g: %d Max_v: %d Max_g: %d Track_v: %d Track_g: %d command %c\r\n",
-                v_state,g_state , v_mode,g_mode, v_pos ,g_pos ,v_max_pos ,
-                g_max_pos , v_target_pos, g_target_pos, command);
-
-        for (int i = 0; i < 9; i++)
-       {
-         sd_buff[i]='?';
-       }
-        chThdSleepMilliseconds( 100 );
-
-
-    };
-}
-
-#endif
