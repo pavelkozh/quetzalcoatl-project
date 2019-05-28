@@ -50,13 +50,9 @@ static THD_FUNCTION(can_rx, arg) {
         continue;
       while ( canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK)
             {
-              /* Process message.*/
-              palTogglePad(GPIOB,14); 
-              txmsg.data32[0] = rxmsg.data32[0];
-              txmsg.data32[1] = rxmsg.data32[1];
               can_handler(rxmsg);
             }
-      chThdSleepMilliseconds( 10 );
+      chThdSleepMilliseconds( 15 );
 
 
     }
