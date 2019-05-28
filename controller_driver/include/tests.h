@@ -20,6 +20,11 @@ void TestEngineSpeedRouting ( void );
 */
 void TestFLRouting(void);
 
+/* 
+* @brief test px3flow sensore
+*/
+void PX4FLOWTest(void);
+
 
 
 static inline void testsRoutines( void )
@@ -47,6 +52,10 @@ static inline void testsRoutines( void )
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ENGINE_SPEED)
 
     TestEngineSpeedRouting();
+
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_PX4FLOW)
+
+    PX4FLOWTest();
 
 #endif
 

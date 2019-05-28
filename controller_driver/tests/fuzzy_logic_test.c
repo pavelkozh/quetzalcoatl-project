@@ -4,6 +4,7 @@
 #include <controllers.h>
 #include <lld_control.h>
 #include <fuzzy_logic.h>
+#include <lld_px4flow.h>
 #include <chprintf.h>
 
 
@@ -230,6 +231,8 @@ void TestFLRouting ( void )
     palSetLineMode( BreakM.dir_line, PAL_MODE_OUTPUT_PUSHPULL);
     MotorlldControlInit( &BreakM );
 
+    pxrflowInit();
+
     uint32_t CPSpeed = 5000;
     uint32_t steps = 4000;
     uint16_t speed = 4000;
@@ -310,8 +313,8 @@ void TestFLRouting ( void )
         if(sd_buff[0]=='c') fl_start_fag = 0;
 
         // chprintf( (BaseSequentialStream *)&SD3, "State: %d State: %d  Mode: %d  Position1: %d  Position2: %d Max1: %d Max2: %d Track1: %d Track2: %d \r\n",ClutchM.state,BreakM.state , ClutchM.mode, ClutchM.position ,BreakM.position ,ClutchM.max_position ,BreakM.max_position , ClutchM.tracked_position,BreakM.tracked_position);
-        chprintf( (BaseSequentialStream *)&SD3,"fl_start_fag: %d vs: %.2f, GazSp: %.2f, dGazSp: %.3f Csp: %.2f, Bsp: %.2f__________ min_CSp: %d, max_CSp: %d, min_Bsp: %d, max_Bsp: %d \n\r",fl_start_fag, VSpeed_e, gazel.Speed,dErr, res_buff[0], res_buff[1], min_clutch_speed, max_clutch_speed, min_break_speed, max_break_speed); 
-
+        //chprintf( (BaseSequentialStream *)&SD3,"fl_start_fag: %d vs: %.2f, GazSp: %.2f, dGazSp: %.3f Csp: %.2f, Bsp: %.2f__________ min_CSp: %d, max_CSp: %d, min_Bsp: %d, max_Bsp: %d \n\r",fl_start_fag, VSpeed_e, gazel.Speed,dErr, res_buff[0], res_buff[1], min_clutch_speed, max_clutch_speed, min_break_speed, max_break_speed); 
+        chprintf( (BaseSequentialStream *)&SD3,"%d, %d, %d", 
         for (int i = 0; i < 9; i++)
         {
           sd_buff[i]='?';
