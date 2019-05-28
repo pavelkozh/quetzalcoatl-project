@@ -33,7 +33,8 @@ void calibrationMTInit ( void );
 /*
  * @brief    moving carriage to the center
  */
-void doCalibrationMT ( bool vupLS_state, bool vlowLS_state, bool hlLS_state,  bool hrLS_state );
+//void doCalibrationMT ( bool vupLS_state, bool vlowLS_state, bool hlLS_state,  bool hrLS_state );
+uint8_t doCalibrationMT ( void );
 
 
 

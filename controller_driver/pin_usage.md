@@ -44,8 +44,8 @@ Driver | Pins | Input / Output | Description
 -------|------|----------------|------------
 EXT1   |PG2   | Input          | horizontal axis right sensor
 EXT1   |PG3   | Input          | horizontal axis left sensor
-EXT1   |PC14  | Input          | vertical   axis upper sensor
-EXT1   |PC15  | Input          | vertical   axis lower sensor   
+EXT1   |PC11  | Input          | vertical   axis upper sensor
+EXT1   |PC12  | Input          | vertical   axis lower sensor   
 
 
 ## Steer actuator control unit 

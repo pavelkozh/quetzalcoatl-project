@@ -224,6 +224,8 @@ void TestMtControl ( void )
     palSetPadMode( GPIOB, 7, PAL_MODE_OUTPUT_PUSHPULL );    //Led
     palSetPadMode( GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL );    //Led
     palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
+
+#if 0
     can_init();
     extDacInit();
     chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO + 10, pid, NULL);
@@ -240,6 +242,8 @@ void TestMtControl ( void )
 
     mtControlInit ();
 
+#endif
+
 
     uint32_t CPSpeed = 5000;
     uint32_t steps = 4000;
@@ -249,6 +253,7 @@ void TestMtControl ( void )
    // static char  sd_buff2[10] ;
 
     bool vupLS_state = 0, vlowLS_state = 0, hlLS_state = 0, hrLS_state = 0;
+    uint8_t all_sensors_state = 0;
 
     while(1) {
 
@@ -308,17 +313,20 @@ void TestMtControl ( void )
 
         //*****Calibration testing*****//
         #if 1
-        if(sd_buff[0]=='e') vupLS_state  = !vupLS_state;
-        if(sd_buff[0]=='d') vlowLS_state = !vlowLS_state;
-        if(sd_buff[0]=='r') hlLS_state   = !hlLS_state;
-        if(sd_buff[0]=='g') hrLS_state   = !hrLS_state;
-        doCalibrationMT (vupLS_state, vlowLS_state, hlLS_state, hrLS_state );
+
+//        if(sd_buff[0]=='e') vupLS_state  = !vupLS_state;
+//        if(sd_buff[0]=='d') vlowLS_state = !vlowLS_state;
+//        if(sd_buff[0]=='r') hlLS_state   = !hlLS_state;
+//        if(sd_buff[0]=='g') hrLS_state   = !hrLS_state;
+        //doCalibrationMT (vupLS_state, vlowLS_state, hlLS_state, hrLS_state );
+        all_sensors_state = doCalibrationMT ();
         uint8_t vm_state = getVerticalState();
         uint8_t gm_state = getGorisontalState ();
         int32_t v_motor_position = getVerticalPosition();
         int32_t g_motor_position = getGorisontalPosition();
+        palToggleLine(LINE_LED3);
 
-        chprintf( (BaseSequentialStream *)&SD3, "vupLS_state:  %d vlowLS_state:  %d hlLS_state:  %d hrLS_state :  %d  v_pos:  %d  h_pos:  %d  vm_state: %d hm_state: %d \r\n",vupLS_state, vlowLS_state, hlLS_state, hrLS_state, v_motor_position, g_motor_position, vm_state, gm_state);
+        chprintf( (BaseSequentialStream *)&SD3, "vupLS_state:  %d vlowLS_state:  %d hlLS_state:  %d hrLS_state :  %d  v_pos:  %d  h_pos:  %d  vm_state: %d hm_state: %d \r\n",(all_sensors_state)&&(1<<3),(all_sensors_state)&&(1<<2),(all_sensors_state)&&(1<<1) ,(all_sensors_state)&&(1<<0) , v_motor_position, g_motor_position, vm_state, gm_state);
         #endif
 
 

@@ -3,11 +3,11 @@
 #include <common.h>
 
 /* LS - Limit Switch */
-#define VERTICAL_UPPER_LS_PAD 14
-#define VERTICAL_UPPER_LS_LINE PAL_LINE( GPIOG, VERTICAL_UPPER_LS_PAD )
+#define VERTICAL_UPPER_LS_PAD 12
+#define VERTICAL_UPPER_LS_LINE PAL_LINE( GPIOC, VERTICAL_UPPER_LS_PAD )
 
-#define VERTICAL_LOWER_LS_PAD 15
-#define VERTICAL_LOWER_LS_LINE PAL_LINE( GPIOG, VERTICAL_LOWER_LS_PAD )
+#define VERTICAL_LOWER_LS_PAD 11
+#define VERTICAL_LOWER_LS_LINE PAL_LINE( GPIOC, VERTICAL_LOWER_LS_PAD )
 
 #define HORIZONTAL_RIGHT_LS_PAD 2
 #define HORIZONTAL_RIGHT_LS_LINE PAL_LINE( GPIOG, HORIZONTAL_RIGHT_LS_PAD )
@@ -256,7 +256,7 @@ int8_t shiftMTToNeutral ( uint16_t speed )
     if ( ( m_gorisontal.position == m_gorisontal.tracked_position) && ( m_vertical.position == m_vertical.tracked_position) )
     {
         currently_selected_gear = 0;
-        palSetLine(LINE_LED1);
+        //palSetLine(LINE_LED1);
     }
 
     return currently_selected_gear;
@@ -368,10 +368,10 @@ void calibrationMTInit ( void )
     ch4_conf.cb       = extcb_horizontal_right_sensor;
 
     /* Set up EXT channel hardware pin mode as digital input  */
-    palSetLineMode( VERTICAL_UPPER_LS_LINE,   PAL_MODE_INPUT_PULLUP );
-    palSetLineMode( VERTICAL_LOWER_LS_LINE,   PAL_MODE_INPUT_PULLUP );
-    palSetLineMode( HORIZONTAL_LEFT_LS_LINE,  PAL_MODE_INPUT_PULLUP );
-    palSetLineMode( HORIZONTAL_RIGHT_LS_LINE, PAL_MODE_INPUT_PULLUP );
+    palSetLineMode( VERTICAL_UPPER_LS_LINE,   PAL_MODE_INPUT_PULLDOWN );
+    palSetLineMode( VERTICAL_LOWER_LS_LINE,   PAL_MODE_INPUT_PULLDOWN );
+    palSetLineMode( HORIZONTAL_LEFT_LS_LINE,  PAL_MODE_INPUT_PULLDOWN );
+    palSetLineMode( HORIZONTAL_RIGHT_LS_LINE, PAL_MODE_INPUT_PULLDOWN );
 
     /* Set channel (second arg) mode with filled configuration */
     extSetChannelMode( &EXTD1, VERTICAL_UPPER_LS_PAD,   &ch1_conf );
@@ -382,44 +382,59 @@ void calibrationMTInit ( void )
 }
 
 
-void doCalibrationMT ( bool vupLS_state, bool vlowLS_state, bool hlLS_state,  bool hrLS_state )
+//void doCalibrationMT ( bool vupLS_state, bool vlowLS_state, bool hlLS_state,  bool hrLS_state )
+uint8_t doCalibrationMT ( void )
 {
+    palToggleLine(LINE_LED1);
     /* MT motors control initialization*/
     mtControlInit ();
 
     /*EXT Init, EXT interrupt enable */
     calibrationMTInit ();
 
+
+    uint8_t vupLS_state  = 0,
+            vlowLS_state = 0,
+            hlLS_state   = 0,
+            hrLS_state   = 0;
+
+
+    vupLS_state  = palReadLine( VERTICAL_UPPER_LS_LINE );
+    vlowLS_state = palReadLine( VERTICAL_LOWER_LS_LINE );
+    hrLS_state   = palReadLine( HORIZONTAL_RIGHT_LS_LINE );
+    hlLS_state   = palReadLine( HORIZONTAL_LEFT_LS_LINE );
+
     /* check vertical axis upper and lower sensors PADs */
     /*if upper sensor is on -> move down until lower sensor external interrupt occur
      *if lower sensor is on -> move up until upper sensor external interrupt occur */
-    //if ( palReadLine( VERTICAL_UPPER_LS_LINE ) )
-    if ( vupLS_state )
+    if ( palReadLine( VERTICAL_UPPER_LS_LINE ) )
+    //if ( vupLS_state )
     {
         verticalMotorRunContinuous (0, 20000);
     }
-    //if ( palReadLine( VERTICAL_LOWER_LS_LINE ) )
-    if ( vlowLS_state )
+    if ( palReadLine( VERTICAL_LOWER_LS_LINE ) )
+    //if ( vlowLS_state )
     {
         verticalMotorRunContinuous (1, 20000);
     }
-
+    palToggleLine(LINE_LED2);
     /* check horizontal axis left and right sensors PADs
      * if left sensor is on -> move to the right until right sensor external interrupt occur
      * if right sensor is on -> move to the left until left sensor external interrupt occur */
 
-    //if ( palReadLine( HORIZONTAL_RIGHT_LS_LINE ) )
-    if ( hrLS_state )
+    if ( palReadLine( HORIZONTAL_RIGHT_LS_LINE ) )
+    //if ( hrLS_state )
     {
         gorisontalMotorRunContinuous (0, 20000);
     }
-    //if ( palReadLine( HORIZONTAL_LEFT_LS_LINE ) )
-    if ( hlLS_state )
+    if ( palReadLine( HORIZONTAL_LEFT_LS_LINE ) )
+    //if ( hlLS_state )
     {
         gorisontalMotorRunContinuous (1, 20000);
     }
 
-
+    uint8_t sensors_state = (vupLS_state << 3)||(vlowLS_state << 2)||(hrLS_state << 1)||(hlLS_state << 0);
+    //uint8_t sensors_state = vlowLS_state;
 
     /* Disable EXT interrupts */
     extChannelDisable(&EXTD1, HORIZONTAL_RIGHT_LS_PAD);
@@ -427,6 +442,7 @@ void doCalibrationMT ( bool vupLS_state, bool vlowLS_state, bool hlLS_state,  bo
     extChannelDisable(&EXTD1, VERTICAL_UPPER_LS_PAD);
     extChannelDisable(&EXTD1, VERTICAL_LOWER_LS_PAD);
 
+    return sensors_state;
 }
 
 
