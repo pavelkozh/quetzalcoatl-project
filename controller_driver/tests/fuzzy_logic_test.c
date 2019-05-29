@@ -129,8 +129,7 @@ uint32_t engineSpeedControl( uint32_t engine_speed_rpm )
     return controlValue;
 
 }
-
-static THD_WORKING_AREA(pid_wa, 64);
+static THD_WORKING_AREA(pid_wa, 256);
 static THD_FUNCTION(pid, arg) {
     
     (void)arg;
@@ -150,7 +149,7 @@ static THD_FUNCTION(pid, arg) {
         }
         
         extDacSetValue(( uint8_t)(val*0.55),val);  
-        chThdSleepMilliseconds( 20 );
+        chThdSleepMilliseconds( 15 );
     }
 }
 
@@ -231,7 +230,6 @@ void TestFLRouting ( void )
     palSetLineMode( BreakM.dir_line, PAL_MODE_OUTPUT_PUSHPULL);
     MotorlldControlInit( &BreakM );
 
-    pxrflowInit();
 
     uint32_t CPSpeed = 5000;
     uint32_t steps = 4000;
@@ -312,14 +310,15 @@ void TestFLRouting ( void )
         if(sd_buff[0]=='x') fl_start_fag = 1;
         if(sd_buff[0]=='c') fl_start_fag = 0;
 
+
         // chprintf( (BaseSequentialStream *)&SD3, "State: %d State: %d  Mode: %d  Position1: %d  Position2: %d Max1: %d Max2: %d Track1: %d Track2: %d \r\n",ClutchM.state,BreakM.state , ClutchM.mode, ClutchM.position ,BreakM.position ,ClutchM.max_position ,BreakM.max_position , ClutchM.tracked_position,BreakM.tracked_position);
         //chprintf( (BaseSequentialStream *)&SD3,"fl_start_fag: %d vs: %.2f, GazSp: %.2f, dGazSp: %.3f Csp: %.2f, Bsp: %.2f__________ min_CSp: %d, max_CSp: %d, min_Bsp: %d, max_Bsp: %d \n\r",fl_start_fag, VSpeed_e, gazel.Speed,dErr, res_buff[0], res_buff[1], min_clutch_speed, max_clutch_speed, min_break_speed, max_break_speed); 
-        chprintf( (BaseSequentialStream *)&SD3,"%d, %d, %d", 
+        chprintf( (BaseSequentialStream *)&SD3,"x: %.02f Speed: %.02f Px4flow: %.02f gnd: %.02f \n\r", flow_comp_m_x()*0.0144, gazel.AcceleratorPedalPosition, gazel.Speed_px4flow, ground_distance()/1000.0);
         for (int i = 0; i < 9; i++)
         {
           sd_buff[i]='?';
         }
         //chprintf( (BaseSequentialStream *)&SD3,"val: %.02f ,ln: %.02f,mn: %.02f,sn: %.02f,no: %.02f,sp: %.02f,mp: %.02f,lp: %.02f \n\r", testvar_out, fuzzy_speed.output_val.ln,fuzzy_speed.output_val.mn,fuzzy_speed.output_val.sn,fuzzy_speed.output_val.no,fuzzy_speed.output_val.sp,fuzzy_speed.output_val.mp,fuzzy_speed.output_val.lp);
-        chThdSleepMilliseconds( 500 );
+        chThdSleepMilliseconds( 100 );
     }
 }

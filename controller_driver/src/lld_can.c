@@ -1,5 +1,5 @@
 #include <lld_can.h>
-
+#include <lld_px4flow.h>
 
 
 static const CANConfig cancfg= {
@@ -8,7 +8,8 @@ CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP,
 CAN_BTR_TS1(5) | CAN_BTR_BRP(26)
 };
 
-
+uint32_t px4flow_sum = 0;
+uint8_t px4flow_cnt = 0;
 
 
 /*0b100 - Data with EID or (0b110 - RemoteFrame with EID)*/
@@ -23,6 +24,7 @@ extern  gazelParam gazel = {
   .DriverIsDemandEnginePercentTorque = 0,
   .ActualEnginePercentTorque  = 0,
   .Speed = 0.0,
+  .Speed_px4flow = 0.0,
   .AcceleratorPedalPosition = 0,
   .PercentLoadAtCurrentSpeed = 0,
   .EngineFuelRate = 0 ,
@@ -46,17 +48,22 @@ static THD_FUNCTION(can_rx, arg) {
 
     while (1)
     {
+        if(update() == MSG_OK){
+            px4flow_sum += flow_comp_m_x();
+            px4flow_cnt++;
+        }
+        else{
+            chprintf( (BaseSequentialStream *)&SD3, "I2C error \r\n");
+        }
       if (chEvtWaitAnyTimeout(ALL_EVENTS, MS2ST(100)) == 0)
         continue;
       while ( canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK)
             {
               /* Process message.*/
-              palTogglePad(GPIOB,14); 
-              txmsg.data32[0] = rxmsg.data32[0];
-              txmsg.data32[1] = rxmsg.data32[1];
+              //palTogglePad(GPIOB,14); 
               can_handler(rxmsg);
             }
-      chThdSleepMilliseconds( 10 );
+      chThdSleepMilliseconds( 15 );
 
 
     }
@@ -75,18 +82,17 @@ static THD_FUNCTION(can_tx, p) {
   txmsg.EID = 0x01234567;
   txmsg.RTR = CAN_RTR_DATA;
   txmsg.DLC = 8;
-  txmsg.data32[0] = 0x55AA55AA;
-  txmsg.data32[1] = 0x00FF00FF;
 
   while (true) {
-
-    /*if( canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, MS2ST(100)) == MSG_OK){
+  txmsg.data32[0] = (uint32_t) gazel.Speed_px4flow * 1000;
+  txmsg.data32[1] = 0x00FF00FF;
+    if( canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, MS2ST(100)) == MSG_OK){
          palTogglePad(GPIOB,7);
     }else{
-         palTogglePad(GPIOB,14); 
-    }*/
+         palToggleLine(LINE_LED3); 
+    }
 
-    chThdSleepMilliseconds(500);
+    chThdSleepMilliseconds(100);
   }
 }
 
@@ -97,7 +103,7 @@ void can_init ( void )
     palSetPadMode(GPIOD,1,PAL_MODE_ALTERNATE(9));
     palSetPadMode(GPIOD,0,PAL_MODE_ALTERNATE(9));
 
-
+    px4flowInit();
   // Setting can filters
     CANFilter can_filter[8] = {\
     {0, 1, 1, 0, set_can_eid_data(0x00008000), set_can_eid_data(0x00005555)},\
@@ -117,6 +123,7 @@ void can_init ( void )
     chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 7, can_rx, NULL);
     //chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 6, can_tx, NULL);
 
+
 }
 
 
@@ -129,6 +136,9 @@ void can_handler(CANRxFrame msg){
       break;
     case PGN_CRUISE_CONTROL_AND_VEHICL_SPEED:
       gazel.Speed = ((msg.data8[2]<<8)|msg.data8[1])/256.0;
+      gazel.Speed_px4flow = (float)(px4flow_sum/px4flow_cnt)*0.0144;
+      px4flow_sum = 0;
+      px4flow_cnt = 0;
       gazel.BrakeSwitch = (msg.data8[4]>>4) & 0x03;
       gazel.ClutchSwitch =(msg.data8[4]>>6) & 0x03;
       break;
