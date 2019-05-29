@@ -117,7 +117,7 @@ void fallingEdgeCb(MotorDriver *mtd){
             else
                 mtd -> position++;
             if( (mtd -> position  >=  mtd -> max_position) || (mtd -> position  <= mtd -> min_position) ){
-                MotorStop( mtd) ; 
+                MotorStop( mtd) ;
             }
             break;
 

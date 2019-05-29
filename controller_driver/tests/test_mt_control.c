@@ -40,7 +40,7 @@ MotorDriver ClutchM = {
     .dir_line        =   PAL_LINE(GPIOB, 8),
     .rising_edge_cb  =   RisingEdgeClutchMCallback,
     .falling_edge_cb =   fallingEdgeClutchMCallback,
-    .max_position    =   92000,
+    .max_position    =   90000,
     .min_position     =  0
 };
 
@@ -56,7 +56,7 @@ void fallingEdgeClutchMCallback(PWMDriver *pwmd){
 
     (void) pwmd;
     fallingEdgeCb(&ClutchM);
-    palToggleLine(PAL_LINE(GPIOB,14));
+   // palToggleLine(PAL_LINE(GPIOB,14));
 //Code when motor must stop
 }
 
@@ -65,7 +65,7 @@ MotorDriver BreakM = {
     .dir_line        =   PAL_LINE(GPIOD, 11),
     .rising_edge_cb  =   RisingEdgeBreakMCallback,
     .falling_edge_cb =   fallingEdgeBreakMCallback,
-    .max_position    =   20000,
+    .max_position    =   40000,
     .min_position     =  0
 };
 
@@ -81,7 +81,7 @@ void fallingEdgeBreakMCallback(PWMDriver *pwmd){
 
     (void) pwmd;
     fallingEdgeCb(&BreakM);
-    palToggleLine(PAL_LINE(GPIOB,7));
+  //  palToggleLine(PAL_LINE(GPIOB,7));
 //Code when motor must stop
 }
 
@@ -186,7 +186,7 @@ static THD_FUNCTION(gearshift, arg) {
         case 6: gear_num = shiftMTToNextGear(6,1000); break;
         }
 
-            if ( ( gazel.EngineSpeed >= 1500 ) && (gear_shift_control == 1) && ( gear_num != 2 ) )
+            if ( ( gazel.EngineSpeed >= 1300 ) && (gear_shift_control == 1) && ( gear_num != 2 ) )
             //if ( ( eng_speed_debug >= 1200 ) && (gear_shift_control == 1) )
             {
                 shift_enable_flag = 1;
@@ -225,7 +225,7 @@ void TestMtControl ( void )
     palSetPadMode( GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL );    //Led
     palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
 
-#if 0
+#if 1
     can_init();
     extDacInit();
     chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO + 10, pid, NULL);
@@ -245,6 +245,7 @@ void TestMtControl ( void )
 #endif
 
 
+
     uint32_t CPSpeed = 5000;
     uint32_t steps = 4000;
     uint16_t speed = 4000;
@@ -259,8 +260,7 @@ void TestMtControl ( void )
 
         sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
 
-        //if(sd_buff[6]=='q') ClutchM.tracked_position = atoi(sd_buff);
-        //if(sd_buff[6]=='w') BreakM.tracked_position = atoi(sd_buff);
+
 
         if(sd_buff[5]=='n') {
           speed = atoi(sd_buff);
@@ -283,8 +283,10 @@ void TestMtControl ( void )
         }
 
         if(sd_buff[0]=='c') { MotorStop( &ClutchM );  MotorStop( &BreakM ); }
-        if(sd_buff[5]=='z') ClutchM.max_position = atoi(sd_buff);
-        if(sd_buff[5]=='x') BreakM.max_position = atoi(sd_buff);
+        if(sd_buff[0]=='z') MotorRunContinuous(&ClutchM, 0, 3000);
+        if(sd_buff[0]=='o') MotorRunContinuous(&ClutchM, 1, 3000);
+        if(sd_buff[0]=='x') MotorRunContinuous(&BreakM, 0, 3000);
+        if(sd_buff[0]=='f') MotorRunContinuous(&BreakM, 1, 3000);
 
 
         //*****PID CONTROL*******//
@@ -301,32 +303,29 @@ void TestMtControl ( void )
 
 
         //**** Gear Shift commands ****//
-//        if(sd_buff[0]=='e') gear = 0;
-//        if(sd_buff[0]=='d') gear = 1;
-//        if(sd_buff[0]=='r') gear = 2;
-//        if(sd_buff[0]=='g') gear = 6;
-//        if(sd_buff[0]=='y') gear_shift_control = 1;
-//        if(sd_buff[0]=='h') gear_shift_control = 0;
-//        if(sd_buff[5]=='t') eng_speed_debug = atoi(sd_buff);
+        if(sd_buff[0]=='e') gear = 0;
+        if(sd_buff[0]=='d') gear = 1;
+        if(sd_buff[0]=='r') gear = 2;
+        if(sd_buff[0]=='g') gear = 6;
+        if(sd_buff[0]=='y') gear_shift_control = 1;
+        if(sd_buff[0]=='h') gear_shift_control = 0;
+        if(sd_buff[5]=='t') eng_speed_debug = atoi(sd_buff);
 
-        //chprintf( (BaseSequentialStream *)&SD3, "err: %.2f Control: %d A: %d Pedal: %.1f ESpeed: %.02f  VSeed: %.2f ________ Kp: %.02f ki: %.04f Kd:%.02f  ISum: %.3f ______INTEGZONE: %.3f  GearControl %d ClutchState %d  \r\n", pidCtxV.err, VehicleControl, (uint8_t)val, gazel.AcceleratorPedalPosition, gazel.EngineSpeed, gazel.Speed , pidCtxV.kp, pidCtxV.ki, pidCtxV.kd,pidCtxV.integrSum, pidCtxV.integZone_abs, gear, ClutchM.state );
+        chprintf( (BaseSequentialStream *)&SD3, "err: %.2f Control: %d A: %d Pedal: %.1f ESpeed: %.02f  VSeed: %.2f ________ Kp: %.02f ki: %.04f Kd:%.02f  ISum: %.3f ______INTEGZONE: %.3f  GearControl %d ClutchState %d  \r\n", pidCtxV.err, VehicleControl, (uint8_t)val, gazel.AcceleratorPedalPosition, gazel.EngineSpeed, gazel.Speed , pidCtxV.kp, pidCtxV.ki, pidCtxV.kd,pidCtxV.integrSum, pidCtxV.integZone_abs, gear, ClutchM.state );
 
         //*****Calibration testing*****//
         #if 1
 
-//        if(sd_buff[0]=='e') vupLS_state  = !vupLS_state;
-//        if(sd_buff[0]=='d') vlowLS_state = !vlowLS_state;
-//        if(sd_buff[0]=='r') hlLS_state   = !hlLS_state;
-//        if(sd_buff[0]=='g') hrLS_state   = !hrLS_state;
-        //doCalibrationMT (vupLS_state, vlowLS_state, hlLS_state, hrLS_state );
-        all_sensors_state = doCalibrationMT ();
+        //if(sd_buff[0]=='e') all_sensors_state = doCalibrationMT ();
+
+        //all_sensors_state = doCalibrationMT ();
         uint8_t vm_state = getVerticalState();
         uint8_t gm_state = getGorisontalState ();
         int32_t v_motor_position = getVerticalPosition();
         int32_t g_motor_position = getGorisontalPosition();
-        palToggleLine(LINE_LED3);
 
-        chprintf( (BaseSequentialStream *)&SD3, "vupLS_state:  %d vlowLS_state:  %d hlLS_state:  %d hrLS_state :  %d  v_pos:  %d  h_pos:  %d  vm_state: %d hm_state: %d \r\n",(all_sensors_state)&&(1<<3),(all_sensors_state)&&(1<<2),(all_sensors_state)&&(1<<1) ,(all_sensors_state)&&(1<<0) , v_motor_position, g_motor_position, vm_state, gm_state);
+
+     // chprintf( (BaseSequentialStream *)&SD3, "vupLS_state:  %d vlowLS_state:  %d hlLS_state:  %d hrLS_state :  %d  v_pos:  %d  h_pos:  %d  vm_state: %d hm_state: %d \r\n",(all_sensors_state)&&(1<<3),(all_sensors_state)&&(1<<2),(all_sensors_state)&&(1<<1) ,(all_sensors_state)&&(1<<0) , v_motor_position, g_motor_position, vm_state, gm_state);
         #endif
 
 

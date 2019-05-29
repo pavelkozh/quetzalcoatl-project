@@ -12,6 +12,7 @@
 #define HORIZONTAL_RIGHT_LS_PAD 2
 #define HORIZONTAL_RIGHT_LS_LINE PAL_LINE( GPIOG, HORIZONTAL_RIGHT_LS_PAD )
 
+
 #define HORIZONTAL_LEFT_LS_PAD 3
 #define HORIZONTAL_LEFT_LS_LINE PAL_LINE( GPIOG, HORIZONTAL_LEFT_LS_PAD )
 
@@ -29,8 +30,8 @@ MotorDriver m_vertical = {
                           .dir_line          = PAL_LINE (GPIOE, 3 ),
                           .rising_edge_cb    = risingEdgeMTGorisontalCallback,
                           .falling_edge_cb   = fallingEdgeMTGorisontalCallback,
-                          .max_position      = 15000,
-                          .min_position      = -25000
+                          .max_position      = 20000,//15000,
+                          .min_position      = -25000//-25000
 
 
 };
@@ -55,8 +56,8 @@ MotorDriver m_gorisontal = {
                               .dir_line          = PAL_LINE (GPIOG, 1 ),
                               .rising_edge_cb    = risingEdgeMTVerticalCallback,
                               .falling_edge_cb   = fallingEdgeMTVerticalCallback,
-                              .max_position      = 14000,
-                              .min_position      = -14000
+                              .max_position      = 20000,//14000,
+                              .min_position      = -20000//-14000
 };
 
 void risingEdgeMTGorisontalCallback(PWMDriver *pwmd)
@@ -101,11 +102,11 @@ void mtControlInit ( void )
     points_array[0].x = 0; //neutral gear horizontal coordinate
     points_array[0].y = 0; //neutral gear vertical coordinate
     /*first gear coordinates*/
-    points_array[1].x = -10000; //first gear horizontal coordinate
+    points_array[1].x = -15000; //first gear horizontal coordinate
     points_array[1].y = 15000; //first gear vertical coordinate
     /*second gear coordinates*/
-    points_array[2].x = -13000; //second gear horizontal coordinate
-    points_array[2].y = -24000; //second gear vertical coordinate
+    points_array[2].x = -15000; //second gear horizontal coordinate
+    points_array[2].y = -20000; //second gear vertical coordinate
     /*third gear coordinates*/
     points_array[3].x = 0; //third gear horizontal coordinate
     points_array[3].y = 13000; //third gear vertical coordinate
@@ -116,8 +117,8 @@ void mtControlInit ( void )
     points_array[5].x = 12500; //fifth gear horizontal coordinate
     points_array[5].y = 13000; //fifth gear vertical coordinate
     /*reverse gear coordinates*/
-    points_array[6].x = 13000; //reverse gear horizontal coordinate
-    points_array[6].y = -24000; //reverse gear vertical coordinate
+    points_array[6].x = 16000; //reverse gear horizontal coordinate
+    points_array[6].y = -22000; //reverse gear vertical coordinate
 }
 
 void setTrackedMode ( uint16_t vertical_speed, uint16_t gorisontal_speed )
@@ -270,13 +271,13 @@ int8_t shiftMTToNextGear (int8_t gear_num, uint16_t speed)
     {
         if ( currently_selected_gear != 0 ) //currently selected gear is not a neutral gear
         {
-//            if ( ( (( currently_selected_gear == 1 ) && (gear_num == 2)) == false ) || ( (( currently_selected_gear == 2 ) && (gear_num == 1)) == false ) )
+//            if (  (( currently_selected_gear == 1 ) && (gear_num == 2)) ||  (( currently_selected_gear == 2 ) && (gear_num == 1))  )
 //            {
-//                shiftMTToNeutral ( speed ); // firstly disable currently selected gear
+//                currently_selected_gear = 0;
 //            }
 //            else
 //            {
-//                currently_selected_gear = 0;
+//                shiftMTToNeutral ( speed ); // firstly disable currently selected gear
 //            }
             shiftMTToNeutral ( speed ); // firstly disable currently selected gear
 
@@ -287,7 +288,7 @@ int8_t shiftMTToNextGear (int8_t gear_num, uint16_t speed)
             if ( m_gorisontal.position == m_gorisontal.tracked_position )
             {
                 //palToggleLine(LINE_LED2);
-                palSetLine(LINE_LED2);
+               // palSetLine(LINE_LED2);
                 m_vertical.tracked_position   =  points_array[gear_num].y;
             }
             if ((   m_vertical.position == m_vertical.tracked_position ) && ( m_gorisontal.position == m_gorisontal.tracked_position ))
@@ -301,44 +302,57 @@ int8_t shiftMTToNextGear (int8_t gear_num, uint16_t speed)
 }
 
 
-/***     channel processing     ***/
+/****************************************/
+/********GEARSHIFT CALIBRATION***********/
+/****************************************/
+
+
+/***     EXT interrupts channel processing     ***/
 static void extcb_vertical_upper_sensor(EXTDriver *extp, expchannel_t channel)
 {
     (void)extp;
     (void)channel;
 
+
+    palToggleLine(LINE_LED1);
     verticalMotorStop ();
-    verticalCaclibration( 1, 20000, 2000 );
+   // verticalCaclibration( 1, 20000, 2000 );
+   //extChannelDisable(&EXTD1, VERTICAL_UPPER_LS_PAD);
 }
 
-/***     channel processing     ***/
 static void extcb_vertical_lower_sensor(EXTDriver *extp, expchannel_t channel)
 {
     (void)extp;
     (void)channel;
 
+    palToggleLine(LINE_LED1);
     verticalMotorStop ();
-    verticalCaclibration( 0, 20000, 2000 );
+   // verticalCaclibration( 0, 20000, 2000 );
+   //extChannelDisable(&EXTD1, VERTICAL_LOWER_LS_PAD);
 }
 
-/***     channel processing     ***/
 static void extcb_horizontal_left_sensor(EXTDriver *extp, expchannel_t channel)
 {
     (void)extp;
     (void)channel;
 
+    palToggleLine(LINE_LED2);
     gorisontalMotorStop ();
-    gorisontalCaclibration( 0, 20000, 2000 );
+
+   // gorisontalCaclibration( 0, 20000, 2000 );
+   //extChannelDisable(&EXTD1, HORIZONTAL_LEFT_LS_PAD);
 }
 
-/***     channel processing     ***/
 static void extcb_horizontal_right_sensor(EXTDriver *extp, expchannel_t channel)
 {
     (void)extp;
     (void)channel;
 
+    palToggleLine(LINE_LED3);
     gorisontalMotorStop ();
-    gorisontalCaclibration( 1, 20000, 2000 );
+
+    //gorisontalCaclibration( 1, 20000, 2000 );
+    //    extChannelDisable(&EXTD1, HORIZONTAL_RIGHT_LS_PAD);
 }
 
 
@@ -355,16 +369,16 @@ void calibrationMTInit ( void )
     EXTChannelConfig ch1_conf,ch2_conf,ch3_conf,ch4_conf;
 
     /* Fill in configuration for channels */
-    ch1_conf.mode     = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC;
+    ch1_conf.mode     = EXT_CH_MODE_FALLING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC;
     ch1_conf.cb       = extcb_vertical_upper_sensor;
 
-    ch2_conf.mode     = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC;
+    ch2_conf.mode     = EXT_CH_MODE_FALLING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC;
     ch2_conf.cb       = extcb_vertical_lower_sensor;
 
-    ch3_conf.mode     = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOG;
+    ch3_conf.mode     = EXT_CH_MODE_FALLING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOG;
     ch3_conf.cb       = extcb_horizontal_left_sensor;
 
-    ch4_conf.mode     = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOG;
+    ch4_conf.mode     = EXT_CH_MODE_FALLING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOG;
     ch4_conf.cb       = extcb_horizontal_right_sensor;
 
     /* Set up EXT channel hardware pin mode as digital input  */
@@ -382,10 +396,8 @@ void calibrationMTInit ( void )
 }
 
 
-//void doCalibrationMT ( bool vupLS_state, bool vlowLS_state, bool hlLS_state,  bool hrLS_state )
 uint8_t doCalibrationMT ( void )
 {
-    palToggleLine(LINE_LED1);
     /* MT motors control initialization*/
     mtControlInit ();
 
@@ -393,11 +405,11 @@ uint8_t doCalibrationMT ( void )
     calibrationMTInit ();
 
 
+    /* for sensors state return */
     uint8_t vupLS_state  = 0,
             vlowLS_state = 0,
             hlLS_state   = 0,
             hrLS_state   = 0;
-
 
     vupLS_state  = palReadLine( VERTICAL_UPPER_LS_LINE );
     vlowLS_state = palReadLine( VERTICAL_LOWER_LS_LINE );
@@ -407,42 +419,33 @@ uint8_t doCalibrationMT ( void )
     /* check vertical axis upper and lower sensors PADs */
     /*if upper sensor is on -> move down until lower sensor external interrupt occur
      *if lower sensor is on -> move up until upper sensor external interrupt occur */
-    if ( palReadLine( VERTICAL_UPPER_LS_LINE ) )
-    //if ( vupLS_state )
+    if ( !palReadLine( VERTICAL_UPPER_LS_LINE ) )
     {
         verticalMotorRunContinuous (0, 20000);
     }
-    if ( palReadLine( VERTICAL_LOWER_LS_LINE ) )
-    //if ( vlowLS_state )
+    if ( !palReadLine( VERTICAL_LOWER_LS_LINE ) )
     {
         verticalMotorRunContinuous (1, 20000);
     }
-    palToggleLine(LINE_LED2);
-    /* check horizontal axis left and right sensors PADs
+
+   /* check horizontal axis left and right sensors PADs
      * if left sensor is on -> move to the right until right sensor external interrupt occur
      * if right sensor is on -> move to the left until left sensor external interrupt occur */
-
-    if ( palReadLine( HORIZONTAL_RIGHT_LS_LINE ) )
-    //if ( hrLS_state )
+    if ( !palReadLine( HORIZONTAL_RIGHT_LS_LINE ) )
     {
-        gorisontalMotorRunContinuous (0, 20000);
-    }
-    if ( palReadLine( HORIZONTAL_LEFT_LS_LINE ) )
-    //if ( hlLS_state )
-    {
+        extChannelDisable(&EXTD1, HORIZONTAL_RIGHT_LS_PAD);
         gorisontalMotorRunContinuous (1, 20000);
     }
+    if ( !palReadLine( HORIZONTAL_LEFT_LS_LINE ) )
+    {
+        extChannelDisable(&EXTD1, HORIZONTAL_LEFT_LS_PAD);
+        gorisontalMotorRunContinuous (0, 20000);
+    }
 
-    uint8_t sensors_state = (vupLS_state << 3)||(vlowLS_state << 2)||(hrLS_state << 1)||(hlLS_state << 0);
-    //uint8_t sensors_state = vlowLS_state;
+//    uint8_t sensors_state = (vupLS_state << 3)||(vlowLS_state << 2)||(hrLS_state << 1)||(hlLS_state << 0);
 
-    /* Disable EXT interrupts */
-    extChannelDisable(&EXTD1, HORIZONTAL_RIGHT_LS_PAD);
-    extChannelDisable(&EXTD1, HORIZONTAL_LEFT_LS_PAD);
-    extChannelDisable(&EXTD1, VERTICAL_UPPER_LS_PAD);
-    extChannelDisable(&EXTD1, VERTICAL_LOWER_LS_PAD);
 
-    return sensors_state;
+    return 0;// sensors_state;
 }
 
 
