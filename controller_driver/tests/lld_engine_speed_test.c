@@ -251,6 +251,6 @@ void TestEngineSpeedRouting ( void )
           sd_buff[i]='?';
           sd_buff2[i]='?';
         }
-        chThdSleepMilliseconds( 500 );
+        chThdSleepMilliseconds( 100 );
     }
 }

@@ -8,8 +8,6 @@ CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP,
 CAN_BTR_TS1(5) | CAN_BTR_BRP(26)
 };
 
-uint32_t px4flow_sum = 0;
-uint8_t px4flow_cnt = 0;
 
 
 /*0b100 - Data with EID or (0b110 - RemoteFrame with EID)*/
@@ -34,6 +32,35 @@ extern  gazelParam gazel = {
   .BrakePedalPosition=0
 };
 
+
+
+int32_t px4flow_data[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+uint8_t px4flow_cnt = 0;
+int32_t px4flow_sum = 0;
+int16_t last_px4flow = 0;
+
+void px4_filter(){
+      if(update() == MSG_OK){
+
+        if(ground_distance()>1000){
+          px4flow_sum -= px4flow_data[px4flow_cnt];
+
+          if( ((last_px4flow - flow_comp_m_x())<500)&&((last_px4flow - flow_comp_m_x())>-500)) {
+            px4flow_data[px4flow_cnt]= flow_comp_m_x();
+            last_px4flow = flow_comp_m_x();
+          }else{
+            px4flow_data[px4flow_cnt]= last_px4flow;
+          }
+
+          px4flow_sum += px4flow_data[px4flow_cnt];
+          px4flow_cnt = px4flow_cnt >= 19 ? 0 : px4flow_cnt+1;
+        }
+      }
+      else{
+          chprintf( (BaseSequentialStream *)&SD3, "I2C error \r\n");
+      }
+      gazel.Speed_px4flow = (px4flow_sum /20.0)*0.0036 ; //0.0036  0.0144
+};
 /*
  * Receiver thread.
  */
@@ -48,21 +75,14 @@ static THD_FUNCTION(can_rx, arg) {
 
     while (1)
     {
-        if(update() == MSG_OK){
-            px4flow_sum += flow_comp_m_x();
-            px4flow_cnt++;
-        }
-        else{
-            chprintf( (BaseSequentialStream *)&SD3, "I2C error \r\n");
-        }
+      px4_filter();
       if (chEvtWaitAnyTimeout(ALL_EVENTS, MS2ST(100)) == 0)
         continue;
       while ( canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK)
             {
-
               can_handler(rxmsg);
             }
-      chThdSleepMilliseconds( 15 );
+      chThdSleepMilliseconds( 10 );
 
 
     }
@@ -83,7 +103,7 @@ static THD_FUNCTION(can_tx, p) {
   txmsg.DLC = 8;
 
   while (true) {
-  txmsg.data32[0] = (uint32_t) gazel.Speed_px4flow * 1000;
+  txmsg.data32[0] = flow_comp_m_x();
   txmsg.data32[1] = 0x00FF00FF;
     if( canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, MS2ST(100)) == MSG_OK){
          palTogglePad(GPIOB,7);
@@ -120,7 +140,7 @@ void can_init ( void )
     //start Can
     canStart(&CAND1, &cancfg);
     chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 7, can_rx, NULL);
-    //chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 6, can_tx, NULL);
+    //chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 7, can_tx, NULL);
 
 
 }
@@ -135,9 +155,6 @@ void can_handler(CANRxFrame msg){
       break;
     case PGN_CRUISE_CONTROL_AND_VEHICL_SPEED:
       gazel.Speed = ((msg.data8[2]<<8)|msg.data8[1])/256.0;
-      gazel.Speed_px4flow = (float)(px4flow_sum/px4flow_cnt)*0.0144;
-      px4flow_sum = 0;
-      px4flow_cnt = 0;
       gazel.BrakeSwitch = (msg.data8[4]>>4) & 0x03;
       gazel.ClutchSwitch =(msg.data8[4]>>6) & 0x03;
       break;

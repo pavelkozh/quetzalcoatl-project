@@ -27,7 +27,7 @@ static const I2CConfig i2cfg2 = {
 #else
 // Following numbers trimmed to give 100kHz clock - waveform reasonably symmetrical
 static const I2CConfig i2cfg2 = {
-     STM32_TIMINGR_PRESC(9U)  |
+     STM32_TIMINGR_PRESC(15U)  |
      STM32_TIMINGR_SCLDEL(9U) | STM32_TIMINGR_SDADEL(9U) |
      STM32_TIMINGR_SCLH(21U)   | STM32_TIMINGR_SCLL(24U),
     0,              // CR1

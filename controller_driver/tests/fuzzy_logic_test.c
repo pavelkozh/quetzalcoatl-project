@@ -17,10 +17,6 @@ void RisingEdgeBreakMCallback(PWMDriver *pwmd);
 
 void fallingEdgeBreakMCallback(PWMDriver *pwmd);
 
-uint16_t max_clutch_speed     = 2000;
-uint16_t min_clutch_speed     = 15000;
-uint16_t max_break_speed     = 10000;
-uint16_t min_break_speed      = 5000;
 
 uint8_t     val = 55;  //50 = 1V
 float       es = 770.0;
@@ -42,7 +38,7 @@ MotorDriver ClutchM = {
     .dir_line        =   PAL_LINE(GPIOB, 8),
     .rising_edge_cb  =   RisingEdgeClutchMCallback,
     .falling_edge_cb =   fallingEdgeClutchMCallback,
-    .max_position    =   90000,
+    .max_position    =   100000,
     .min_position    =  0
 };
 
@@ -123,13 +119,13 @@ uint32_t engineSpeedControl( uint32_t engine_speed_rpm )
 
 
     /*  roughly reset integral */
-    controlValue = CLIP_VALUE(controlValue,0,420);// 55 -> 215; 107 -> 420
+    controlValue = CLIP_VALUE(controlValue,0,5000);// 55 -> 215; 107 -> 420
     controlValue = map2(controlValue,0,5000,77,255);
 
     return controlValue;
 
 }
-static THD_WORKING_AREA(pid_wa, 256);
+static THD_WORKING_AREA(pid_wa, 128);
 static THD_FUNCTION(pid, arg) {
     
     (void)arg;
@@ -149,11 +145,11 @@ static THD_FUNCTION(pid, arg) {
         }
         
         extDacSetValue(( uint8_t)(val*0.55),val);  
-        chThdSleepMilliseconds( 15 );
+        chThdSleepMilliseconds( 20 );
     }
 }
 
-uint16_t map(double x, uint16_t in_min, uint16_t in_max, uint16_t out_min, uint16_t out_max)
+uint32_t map(double x, uint32_t in_min, uint32_t in_max, uint32_t out_min, uint32_t out_max)
 {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
@@ -163,9 +159,17 @@ uint16_t map(double x, uint16_t in_min, uint16_t in_max, uint16_t out_min, uint1
     static double VSpeed_e = 0.0;
     static double VSpeed = 0.0;
     static double dErr= 0.0;
+    static double dErr_filter[5]= {0,0,0,0,0};
+    static uint8_t  dE_cnt = 0;
     static double  vs = 0;
-    static bool fl_start_fag = 0;
+    static bool fl_start_flag = 0;
+    static target_zone_flag = 0;
     static uint8_t pedal_calibration_start_fag = 0;
+
+uint32_t max_clutch_pos     = 75000;
+uint32_t min_clutch_pos     = 50000;
+uint16_t max_break_pos     = 20000;
+uint16_t min_break_pos      = 0;
 
 static THD_WORKING_AREA(fl_wa, 256);
 static THD_FUNCTION(fl, arg) {
@@ -177,61 +181,93 @@ static THD_FUNCTION(fl, arg) {
     fuzzylogicInit();
 
     while(1){
-        if(pedal_calibration_start_fag >= 1){
-            fl_start_fag = 0;
-            if((gazel.ClutchSwitch==1) && (pedal_calibration_start_fag == 1))
-                MotorRunContinuous( &ClutchM, 1, 1000 );
-            else
-                MotorRunContinuous( &ClutchM, 0, 1000 );
-            if((gazel.BrakeSwitch==1) && (pedal_calibration_start_fag == 1))
-                MotorRunContinuous( &BreakM, 1, 1000 );
-            else
-                MotorRunContinuous( &BreakM, 0, 1000 );
+        // if(pedal_calibration_start_fag >= 1){
+        //     fl_start_flag = 0;
+        //     if((gazel.ClutchSwitch==1) && (pedal_calibration_start_fag == 1))
+        //         MotorRunContinuous( &ClutchM, 1, 1000 );
+        //     else
+        //         MotorRunContinuous( &ClutchM, 0, 1000 );
+        //     if((gazel.BrakeSwitch==1) && (pedal_calibration_start_fag == 1))
+        //         MotorRunContinuous( &BreakM, 1, 1000 );
+        //     else
+        //         MotorRunContinuous( &BreakM, 0, 1000 );
 
-            pedal_calibration_start_fag = 2;
-            if((gazel.ClutchSwitch != Clutch_old) && (pedal_calibration_start_fag == 2)){
-                MotorStop( &ClutchM );
-                pedal_calibration_start_fag = 0;
-            }
-            if((gazel.BrakeSwitch != Break_old) && (pedal_calibration_start_fag == 2)){
-                MotorStop( &BreakM );
-                pedal_calibration_start_fag = 0;
-            }
-        }else{
-           Clutch_old = gazel.ClutchSwitch;
-           Break_old = gazel.BrakeSwitch;
-        }
-        if(fl_start_fag == 1){
-            if(ClutchM.position >5500) // end of dead zone of clutch 
-                MotorRunContinuous( &ClutchM, 1, 1000 ); //
-            else{
-                if(vs==0){
-                    MotorRunContinuous( &ClutchM, 0, 1000 ); //100 + res_buff becouse max_clutch_speed < min_clutch_speed and res_buff < 0
-                    MotorRunContinuous( &BreakM, 0, 1000 );
+        //     pedal_calibration_start_fag = 2;
+        //     if((gazel.ClutchSwitch != Clutch_old) && (pedal_calibration_start_fag == 2)){
+        //         MotorStop( &ClutchM );
+        //         pedal_calibration_start_fag = 0;
+        //     }
+        //     if((gazel.BrakeSwitch != Break_old) && (pedal_calibration_start_fag == 2)){
+        //         MotorStop( &BreakM );
+        //         pedal_calibration_start_fag = 0;
+        //     }
+        // }else{
+        //    Clutch_old = gazel.ClutchSwitch;
+        //    Break_old = gazel.BrakeSwitch;
+        // }
+        if(fl_start_flag == 1){
+                // MotorRunTracking( &ClutchM, 3000); MotorRunTracking( &BreakM, 3000);
+                // if(vs==0){
+                //     MotorRunContinuous( &ClutchM, 0, 5000 ); //100 + res_buff becouse max_clutch_speed < min_clutch_speed and res_buff < 0
+                //     if(ClutchM.State == 0)
+                //         MotorRunContinuous( &BreakM, 0, 5000 );
+                // }else{
+
+                if(target_zone_flag == 0 ){
+                    MotorRunContinuous( &ClutchM, 1, 10000 );
+                    if( gazel.Speed_px4flow >=0.05){
+                        max_clutch_pos = ClutchM.position + 1000;
+                        min_clutch_pos = ClutchM.position -5000;
+                        target_zone_flag = 1;
+                    }
                 }else{
-                VSpeed_e= vs - gazel.Speed;
-                dErr = VSpeed_e_prev - VSpeed_e;
-                calculateFLReg(-VSpeed_e, dErr, &res_buff);
-                VSpeed_e_prev = VSpeed_e;
-                if(res_buff[0]<0)
-                    MotorRunContinuous( &ClutchM, 1, map(100 + res_buff[0], 0,100, max_clutch_speed, min_clutch_speed) ); //100 + res_buff becouse max_clutch_speed < min_clutch_speed and res_buff < 0
-                else if(res_buff[0]>0)
-                    MotorRunContinuous( &ClutchM, 0, map(100 - res_buff[0], 0,100, max_clutch_speed, min_clutch_speed) ); //100 + res_buff becouse max_clutch_speed < min_clutch_speed and res_buff < 0
-                else 
-                    MotorStop(&ClutchM);
+                    MotorRunTracking( &ClutchM, 1300);
+                    MotorRunTracking( &BreakM, 3000);
+                    VSpeed_e= vs - gazel.Speed_px4flow;
+                    dErr =  VSpeed_e - VSpeed_e_prev;
+                    //filter dE
+                    dErr_filter[dE_cnt] = dErr;
+                    dE_cnt = dE_cnt >= 1 ? 0 : dE_cnt+1;
+                    double dErr_mean = (dErr_filter[0]+dErr_filter[1])/2.0;//+dErr_filter[2]+dErr_filter[3]+dErr_filter[4])/5.0;
+                    //calculate fl
+                    calculateFLReg(VSpeed_e, dErr_mean, &res_buff);
+                    VSpeed_e_prev = VSpeed_e;
 
-                if(res_buff[1]<0)
-                    MotorRunContinuous( &BreakM, 1, map(100 + res_buff[1], 0,100, max_break_speed, min_break_speed) ); //100 + res_buff becouse max_breake_speed < min_break_speed and res_buff < 0
-                else if(res_buff[1]>0)
-                    MotorRunContinuous( &BreakM, 0, map(100 - res_buff[1], 0,100, max_break_speed, min_break_speed) ); //100 + res_buff becouse max_breake_speed < min_break_speed and res_buff < 0
-                else 
-                    MotorStop(&BreakM);
+                    if(res_buff[0]<0){
+                        BreakM.tracked_position = 0;
+                        ClutchM.tracked_position = map(res_buff[0]+100,0,100,min_clutch_pos,max_clutch_pos);
+                    }
+                    if (res_buff[0]>0){
+                        ClutchM.tracked_position = 72000;
+                        BreakM.tracked_position = map(res_buff[0],0,100,min_break_pos,max_break_pos);
+                    }
+
                 }
-            }
-        }else{
+
+                // if(res_buff[0]<0)
+                //         MotorRunContinuous( &ClutchM, 1, map(100 + res_buff[0], 0,100, max_clutch_speed, min_clutch_speed) ); //100 + res_buff becouse max_clutch_speed < min_clutch_speed and res_buff < 0
+                //     else if(res_buff[0]>0)
+                //         MotorRunContinuous( &ClutchM, 0, map(100 - res_buff[0], 0,100, max_clutch_speed, min_clutch_speed) ); //100 + res_buff becouse max_clutch_speed < min_clutch_speed and res_buff < 0
+                //     else 
+                //         MotorStop(&ClutchM);
+                // }
+
+
+                // if(res_buff[1]<0)
+                //     MotorRunContinuous( &BreakM, 1, map(100 + res_buff[1], 0,100, max_break_speed, min_break_speed) ); //100 + res_buff becouse max_breake_speed < min_break_speed and res_buff < 0
+                // else if(res_buff[1]>0)
+                //     MotorRunContinuous( &BreakM, 0, map(100 - res_buff[1], 0,100, max_break_speed, min_break_speed) ); //100 + res_buff becouse max_breake_speed < min_break_speed and res_buff < 0
+                // else 
+                //     MotorStop(&BreakM);
+                // }
+            // }
+        // }else{
             //MotorRunContinuous( &ClutchM, 0, 600);
+        }else{
+            target_zone_flag = 0;
         }
-            chThdSleepMilliseconds( 100 );
+            chThdSleepMilliseconds( 50 );
+        
     }
 }
 
@@ -247,8 +283,8 @@ void TestFLRouting ( void )
     palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
     can_init();
     extDacInit();
-    chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO + 10, pid, NULL);
-    chThdCreateStatic(fl_wa, sizeof(fl_wa), NORMALPRIO + 7, fl, NULL);
+    chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO + 5, pid, NULL);
+    chThdCreateStatic(fl_wa, sizeof(fl_wa), NORMALPRIO + 6, fl, NULL);
     // Fuzzy logic controller
     // fuzzylogicInit();
       /*MotoR driver Setting */
@@ -265,6 +301,7 @@ void TestFLRouting ( void )
     uint32_t CPSpeed = 5000;
     uint32_t steps = 4000;
     uint16_t speed = 4000;
+    int32_t filter_px4flow = 0;
 
 
     static double res_buff2[2] = {0.0,0.0};
@@ -289,10 +326,10 @@ void TestFLRouting ( void )
 
         // //*****MOTOR CONTROL*******//
 
-        if(sd_buff[0]=='r') MotorRunContinuous( &ClutchM, 1, speed);
-        if(sd_buff[0]=='f') MotorRunContinuous( &ClutchM, 0, speed);
-        if(sd_buff[0]=='t') MotorRunContinuous( &BreakM, 1, speed);
-        if(sd_buff[0]=='g') MotorRunContinuous( &BreakM, 0, speed);
+        if(sd_buff[0]=='r') {fl_start_flag = 0;MotorRunContinuous( &ClutchM, 1, speed);}
+        if(sd_buff[0]=='f') {fl_start_flag = 0;MotorRunContinuous( &ClutchM, 0, speed);}
+        if(sd_buff[0]=='t') {fl_start_flag = 0;MotorRunContinuous( &BreakM, 1, speed);}
+        if(sd_buff[0]=='g') {fl_start_flag = 0;MotorRunContinuous( &BreakM, 0, speed);}
 
         // if(sd_buff[0]=='u') { MotorRunTracking( &ClutchM, speed); MotorRunTracking( &BreakM, speed);}
 
@@ -321,16 +358,15 @@ void TestFLRouting ( void )
         // if(sd_buff[0]=='a') control_start = 1;
         // if(sd_buff[5]=='l') pidCtx.integrLimit = atoi(sd_buff);
         // if(sd_buff[5]=='k') CSErrorDeadzoneHalfwidth = atoi(sd_buff);
-        
         // extDacSetValue(( uint8_t)(val*0.55),val);
 
         //*****Fuzzy CONTROL*******//
 
         if(sd_buff[0]=='q') vs  = atoi(&sd_buff[1])/100.0; 
-        if(sd_buff[0]=='w') max_clutch_speed = atoi(&sd_buff[1]); 
-        if(sd_buff[0]=='e') min_clutch_speed = atoi(&sd_buff[1]);
-        if(sd_buff[0]=='d') max_break_speed = atoi(&sd_buff[1]);
-        if(sd_buff[0]=='s') min_break_speed = atoi(&sd_buff[1]);
+        if(sd_buff[0]=='w') max_clutch_pos = atoi(&sd_buff[1]); 
+        if(sd_buff[0]=='e') min_clutch_pos = atoi(&sd_buff[1]);
+        if(sd_buff[0]=='d') max_break_pos = atoi(&sd_buff[1]);
+        if(sd_buff[0]=='s') min_break_pos = atoi(&sd_buff[1]);
         // if(sd_buff[0]=='z') {
         //     dVSpeed_t = atoi( &sd_buff[1] ) /100.0-0.3;
         //     vs = vs - dVSpeed_t;
@@ -338,14 +374,19 @@ void TestFLRouting ( void )
         // }
         // if(sd_buff[0]=='z') VSpeed = atoi(&sd_buff[1])/100.0;
         // if(sd_buff[0]=='v') dVSpeed = atoi(&sd_buff[1])/100.0;
-        if(sd_buff[0]=='x') fl_start_fag = 1;
-        if(sd_buff[0]=='c') fl_start_fag = 0;
+        if(sd_buff[0]=='x'){
+                            fl_start_flag = 1;
+                        } 
+        if(sd_buff[0]=='c') fl_start_flag = 0;
+
+        if(ground_distance()>1000)
+         filter_px4flow = flow_comp_m_x()*0.0144;
         // chprintf( (BaseSequentialStream *)&SD3, "State: %d State: %d  Mode: %d  Position1: %d  Position2: %d Max1: %d Max2: %d Track1: %d Track2: %d \r\n",ClutchM.state,BreakM.state , ClutchM.mode, ClutchM.position ,BreakM.position ,ClutchM.max_position ,BreakM.max_position , ClutchM.tracked_position,BreakM.tracked_position);
-        chprintf( (BaseSequentialStream *)&SD3,"fl_start_fag: %d vs: %.2f, GazSp: %.2f, dGazSp: %.3f Csp: %.2f, Bsp: %.2f__________ min_CSp: %d, max_CSp: %d, min_Bsp: %d, max_Bsp: %d \n\r",fl_start_fag, VSpeed_e, gazel.Speed,dErr, res_buff[0], res_buff[1], min_clutch_speed, max_clutch_speed, min_break_speed, max_break_speed); 
+        //chprintf( (BaseSequentialStream *)&SD3,"fl_start_flag: %d vs: %.2f, GazSp: %.2f, dGazSp: %.3f Csp: %.2f, Bsp: %.2f__________ min_CSp: %d, max_CSp: %d, min_Bsp: %d, max_Bsp: %d \n\r",fl_start_flag, VSpeed_e, gazel.Speed,dErr, res_buff[0], res_buff[1], min_clutch_speed, max_clutch_speed, min_break_speed, max_break_speed); 
 
         // chprintf( (BaseSequentialStream *)&SD3, "State: %d State: %d  Mode: %d  Position1: %d  Position2: %d Max1: %d Max2: %d Track1: %d Track2: %d \r\n",ClutchM.state,BreakM.state , ClutchM.mode, ClutchM.position ,BreakM.position ,ClutchM.max_position ,BreakM.max_position , ClutchM.tracked_position,BreakM.tracked_position);
-        //chprintf( (BaseSequentialStream *)&SD3,"fl_start_fag: %d vs: %.2f, GazSp: %.2f, dGazSp: %.3f Csp: %.2f, Bsp: %.2f__________ min_CSp: %d, max_CSp: %d, min_Bsp: %d, max_Bsp: %d \n\r",fl_start_fag, VSpeed_e, gazel.Speed,dErr, res_buff[0], res_buff[1], min_clutch_speed, max_clutch_speed, min_break_speed, max_break_speed); 
-        chprintf( (BaseSequentialStream *)&SD3,"x: %.02f Speed: %.02f Px4flow: %.02f gnd: %.02f \n\r", flow_comp_m_x()*0.0144, gazel.AcceleratorPedalPosition, gazel.Speed_px4flow, ground_distance()/1000.0);
+        chprintf( (BaseSequentialStream *)&SD3,"vs:\t%.2f\tESp:\t%.2f\tPx4flow:\t%.02f\tdGazSp:\t%.3f\tCsp:\t%.2f\tClutchM:\t%d\tBreakM:\t%d\tmin_CSp:\t%d\tmax_CSp:\t%d\n\r",vs, VSpeed_e,gazel.Speed_px4flow,dErr, res_buff[0],ClutchM.position,BreakM.position, min_clutch_pos, max_clutch_pos); 
+        //chprintf( (BaseSequentialStream *)&SD3,"Px4flow: %.02f\t GazSp: %.2f\t x: %.02f\t gnd: %.02f\t ClutchM: %d \n\r", gazel.Speed_px4flow,gazel.Speed,flow_comp_m_x()*0.0036,ground_distance()/1000.0, ClutchM.position);
         for (int i = 0; i < 9; i++)
         {
           sd_buff[i]='?';
