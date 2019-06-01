@@ -82,6 +82,7 @@ void fallingEdgeBreakMCallback(PWMDriver *pwmd){
 /**********************************************PID*****************************************************/
 
 
+#define VEHICLE_SPEED_REFERENCE_ACCELERATION        0.5 /* (km/h)/100ms   */
 
 uint32_t map(uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_min, uint32_t out_max)
 {
@@ -92,6 +93,7 @@ uint32_t map(uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_min, uin
 static uint8_t     val = 55;  //50 = 1V
 static float       Eref = 770.0;
 static float       Vref = 0;
+static float       current_Vref = 0;
 
 
 static int32_t VehicleControl = 0;
@@ -100,6 +102,7 @@ static uint8_t CSErrorDeadzoneHalfwidth = 1;
 
 static bool        engine_control_start = 0;
 static bool        vehicle_control_start = 0;
+static bool        speed_reference_linear_acceleration_enable = 0;
 
 static PIDControllerContext_t  pidCtx = {
     .kp   = 3.5,
@@ -221,8 +224,17 @@ static THD_FUNCTION(pid, arg) {
 
 
 
-        if ( (vehicle_control_start) && (!engine_control_start ) ){
-            val = vehicleSpeedControl((uint32_t) Vref);
+        if ( (vehicle_control_start) && (!engine_control_start ) )
+        {
+            if (( Vref > gazel.Speed + VEHICLE_SPEED_REFERENCE_ACCELERATION ) && (speed_reference_linear_acceleration_enable))
+            {
+                current_Vref = gazel.Speed + VEHICLE_SPEED_REFERENCE_ACCELERATION;
+            }
+            else
+            {
+                current_Vref = Vref;
+            }
+            val = vehicleSpeedControl((uint32_t) current_Vref);
         }
         else{
                 pidCtxV.err        = 0;
@@ -246,6 +258,8 @@ static THD_FUNCTION(pid, arg) {
 
 
 
+
+
 /*********************************************************** MT Control **********************************************/
 
 #define ENGINE_SPEED_THRESHOLD 1900
@@ -256,52 +270,59 @@ uint8_t gear = -1;
 float eng_speed_debug = 0;
 bool shift_enable_flag = 0;
 
+uint8_t synchronization_coeff = 0;
+
+void gearControl ( uint8_t target_gear )
+{
+    switch(target_gear){
+        case 2: synchronization_coeff = 75.3; break;
+        case 3: synchronization_coeff = 49.0; break;
+    }
+    if ( gear_num == target_gear - 1  )
+    {
+        MotorRunContinuous( &ClutchM, 0, 500 );
+        if ( ClutchM.state == 0 )
+        {
+            gear = target_gear;
+            Eref = gazel.Speed * synchronization_coeff;
+            engine_control_start = 1;
+        }
+    }
+    if ( ( gear_num == target_gear ) )
+    {
+        MotorRunContinuous( &ClutchM, 1, 500 );
+        if ( ClutchM.state == 0 )
+        {
+            shift_enable_flag = 0;
+            engine_control_start = false;
+            vehicle_control_start = true;
+        }
+
+    }
+
+}
+
 static THD_WORKING_AREA(gearshift_wa, 256);
 static THD_FUNCTION(gearshift, arg) {
 
     (void)arg;
     while(1){
         switch(gear){
-        case 0: gear_num = shiftMTToNeutral(1000); break;
-        case 1: gear_num = shiftMTToNextGear(1,1000); break;
-        case 2: gear_num = shiftMTToNextGear(2,1000); break;
-        case 6: gear_num = shiftMTToNextGear(6,1000); break;
+            case 0: gear_num = shiftMTToNeutral(1000); break;
+            case 1: gear_num = shiftMTToNextGear(1,1000); break;
+            case 2: gear_num = shiftMTToNextGear(2,1000); break;
+            case 6: gear_num = shiftMTToNextGear(6,1000); break;
         }
 
-            if ( ( gazel.EngineSpeed >= ENGINE_SPEED_THRESHOLD ) && (gear_shift_control == 1) && ( gear_num != 2 ) )
-            //if ( ( eng_speed_debug >= 1200 ) && (gear_shift_control == 1) )
-            {
+            if ( ( gazel.EngineSpeed >= ENGINE_SPEED_THRESHOLD ) && (gear_shift_control == 1) ){
                 shift_enable_flag = 1;
             }
-
-            if ( shift_enable_flag )
-            {
-                if ( gear_num != 2  )
-                {
-                    MotorRunContinuous( &ClutchM, 0, 500 );
-                    if ( ClutchM.state == 0 )
-                    {
-                        gear = 2;
-                        Eref = gazel.Speed * 75.3;
-                        engine_control_start = 1;
-                    }
-                }
-                if ( gear_num == 2  )
-                {
-                    MotorRunContinuous( &ClutchM, 1, 500 );
-                    if ( ClutchM.state == 0 )
-                    {
-                        shift_enable_flag = 0;
-                        engine_control_start = false;
-                        vehicle_control_start = true;
-                    }
-
-                }
+            if ( shift_enable_flag ){
+                gearControl( gear_num + 1 );
             }
 
             chThdSleepMilliseconds( 20 );
     }
-
 
 }
 
@@ -315,7 +336,6 @@ void TestMtControl ( void )
     palSetPadMode( GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL );    //Led
     palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
 
-#if 1
     can_init();
     extDacInit();
     chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO + 10, pid, NULL);
@@ -333,27 +353,19 @@ void TestMtControl ( void )
 
     mtControlInit ();
 
-#endif
 
 
 
-    uint32_t CPSpeed = 5000;
-    uint32_t steps = 4000;
     uint16_t speed = 4000;
-
     static char  sd_buff[10] ;
-   // static char  sd_buff2[10] ;
-
-    bool vupLS_state = 0, vlowLS_state = 0, hlLS_state = 0, hrLS_state = 0;
-    uint8_t all_sensors_state = 0;
+//    bool vupLS_state = 0, vlowLS_state = 0, hlLS_state = 0, hrLS_state = 0;
+//    uint8_t all_sensors_state = 0;
 
     while(1) {
 
         palToggleLine(LINE_LED1);
 
         sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
-
-
 
         if(sd_buff[5]=='n') {
           speed = atoi(sd_buff);
@@ -388,6 +400,8 @@ void TestMtControl ( void )
         if(sd_buff[0]=='a') vehicle_control_start = 1;
         if(sd_buff[0]=='s') vehicle_control_start = 0;
 
+        if(sd_buff[0]=='j') speed_reference_linear_acceleration_enable = !speed_reference_linear_acceleration_enable;
+
 
 
         //**** Gear Shift commands ****//
@@ -406,7 +420,7 @@ void TestMtControl ( void )
 
         //chprintf( (BaseSequentialStream *)&SD3, "err: %.2f Control: %d A: %d Pedal: %.1f ESpeed: %.02f  VSeed: %.2f ________ Kp: %.02f ki: %.04f Kd:%.02f  ISum: %.3f ______INTEGZONE: %.3f  GearControl %d ClutchState %d  \r\n", pidCtxV.err, VehicleControl, (uint8_t)val, gazel.AcceleratorPedalPosition, gazel.EngineSpeed, gazel.Speed , pidCtxV.kp, pidCtxV.ki, pidCtxV.kd,pidCtxV.integrSum, pidCtxV.integZone_abs, gear, ClutchM.state );
 
-        chprintf( (BaseSequentialStream *)&SD3, "EControlEn %d\tGControlEn %d\tVControlEn %d\tVref: %.2f\tVspeed: %.2f\tESpeed: %.02f\tGN %d\MVpos %d\MGpos %d\tCS %d\tBS %d\t ClPos %d\t \r\n", engine_control_start, gear_shift_control, vehicle_control_start, Vref, gazel.Speed, gazel.EngineSpeed, gear_num, v_motor_position, g_motor_position, gazel.ClutchSwitch, gazel.BrakeSwitch, ClutchM.position );
+        chprintf( (BaseSequentialStream *)&SD3, "EControlEn %d\tGControlEn %d\tVControlEn %d\tVref: %.2f\tRefLinEn %d\tVspeed: %.2f\tESpeed: %.02f\tGN %d\tVpos %d\tGpos %d\tCS %d\tBS %d\tClPos %d\t\r\n", engine_control_start, gear_shift_control, vehicle_control_start, Vref,speed_reference_linear_acceleration_enable, gazel.Speed, gazel.EngineSpeed, gear_num, v_motor_position, g_motor_position, gazel.ClutchSwitch, gazel.BrakeSwitch, ClutchM.position );
 
 
 
