@@ -57,7 +57,7 @@ MotorDriver BreakM = {
     .dir_line        =   PAL_LINE(GPIOD, 11),
     .rising_edge_cb  =   RisingEdgeBreakMCallback,
     .falling_edge_cb =   fallingEdgeBreakMCallback,
-    .max_position    =   40000,
+    .max_position    =   25000,
     .min_position     =  0
 };
 
@@ -376,10 +376,10 @@ void TestMtControl ( void )
         }
 
         if(sd_buff[0]=='c') { MotorStop( &ClutchM );  MotorStop( &BreakM ); }
-        if(sd_buff[0]=='z') MotorRunContinuous(&ClutchM, 0, 3000);
-        if(sd_buff[0]=='o') MotorRunContinuous(&ClutchM, 1, 3000);
-        if(sd_buff[0]=='x') MotorRunContinuous(&BreakM, 0, 3000);
-        if(sd_buff[0]=='f') MotorRunContinuous(&BreakM, 1, 3000);
+        if(sd_buff[0]=='z') MotorRunContinuous(&ClutchM, 0, 1000);
+        if(sd_buff[0]=='o') MotorRunContinuous(&ClutchM, 1, 1000);
+        if(sd_buff[0]=='x') MotorRunContinuous(&BreakM, 0, 1000);
+        if(sd_buff[0]=='f') MotorRunContinuous(&BreakM, 1, 1000);
 
 
         //*****PID CONTROL*******//
