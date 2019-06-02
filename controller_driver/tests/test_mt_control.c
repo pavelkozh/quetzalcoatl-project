@@ -88,11 +88,14 @@ void fallingEdgeBreakMCallback(PWMDriver *pwmd){
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 /**********************************************PID*****************************************************/
 
 
 #define VEHICLE_SPEED_REFERENCE_ACCELERATION        0.5 /* (km/h)/100ms   */
 
+=======
+>>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
 =======
 >>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
 uint32_t map(uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_min, uint32_t out_max)
@@ -101,6 +104,7 @@ uint32_t map(uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_min, uin
 }
 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 static uint8_t     val = 55;  //50 = 1V
 static float       Eref = 770.0;
@@ -130,6 +134,11 @@ static PIDControllerContext_t  pidCtxV = {
     .kd   = 0,
     .integrLimit  = 100,
     .integZone = 0.9
+=======
+static const SerialConfig sdcfg = {
+  .speed = 115200,
+  .cr1 = 0, .cr2 = 0, .cr3 = 0
+>>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
 =======
 static const SerialConfig sdcfg = {
   .speed = 115200,
@@ -189,6 +198,7 @@ static THD_FUNCTION(pid, arg) {
 
     while(1){
 <<<<<<< HEAD
+<<<<<<< HEAD
 
         if((gazel.BrakeSwitch==1) || (gazel.ClutchSwitch==1)) vehicle_control_start = false;
 
@@ -221,6 +231,10 @@ static THD_FUNCTION(pid, arg) {
         if (control_start && (gazel.BrakeSwitch==0) && (gazel.ClutchSwitch==0)){
             val = vehicleSpeedControl((uint32_t) esV);
 >>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
+=======
+        if (control_start && (gazel.BrakeSwitch==0) && (gazel.ClutchSwitch==0)){
+            val = vehicleSpeedControl((uint32_t) esV);
+>>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
         }
         else{
                 pidCtxV.err        = 0;
@@ -232,9 +246,12 @@ static THD_FUNCTION(pid, arg) {
 
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
         val = val < 58 ? 58 : val;
         extDacSetValue(( uint8_t)(val*0.55),val);
+=======
+>>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
 =======
 >>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
 
@@ -244,6 +261,7 @@ static THD_FUNCTION(pid, arg) {
     }
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 
@@ -255,12 +273,15 @@ static THD_FUNCTION(pid, arg) {
 
 =======
 >>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
+=======
+>>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
 bool gear_shift_control = 0;
 int8_t gear_num = 0;
 uint8_t gear = -1;
 float eng_speed_debug = 0;
 bool shift_enable_flag = 0;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 uint8_t synchronization_coeff = 0;
 
@@ -298,6 +319,9 @@ static THD_WORKING_AREA(gearshift_wa, 256);
 =======
 static THD_WORKING_AREA(gearshift_wa, 128);
 >>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
+=======
+static THD_WORKING_AREA(gearshift_wa, 128);
+>>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
 static THD_FUNCTION(gearshift, arg) {
 
     (void)arg;
@@ -311,6 +335,7 @@ static THD_FUNCTION(gearshift, arg) {
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             if ( ( gazel.EngineSpeed >= ENGINE_SPEED_THRESHOLD ) && (gear_shift_control == 1) ){
                 shift_enable_flag = 1;
             }
@@ -319,6 +344,8 @@ static THD_FUNCTION(gearshift, arg) {
                 }
 
 =======
+=======
+>>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
             if ( ( gazel.EngineSpeed >= 1300 ) && (gear_shift_control == 1) && ( gear_num != 2 ) )
             //if ( ( eng_speed_debug >= 1200 ) && (gear_shift_control == 1) )
             {
@@ -415,6 +442,7 @@ void TestMtControl ( void )
 
         //*****PID CONTROL*******//
 <<<<<<< HEAD
+<<<<<<< HEAD
 
         if(sd_buff[5]=='b') Vref = atoi(sd_buff);
         if(sd_buff[0]=='a') vehicle_control_start = 1;
@@ -425,6 +453,8 @@ void TestMtControl ( void )
 
 
 =======
+=======
+>>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
         if(sd_buff[5]=='p') pidCtxV.kp = atoi(sd_buff)/100.0;
         if(sd_buff[5]=='i') pidCtxV.ki = atoi(sd_buff)/1000.0;
         if(sd_buff[5]=='m') pidCtxV.kd = atoi(sd_buff)/1000.0;
@@ -435,6 +465,9 @@ void TestMtControl ( void )
         if(sd_buff[2]=='j') pidCtxV.integZone = atoi(sd_buff)/100.0;
         if(sd_buff[5]=='l') pidCtxV.integrLimit = atoi(sd_buff);
         if(sd_buff[5]=='k') CSErrorDeadzoneHalfwidth = atoi(sd_buff);
+<<<<<<< HEAD
+>>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
+=======
 >>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
 
 
@@ -449,6 +482,7 @@ void TestMtControl ( void )
         if(sd_buff[5]=='t') eng_speed_debug = atoi(sd_buff);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         //uint8_t vm_state = getVerticalState();
         //uint8_t gm_state = getGorisontalState ();
         int32_t v_motor_position = getVerticalPosition();
@@ -459,6 +493,9 @@ void TestMtControl ( void )
         chprintf( (BaseSequentialStream *)&SD3, "EControlEn %d\tGControlEn %d\tVControlEn %d\tVref: %.2f\tRefLinEn %d\tVspeed: %.2f\tESpeed: %.02f\tGN %d\tVpos %d\tGpos %d\tCS %d\tBS %d\tClPos %d\t\r\n", engine_control_start, gear_shift_control, vehicle_control_start, Vref,speed_reference_linear_acceleration_enable, gazel.Speed, gazel.EngineSpeed, gear_num, v_motor_position, g_motor_position, gazel.ClutchSwitch, gazel.BrakeSwitch, ClutchM.position );
 
 
+=======
+        chprintf( (BaseSequentialStream *)&SD3, "err: %.2f Control: %d A: %d Pedal: %.1f ESpeed: %.02f  VSeed: %.2f ________ Kp: %.02f ki: %.04f Kd:%.02f  ISum: %.3f ______INTEGZONE: %.3f  GearControl %d ClutchState %d  \r\n", pidCtxV.err, VehicleControl, (uint8_t)val, gazel.AcceleratorPedalPosition, gazel.EngineSpeed, gazel.Speed , pidCtxV.kp, pidCtxV.ki, pidCtxV.kd,pidCtxV.integrSum, pidCtxV.integZone_abs, gear, ClutchM.state );
+>>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
 =======
         chprintf( (BaseSequentialStream *)&SD3, "err: %.2f Control: %d A: %d Pedal: %.1f ESpeed: %.02f  VSeed: %.2f ________ Kp: %.02f ki: %.04f Kd:%.02f  ISum: %.3f ______INTEGZONE: %.3f  GearControl %d ClutchState %d  \r\n", pidCtxV.err, VehicleControl, (uint8_t)val, gazel.AcceleratorPedalPosition, gazel.EngineSpeed, gazel.Speed , pidCtxV.kp, pidCtxV.ki, pidCtxV.kd,pidCtxV.integrSum, pidCtxV.integZone_abs, gear, ClutchM.state );
 >>>>>>> parent of 40e58b8... [MT_control]: Добавлена синхорнизация
