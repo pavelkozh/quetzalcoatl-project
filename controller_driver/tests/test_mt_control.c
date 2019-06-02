@@ -113,8 +113,8 @@ static PIDControllerContext_t  pidCtx = {
 };
 
 static PIDControllerContext_t  pidCtxV = {
-    .kp   = 4.5,
-    .ki   = 0.5,
+    .kp   = 3.5,
+    .ki   = 0.7,
     .kd   = 0,
     .integrLimit  = 100,
     .integZone = 0.9
@@ -190,7 +190,7 @@ uint32_t vehicleSpeedControl( uint32_t speed )
 
     /*  roughly reset integral */
     VehicleControl = CLIP_VALUE(VehicleControl,0,1000);
-    VehicleControl = map(VehicleControl,0,1000,77,240);
+    VehicleControl = map(VehicleControl,0,1000,77,220);
 
     return VehicleControl;
 
@@ -226,15 +226,15 @@ static THD_FUNCTION(pid, arg) {
 
         if ( (vehicle_control_start) && (!engine_control_start ) )
         {
-            if (( Vref > gazel.Speed + VEHICLE_SPEED_REFERENCE_ACCELERATION ) && (speed_reference_linear_acceleration_enable))
-            {
-                current_Vref = gazel.Speed + VEHICLE_SPEED_REFERENCE_ACCELERATION;
-            }
-            else
-            {
-                current_Vref = Vref;
-            }
-            val = vehicleSpeedControl((uint32_t) current_Vref);
+//            if (( Vref > gazel.Speed + VEHICLE_SPEED_REFERENCE_ACCELERATION ) && (speed_reference_linear_acceleration_enable))
+//            {
+//                current_Vref = gazel.Speed + VEHICLE_SPEED_REFERENCE_ACCELERATION;
+//            }
+//            else
+//            {
+//                current_Vref = Vref;
+//            }
+            val = vehicleSpeedControl((uint32_t) Vref);
         }
         else{
                 pidCtxV.err        = 0;
@@ -248,6 +248,8 @@ static THD_FUNCTION(pid, arg) {
         {
             val = 58;
         }
+
+        val = val < 58 ? 58 : val;
         extDacSetValue(( uint8_t)(val*0.55),val);
 
         if(engine_control_start)    chThdSleepMilliseconds( 20 );
@@ -311,15 +313,17 @@ static THD_FUNCTION(gearshift, arg) {
             case 0: gear_num = shiftMTToNeutral(1000); break;
             case 1: gear_num = shiftMTToNextGear(1,1000); break;
             case 2: gear_num = shiftMTToNextGear(2,1000); break;
+            case 3: gear_num = shiftMTToNextGear(3,1000); break;
             case 6: gear_num = shiftMTToNextGear(6,1000); break;
         }
 
             if ( ( gazel.EngineSpeed >= ENGINE_SPEED_THRESHOLD ) && (gear_shift_control == 1) ){
                 shift_enable_flag = 1;
             }
-            if ( shift_enable_flag ){
-                gearControl( gear_num + 1 );
-            }
+                if ( shift_enable_flag ){
+                    gearControl( gear_num + 1 );
+                }
+
 
             chThdSleepMilliseconds( 20 );
     }
@@ -401,6 +405,8 @@ void TestMtControl ( void )
         if(sd_buff[0]=='s') vehicle_control_start = 0;
 
         if(sd_buff[0]=='j') speed_reference_linear_acceleration_enable = !speed_reference_linear_acceleration_enable;
+        if(sd_buff[0]=='l') engine_control_start = 0;
+
 
 
 
@@ -408,6 +414,7 @@ void TestMtControl ( void )
         if(sd_buff[0]=='e') gear = 0;
         if(sd_buff[0]=='d') gear = 1;
         if(sd_buff[0]=='r') gear = 2;
+        if(sd_buff[0]=='k') gear = 3;
         if(sd_buff[0]=='g') gear = 6;
         if(sd_buff[0]=='y') gear_shift_control = 1;
         if(sd_buff[0]=='h') gear_shift_control = 0;

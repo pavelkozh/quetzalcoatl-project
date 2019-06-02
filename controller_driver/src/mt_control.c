@@ -109,7 +109,7 @@ void mtControlInit ( void )
     points_array[2].y = -25000; //second gear vertical coordinate
     /*third gear coordinates*/
     points_array[3].x = 0; //third gear horizontal coordinate
-    points_array[3].y = 13000; //third gear vertical coordinate
+    points_array[3].y = 18000; //third gear vertical coordinate
     /*fourth gear coordinates*/
     points_array[4].x = 0; //fourth gear horizontal coordinate
     points_array[4].y = -18000; //fourth gear vertical coordinate
