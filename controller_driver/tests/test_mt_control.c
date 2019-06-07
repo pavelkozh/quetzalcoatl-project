@@ -14,6 +14,8 @@ static const SerialConfig sdcfg = {
 extern  gazelParam gazel;
 
 /************************************MOTOR*****************************************************/
+/*    !!!!!!!!!!!!!!!!!!!!! MOVE OUT FROM THIS FILE !!!!!!!!!!!!*/
+
 
 void RisingEdgeClutchMCallback(PWMDriver *pwmd);
 
@@ -110,17 +112,17 @@ static PIDControllerContext_t  pidCtx = {
 };
 
 static PIDControllerContext_t  pidCtxV = {
-    .kp   = 4.5,
-    .ki   = 0.5,
+    .kp   = 4,
+    .ki   = 0.3,
     .kd   = 0,
     .integrLimit  = 100,
     .integZone = 0.9
 };
 
 /**
- * @brief   Control system of steering implementation
- * @param   position        - reference position
- * @return  controlValue    - control signal value [-100 100] ( in percent )
+ * @brief    For synchronization
+ * @param    engine_speed_rpm - reference [rpm]
+ * @return   engine_control_value - GAS control [dac units]
  */
 uint32_t engineSpeedControl( uint32_t engine_speed_rpm )
 {
@@ -148,28 +150,22 @@ uint32_t engineSpeedControl( uint32_t engine_speed_rpm )
 
     /*  roughly reset integral */
     engine_control_value = CLIP_VALUE(engine_control_value,0,5000);
-    engine_control_value = map(engine_control_value,0,5000,77,240);
+    engine_control_value = map(engine_control_value,0,5000,77,220);
 
     return engine_control_value;
 
 }
 
 /**
- * @brief   Control system of steering implementation
- * @param   position        - reference position
- * @return  controlValue    - control signal value [-100 100] ( in percent )
+ * @brief     Vehicle speed control function
+ * @param     speed - reference [km/h]
+ * @return    VehicleControl - GAS control [dac units]
  */
 
 uint32_t vehicleSpeedControl( uint32_t speed )
 {
-
-    //engine_speed_rpm  = CLIP_VALUE( engine_speed_rpm, 0, 100 );
     speed = map(speed,0,100,0,1000);
-
-    //engine_speed_rpm  = CLIP_VALUE( engine_speed_rpm, 0, 100 );
-
     int16_t current_speed = map(gazel.Speed,0,100,0,1000);
-
     int16_t error = speed - current_speed;
 
     /* Dead zone for (p) error */
@@ -194,6 +190,10 @@ uint32_t vehicleSpeedControl( uint32_t speed )
 }
 
 
+/**************************************   GAS control thread ****************/
+/* Speed control sampling time = 100ms / Synchronization sampling time = 20ms
+ * When Brake pedal or Clutch pedal are pressed, speed control doesn't work
+*************************************/
 static THD_WORKING_AREA(pid_wa, 256);
 static THD_FUNCTION(pid, arg) {
 
@@ -248,7 +248,7 @@ static THD_FUNCTION(pid, arg) {
 
 /*********************************************************** MT Control **********************************************/
 
-#define ENGINE_SPEED_THRESHOLD 1900
+#define ENGINE_SPEED_THRESHOLD 1900 // engine speed, when gear shifting occur
 
 bool gear_shift_control = 0;
 int8_t gear_num = 0;
@@ -256,8 +256,8 @@ uint8_t gear = -1;
 float eng_speed_debug = 0;
 bool shift_enable_flag = 0;
 
-static THD_WORKING_AREA(gearshift_wa, 256);
-static THD_FUNCTION(gearshift, arg) {
+static THD_WORKING_AREA(mt_control_wa, 256);
+static THD_FUNCTION(mt_control, arg) {
 
     (void)arg;
     while(1){
@@ -268,8 +268,28 @@ static THD_FUNCTION(gearshift, arg) {
         case 6: gear_num = shiftMTToNextGear(6,1000); break;
         }
 
+        /* Shifting is finish and thread go to sleep! */
+        if (gear_num == gear)
+        {
+            chSysLock();
+            chThdSuspendS(&ext_thread_ref);
+            chSysUnlock();
+        }
+
+        chThdSleepMilliseconds( 20 );
+    }
+}
+
+
+
+
+
+static THD_WORKING_AREA(gearshift_wa, 256);
+static THD_FUNCTION(gearshift, arg) {
+
+    (void)arg;
+    while(1){
             if ( ( gazel.EngineSpeed >= ENGINE_SPEED_THRESHOLD ) && (gear_shift_control == 1) && ( gear_num != 2 ) )
-            //if ( ( eng_speed_debug >= 1200 ) && (gear_shift_control == 1) )
             {
                 shift_enable_flag = 1;
             }
@@ -281,7 +301,14 @@ static THD_FUNCTION(gearshift, arg) {
                     MotorRunContinuous( &ClutchM, 0, 500 );
                     if ( ClutchM.state == 0 )
                     {
+                        /* Shifting is start and thread wake up! */
+                        chSysLock();
+                        chThdResume(&mt_control, MSG_OK);
+                        chSysUnlock();
+
                         gear = 2;
+
+                        /*K1 = 149; K2 = 75.3; K3 = 49*/
                         Eref = gazel.Speed * 75.3;
                         engine_control_start = 1;
                     }
@@ -295,7 +322,6 @@ static THD_FUNCTION(gearshift, arg) {
                         engine_control_start = false;
                         vehicle_control_start = true;
                     }
-
                 }
             }
 
@@ -315,14 +341,15 @@ void TestMtControl ( void )
     palSetPadMode( GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL );    //Led
     palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
 
-#if 1
+
     can_init();
     extDacInit();
+    mtControlInit ();
+
     chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO + 10, pid, NULL);
-    //chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO + 10, pid, NULL);
     chThdCreateStatic(gearshift_wa, sizeof(gearshift_wa), NORMALPRIO + 7, gearshift, NULL);
 
-      /*MotoR driver Setting */
+      /*MotoR driver Setting !!!!!!!!!!!!!!!!!!!!! MOVE OUT FROM THIS FILE*/
     palSetLineMode( PAL_LINE( GPIOC, 6),  PAL_MODE_ALTERNATE(2) );
     palSetLineMode( ClutchM.dir_line, PAL_MODE_OUTPUT_PUSHPULL);
     MotorlldControlInit( &ClutchM );
@@ -331,36 +358,29 @@ void TestMtControl ( void )
     palSetLineMode( BreakM.dir_line, PAL_MODE_OUTPUT_PUSHPULL);
     MotorlldControlInit( &BreakM );
 
-    mtControlInit ();
-
-#endif
 
 
-
+    /*** VARIABLES ***/
     uint32_t CPSpeed = 5000;
     uint32_t steps = 4000;
     uint16_t speed = 4000;
-
     static char  sd_buff[10] ;
-   // static char  sd_buff2[10] ;
 
     bool vupLS_state = 0, vlowLS_state = 0, hlLS_state = 0, hrLS_state = 0;
     uint8_t all_sensors_state = 0;
 
     while(1) {
 
-        palToggleLine(LINE_LED1);
-
+        //palToggleLine(LINE_LED1);
         sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
 
 
-
+        //*****MOTOR CONTROL*******//
         if(sd_buff[5]=='n') {
           speed = atoi(sd_buff);
           MotorSetSpeed( &ClutchM, speed);
         }
 
-        //*****MOTOR CONTROL*******//
         if(sd_buff[0]=='u') { MotorRunTracking( &ClutchM, speed); MotorRunTracking( &BreakM, speed);}
 
         if(sd_buff[6]=='q')
@@ -389,7 +409,6 @@ void TestMtControl ( void )
         if(sd_buff[0]=='s') vehicle_control_start = 0;
 
 
-
         //**** Gear Shift commands ****//
         if(sd_buff[0]=='e') gear = 0;
         if(sd_buff[0]=='d') gear = 1;
@@ -404,25 +423,23 @@ void TestMtControl ( void )
         int32_t v_motor_position = getVerticalPosition();
         int32_t g_motor_position = getGorisontalPosition();
 
-        //chprintf( (BaseSequentialStream *)&SD3, "err: %.2f Control: %d A: %d Pedal: %.1f ESpeed: %.02f  VSeed: %.2f ________ Kp: %.02f ki: %.04f Kd:%.02f  ISum: %.3f ______INTEGZONE: %.3f  GearControl %d ClutchState %d  \r\n", pidCtxV.err, VehicleControl, (uint8_t)val, gazel.AcceleratorPedalPosition, gazel.EngineSpeed, gazel.Speed , pidCtxV.kp, pidCtxV.ki, pidCtxV.kd,pidCtxV.integrSum, pidCtxV.integZone_abs, gear, ClutchM.state );
 
         chprintf( (BaseSequentialStream *)&SD3, "EControlEn %d\tGControlEn %d\tVControlEn %d\tVref: %.2f\tVspeed: %.2f\tESpeed: %.02f\tGN %d\MVpos %d\MGpos %d\tCS %d\tBS %d\t ClPos %d\t \r\n", engine_control_start, gear_shift_control, vehicle_control_start, Vref, gazel.Speed, gazel.EngineSpeed, gear_num, v_motor_position, g_motor_position, gazel.ClutchSwitch, gazel.BrakeSwitch, ClutchM.position );
 
 
 
         //*****Calibration testing*****//
-        #if 1
-        //if(sd_buff[0]=='e') all_sensors_state = doCalibrationMT ();
-        //all_sensors_state = doCalibrationMT ();
+        #if 0
+        if(sd_buff[0]=='e') all_sensors_state = doCalibrationMT ();
+        all_sensors_state = doCalibrationMT ();
 
-     // chprintf( (BaseSequentialStream *)&SD3, "vupLS_state:  %d vlowLS_state:  %d hlLS_state:  %d hrLS_state :  %d  v_pos:  %d  h_pos:  %d  vm_state: %d hm_state: %d \r\n",(all_sensors_state)&&(1<<3),(all_sensors_state)&&(1<<2),(all_sensors_state)&&(1<<1) ,(all_sensors_state)&&(1<<0) , v_motor_position, g_motor_position, vm_state, gm_state);
+        chprintf( (BaseSequentialStream *)&SD3, "vupLS_state:  %d vlowLS_state:  %d hlLS_state:  %d hrLS_state :  %d  v_pos:  %d  h_pos:  %d  vm_state: %d hm_state: %d \r\n",(all_sensors_state)&&(1<<3),(all_sensors_state)&&(1<<2),(all_sensors_state)&&(1<<1) ,(all_sensors_state)&&(1<<0) , v_motor_position, g_motor_position, vm_state, gm_state);
         #endif
 
 
         for (int i = 0; i < 9; i++)
         {
           sd_buff[i]='?';
-         // sd_buff2[i]='?';
         }
         chThdSleepMilliseconds( 500 );
     }

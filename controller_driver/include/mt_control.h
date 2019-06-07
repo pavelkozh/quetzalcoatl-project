@@ -5,11 +5,9 @@
 
 
 
-/* Debug function */
-void resetLEDs ( void );
 
 /*
- * @brief     perephery initialization
+ * @brief     periphery initialization
  *            driver control unit initialization
  * @note      In function sets up (x,y) coordinates of "gear" positions
  */
@@ -19,8 +17,10 @@ void mtControlInit ( void );
  * @brief    move carriage to neutral position
  */
 int8_t shiftMTToNeutral ( uint16_t speed );
+
 /*
  * @brief    move carriage to position corresponding to selected gear
+ * @note     attention!!! function need to be permanently called to execute properly
  */
 int8_t shiftMTToNextGear (int8_t gear_num, uint16_t speed);
 
@@ -32,15 +32,15 @@ void calibrationMTInit ( void );
 
 /*
  * @brief    moving carriage to the center
+ * @note     NOT WORKING!!!!!!!!!!!!!!!!
  */
-//void doCalibrationMT ( bool vupLS_state, bool vlowLS_state, bool hlLS_state,  bool hrLS_state );
 uint8_t doCalibrationMT ( void );
 
 
 
 
 
-
+///////////////////////////////////////////////////////////////////
 
 /*
  * @brief    Service functions

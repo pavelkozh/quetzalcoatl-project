@@ -2,21 +2,9 @@
 #include <lld_control.h>
 #include <common.h>
 
-/* LS - Limit Switch */
-#define VERTICAL_UPPER_LS_PAD 12
-#define VERTICAL_UPPER_LS_LINE PAL_LINE( GPIOC, VERTICAL_UPPER_LS_PAD )
-
-#define VERTICAL_LOWER_LS_PAD 11
-#define VERTICAL_LOWER_LS_LINE PAL_LINE( GPIOC, VERTICAL_LOWER_LS_PAD )
-
-#define HORIZONTAL_RIGHT_LS_PAD 2
-#define HORIZONTAL_RIGHT_LS_LINE PAL_LINE( GPIOG, HORIZONTAL_RIGHT_LS_PAD )
 
 
-#define HORIZONTAL_LEFT_LS_PAD 3
-#define HORIZONTAL_LEFT_LS_LINE PAL_LINE( GPIOG, HORIZONTAL_LEFT_LS_PAD )
-
-
+/***** MT MOTORS SETUP *********/
 
 void risingEdgeMTVerticalCallback(PWMDriver *pwmd);
 void fallingEdgeMTVerticalCallback(PWMDriver *pwmd);
@@ -32,20 +20,15 @@ MotorDriver m_vertical = {
                           .falling_edge_cb   = fallingEdgeMTGorisontalCallback,
                           .max_position      = 20000,//15000,
                           .min_position      = -25000//-25000
-
-
 };
 
 void risingEdgeMTVerticalCallback(PWMDriver *pwmd)
 {
-
     (void) pwmd;
     risingEdgeCb(&m_vertical);
-
 }
 void fallingEdgeMTVerticalCallback(PWMDriver *pwmd)
 {
-
     (void) pwmd;
     fallingEdgeCb(&m_vertical);
 }
@@ -62,14 +45,11 @@ MotorDriver m_gorisontal = {
 
 void risingEdgeMTGorisontalCallback(PWMDriver *pwmd)
 {
-
     (void) pwmd;
     risingEdgeCb(&m_gorisontal);
-
 }
 void fallingEdgeMTGorisontalCallback(PWMDriver *pwmd)
 {
-
     (void) pwmd;
     fallingEdgeCb(&m_gorisontal);
 }
@@ -243,7 +223,7 @@ uint16_t getVerticalSpeed ( void )
     return m_vertical.pwmd->period;
 }
 
-//static bool neutral_gear_flag = false;
+
 int8_t currently_selected_gear = -1;
 
 int8_t shiftMTToNeutral ( uint16_t speed )
@@ -305,6 +285,7 @@ int8_t shiftMTToNextGear (int8_t gear_num, uint16_t speed)
 }
 
 
+
 /****************************************/
 /********GEARSHIFT CALIBRATION***********/
 /****************************************/
@@ -357,6 +338,19 @@ static void extcb_horizontal_right_sensor(EXTDriver *extp, expchannel_t channel)
     //gorisontalCaclibration( 1, 20000, 2000 );
     //    extChannelDisable(&EXTD1, HORIZONTAL_RIGHT_LS_PAD);
 }
+
+/* LS - Limit Switch */
+#define VERTICAL_UPPER_LS_PAD 12
+#define VERTICAL_UPPER_LS_LINE PAL_LINE( GPIOC, VERTICAL_UPPER_LS_PAD )
+
+#define VERTICAL_LOWER_LS_PAD 11
+#define VERTICAL_LOWER_LS_LINE PAL_LINE( GPIOC, VERTICAL_LOWER_LS_PAD )
+
+#define HORIZONTAL_RIGHT_LS_PAD 2
+#define HORIZONTAL_RIGHT_LS_LINE PAL_LINE( GPIOG, HORIZONTAL_RIGHT_LS_PAD )
+
+#define HORIZONTAL_LEFT_LS_PAD 3
+#define HORIZONTAL_LEFT_LS_LINE PAL_LINE( GPIOG, HORIZONTAL_LEFT_LS_PAD )
 
 
 void calibrationMTInit ( void )
