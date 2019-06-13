@@ -75,16 +75,13 @@ static THD_FUNCTION(can_rx, arg) {
 
     while (1)
     {
-      px4_filter();
       if (chEvtWaitAnyTimeout(ALL_EVENTS, MS2ST(100)) == 0)
         continue;
       while ( canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK)
             {
               can_handler(rxmsg);
             }
-      chThdSleepMilliseconds( 10 );
-
-
+      chThdSleepMilliseconds( 1 );
     }
     chEvtUnregister(&CAND1.rxfull_event, &el1);
 
@@ -97,21 +94,22 @@ static THD_WORKING_AREA(can_tx_wa, 256);
 static THD_FUNCTION(can_tx, p) {
   (void)p;
   chRegSetThreadName("transmitter");
-  txmsg.IDE = CAN_IDE_EXT;
-  txmsg.EID = 0x01234567;
-  txmsg.RTR = CAN_RTR_DATA;
-  txmsg.DLC = 8;
+  // txmsg.IDE = CAN_IDE_EXT;
+  // txmsg.EID = 0x01234567;
+  // txmsg.RTR = CAN_RTR_DATA;
+  // txmsg.DLC = 8;
 
   while (true) {
-  txmsg.data32[0] = flow_comp_m_x();
-  txmsg.data32[1] = 0x00FF00FF;
-    if( canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, MS2ST(100)) == MSG_OK){
-         palTogglePad(GPIOB,7);
-    }else{
-         palToggleLine(LINE_LED3); 
-    }
+  // txmsg.data32[0] = flow_comp_m_x();
+  // txmsg.data32[1] = 0x00FF00FF;
+  //   if( canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, MS2ST(100)) == MSG_OK){
+  //        palTogglePad(GPIOB,7);
+  //   }else{
+  //        palToggleLine(LINE_LED3); 
+  //   }
+      px4_filter();
 
-    chThdSleepMilliseconds(100);
+    chThdSleepMilliseconds(10);
   }
 }
 
@@ -139,8 +137,8 @@ void can_init ( void )
 
     //start Can
     canStart(&CAND1, &cancfg);
-    chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 7, can_rx, NULL);
-    //chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 7, can_tx, NULL);
+    chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 5, can_rx, NULL);
+    chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 7, can_tx, NULL);
 
 
 }

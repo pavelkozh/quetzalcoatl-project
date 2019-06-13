@@ -55,7 +55,7 @@ typedef struct {
 /*
 *
 */
-    // double      sn;
+     double      sn;
 /*
 *
 */
@@ -63,7 +63,7 @@ typedef struct {
 /*
 *
 */
-    // double      sp;
+     double      sp;
 /*
 *
 */
@@ -110,13 +110,13 @@ static rule rules[100];
 static uint8_t rule_cnt = 0;
 
 static FuzzyVar VSpeed_err = {
-        .min_val = -2.0,
-        .max_val = 2.0
+        .min_val = -0.3,
+        .max_val = 0.3
 };
 
 static FuzzyVar dVSpeed_err = {
-        .min_val = -0.1,
-        .max_val = 0.1
+        .min_val = -0.03,
+        .max_val = 0.03
 };
 
 static FuzzyVar Clutch_pos = {
