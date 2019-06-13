@@ -1,10 +1,11 @@
 #include <tests.h>
-#include <lld_can.h>
+// #include <lld_can.h>
 #include <lld_ext_dac.h>
 #include <controllers.h>
 #include <lld_control.h>
 #include <fuzzy_logic.h>
-#include <lld_px4flow.h>
+// #include <lld_px4flow.h>
+#include <feedback.h>
 #include <chprintf.h>
 
 
@@ -17,11 +18,10 @@ void RisingEdgeBreakMCallback(PWMDriver *pwmd);
 
 void fallingEdgeBreakMCallback(PWMDriver *pwmd);
 
-
-uint8_t     val = 55;  //50 = 1V
-float       es = 770.0;
-bool        control_start = 0;
-uint8_t CSErrorDeadzoneHalfwidth = 0;
+static uint8_t     val = 55;  //50 = 1V
+static float       es = 770.0;
+static bool        control_start = 0;
+static uint8_t CSErrorDeadzoneHalfwidth = 0;
 
 static PIDControllerContext_t  pidCtx = {
     .kp   = 0,
@@ -101,7 +101,7 @@ uint32_t engineSpeedControl( uint32_t engine_speed_rpm )
 
     //engine_speed_rpm  = CLIP_VALUE( engine_speed_rpm, 0, 100 );
 
-    int16_t current_engine_speed = map2(gazel.EngineSpeed,0,5000,0,5000);
+    int16_t current_engine_speed = map2(GazleGetSpeed(),0,5000,0,5000);
 
     int16_t error = engine_speed_rpm - current_engine_speed;
     
@@ -186,6 +186,7 @@ static THD_FUNCTION(fl, arg) {
     fuzzylogicInit();
 
     while(1){
+
         // if(pedal_calibration_start_fag >= 1){
         //     fl_start_flag = 0;
         //     if((gazel.ClutchSwitch==1) && (pedal_calibration_start_fag == 1))
@@ -231,7 +232,8 @@ static THD_FUNCTION(fl, arg) {
                         target_zone_flag = 1;
                     }
                 }else{
-                    VSpeed_e= vs - (gazel.Speed_px4flow/20.0)*0.0036 ;
+
+                    VSpeed_e= vs - ( 0 / 20.0)*0.0036 ;
 
                     // VSpeed_e_sum -= VSpeed_e_buf[E_cnt];
                     // VSpeed_e_buf[E_cnt] = VSpeed_e;
@@ -319,8 +321,8 @@ void TestFLRouting ( void )
     int32_t filter_px4flow = 0;
 
 
-    static double res_buff2[2] = {0.0,0.0};
-
+    double res_buff2[2] = {0.0,0.0};
+    double speed222 = GazleGetSpeed();
 
     static char  sd_buff[10] = {'?','?','?','?','?','?','?','?','?','?'} ;
 
@@ -412,7 +414,6 @@ void TestFLRouting ( void )
                             fl_start_flag = 1;
                         } 
         if(sd_buff[0]=='c') fl_start_flag = 0;
-
         // if(ground_distance()>1000)
         //  filter_px4flow = flow_comp_m_x()*0.0144;
         // chprintf( (BaseSequentialStream *)&SD3, "State: %d State: %d  Mode: %d  Position1: %d  Position2: %d Max1: %d Max2: %d Track1: %d Track2: %d \r\n",ClutchM.state,BreakM.state , ClutchM.mode, ClutchM.position ,BreakM.position ,ClutchM.max_position ,BreakM.max_position , ClutchM.tracked_position,BreakM.tracked_position);
@@ -421,7 +422,7 @@ void TestFLRouting ( void )
         // chprintf( (BaseSequentialStream *)&SD3, "State: %d State: %d  Mode: %d  Position1: %d  Position2: %d Max1: %d Max2: %d Track1: %d Track2: %d \r\n",ClutchM.state,BreakM.state , ClutchM.mode, ClutchM.position ,BreakM.position ,ClutchM.max_position ,BreakM.max_position , ClutchM.tracked_position,BreakM.tracked_position);
         //chprintf( (BaseSequentialStream *)&SD3,"vs:\t%.2f\tESp:\t%.2f\tPx4flow:\t%.02f\tdGazSp:\t%.3f\tCsp:\t%.2f\tClutchM:\t%d\tBreakM:\t%d\t engS:\t%.02f\tSdil:%0.2f\n\r",vs, VSpeed_e,(gazel.Speed_px4flow/20.0)*0.0036,dErr, res_buff[0],ClutchM.position,BreakM.position,gazel. EngineSpeed,VSpeed_e_filter); 
 
-        chprintf( (BaseSequentialStream *)&SD3,"P %.02f GazSp: %.2f\t x: %.02f\t gnd: %.02f\n\r", gazel.Speed_px4flow,gazel.Speed,flow_comp_m_x()*0.0036,ground_distance()/1000.0);
+        chprintf( (BaseSequentialStream *)&SD3,"P %.02f GazSp: %.2f\t x: %.02f\t gnd: %.02f\n\r", flow_comp_m_x()*0.0036,ground_distance()/1000.0);
         for (int i = 0; i < 9; i++)
         {
           sd_buff[i]='?';

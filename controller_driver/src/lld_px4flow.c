@@ -43,15 +43,6 @@ static const I2CConfig i2cfg2 = {
 
 void px4flowInit(void){
 
-    // i2cStart(&I2CD2, &i2cfg2);
-    // palSetPadMode(GPIOB, 10, PAL_STM32_OTYPE_OPENDRAIN | PAL_MODE_ALTERNATE(4));
-    // palSetPadMode(GPIOB, 11, PAL_STM32_OTYPE_OPENDRAIN | PAL_MODE_ALTERNATE(4));
-
-  // /** Start I2C bus 1 */
-  // i2cStart(&I2CD1, &i2cfg1);
-  // palSetPadMode(GPIOB, 8, PAL_STM32_OTYPE_OPENDRAIN | PAL_MODE_ALTERNATE(4));
-  // palSetPadMode(GPIOB, 9, PAL_STM32_OTYPE_OPENDRAIN | PAL_MODE_ALTERNATE(4));
-
   #if 1
   /** Start I2C bus 2 **/
   i2cStart(&I2CD2, &i2cfg2);
