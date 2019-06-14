@@ -47,7 +47,8 @@ static THD_FUNCTION(can_rx, arg) {
     {
       canUpdate();
       px4_filter();
-      chThdSleepMilliseconds( 3 );
+      gaz -> Speed += 1; 
+      chThdSleepMilliseconds( 200 );
     }
     chEvtUnregister(&CAND1.rxfull_event, &el1);
 
