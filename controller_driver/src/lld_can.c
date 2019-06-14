@@ -1,5 +1,4 @@
 #include <lld_can.h>
-#include <lld_px4flow.h>
 
 
 static const CANConfig cancfg= {
@@ -17,7 +16,7 @@ CAN_BTR_TS1(5) | CAN_BTR_BRP(26)
 #define set_can_eid_mask(x) ((x << 3)|0b110)
 
 
-extern  gazelParam gazel = {
+extern gazelParam gazel = {
   .EngineSpeed = 0.0 ,
   .DriverIsDemandEnginePercentTorque = 0,
   .ActualEnginePercentTorque  = 0,
@@ -34,61 +33,17 @@ extern  gazelParam gazel = {
 
 
 
-int32_t px4flow_data[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-uint8_t px4flow_cnt = 0;
-int32_t px4flow_sum = 0;
-int16_t last_px4flow = 0;
 
-void px4_filter(){
-      if(update() == MSG_OK){
 
-        if(ground_distance()>1000){
-          px4flow_sum -= px4flow_data[px4flow_cnt];
-
-          if( ((last_px4flow - flow_comp_m_x())<500)&&((last_px4flow - flow_comp_m_x())>-500)) {
-            px4flow_data[px4flow_cnt]= flow_comp_m_x();
-            last_px4flow = flow_comp_m_x();
-          }else{
-            px4flow_data[px4flow_cnt]= last_px4flow;
-          }
-
-          px4flow_sum += px4flow_data[px4flow_cnt];
-          px4flow_cnt = px4flow_cnt >= 19 ? 0 : px4flow_cnt+1;
-        }
-      }
-      else{
-          chprintf( (BaseSequentialStream *)&SD3, "I2C error \r\n");
-      }
-      gazel.Speed_px4flow = (px4flow_sum /20.0)*0.0036 ; //0.0036  0.0144
-};
-/*
- * Receiver thread.
- */
-static THD_WORKING_AREA(can_rx_wa, 256);
-static THD_FUNCTION(can_rx, arg) {
-    arg = arg;
-
-    event_listener_t el1;
-
-    chRegSetThreadName("receiver");
-    chEvtRegister(&CAND1.rxfull_event, &el1, 0);
-
-    while (1)
-    {
-      px4_filter();
+void canUpdate(){
       if (chEvtWaitAnyTimeout(ALL_EVENTS, MS2ST(100)) == 0)
-        continue;
+        return;
       while ( canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK)
             {
               can_handler(rxmsg);
             }
-      chThdSleepMilliseconds( 10 );
+};
 
-
-    }
-    chEvtUnregister(&CAND1.rxfull_event, &el1);
-
-  }
 
 /*
  * Transmitter thread.
@@ -97,21 +52,22 @@ static THD_WORKING_AREA(can_tx_wa, 256);
 static THD_FUNCTION(can_tx, p) {
   (void)p;
   chRegSetThreadName("transmitter");
-  txmsg.IDE = CAN_IDE_EXT;
-  txmsg.EID = 0x01234567;
-  txmsg.RTR = CAN_RTR_DATA;
-  txmsg.DLC = 8;
+  // txmsg.IDE = CAN_IDE_EXT;
+  // txmsg.EID = 0x01234567;
+  // txmsg.RTR = CAN_RTR_DATA;
+  // txmsg.DLC = 8;
 
   while (true) {
-  txmsg.data32[0] = flow_comp_m_x();
-  txmsg.data32[1] = 0x00FF00FF;
-    if( canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, MS2ST(100)) == MSG_OK){
-         palTogglePad(GPIOB,7);
-    }else{
-         palToggleLine(LINE_LED3); 
-    }
+  // txmsg.data32[0] = flow_comp_m_x();
+  // txmsg.data32[1] = 0x00FF00FF;
+  //   if( canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, MS2ST(100)) == MSG_OK){
+  //        palTogglePad(GPIOB,7);
+  //   }else{
+  //        palToggleLine(LINE_LED3); 
+  //   }
+      //px4_filter();
 
-    chThdSleepMilliseconds(100);
+    chThdSleepMilliseconds(10);
   }
 }
 
@@ -122,7 +78,6 @@ void can_init ( void )
     palSetPadMode(GPIOD,1,PAL_MODE_ALTERNATE(9));
     palSetPadMode(GPIOD,0,PAL_MODE_ALTERNATE(9));
 
-    px4flowInit();
   // Setting can filters
     CANFilter can_filter[8] = {\
     {0, 1, 1, 0, set_can_eid_data(0x00008000), set_can_eid_data(0x00005555)},\
@@ -139,7 +94,6 @@ void can_init ( void )
 
     //start Can
     canStart(&CAND1, &cancfg);
-    chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 7, can_rx, NULL);
     //chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 7, can_tx, NULL);
 
 
@@ -177,4 +131,6 @@ void can_handler(CANRxFrame msg){
 }
 
 
-
+gazelParam* GazleGetStruct(){
+  return &gazel;
+};

@@ -2,6 +2,8 @@
 #define INCLUDE_LLD_CAN_H_
 
 #include <common.h>
+#include <lld_can.h>
+#include <lld_px4flow.h>
 
  /*
      PGN     PGNhex  SPN Description                    spn     Bytes       convert
@@ -35,6 +37,7 @@ void can_init ( void );
 
 void can_handler(CANRxFrame msg);
 
+void canUpdate();
 
 static CANRxFrame rxmsg;
 static CANTxFrame txmsg;
@@ -56,6 +59,9 @@ typedef struct
     double BatteryPotential;
     double BrakePedalPosition;
 } gazelParam;
+
+gazelParam* GazleGetStruct();
+
 
 
 #endif /* INCLUDE_LLD_CAN_H_ */
