@@ -1,13 +1,11 @@
 #include <lld_can.h>
 
 
-
 static const CANConfig cancfg= {
 CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP,
  CAN_BTR_SJW(0) | CAN_BTR_TS2(0) |
 CAN_BTR_TS1(5) | CAN_BTR_BRP(26)
 };
-
 
 
 
@@ -18,11 +16,12 @@ CAN_BTR_TS1(5) | CAN_BTR_BRP(26)
 #define set_can_eid_mask(x) ((x << 3)|0b110)
 
 
-extern  gazelParam gazel = {
+extern gazelParam gazel = {
   .EngineSpeed = 0.0 ,
   .DriverIsDemandEnginePercentTorque = 0,
   .ActualEnginePercentTorque  = 0,
-  .Speed = 0,
+  .Speed = 0.0,
+  .Speed_px4flow = 0.0,
   .AcceleratorPedalPosition = 0,
   .PercentLoadAtCurrentSpeed = 0,
   .EngineFuelRate = 0 ,
@@ -32,37 +31,19 @@ extern  gazelParam gazel = {
   .BrakePedalPosition=0
 };
 
-/*
- * Receiver thread.
- */
-static THD_WORKING_AREA(can_rx_wa, 256);
-static THD_FUNCTION(can_rx, arg) {
-    arg = arg;
 
-    event_listener_t el1;
 
-    chRegSetThreadName("receiver");
-    chEvtRegister(&CAND1.rxfull_event, &el1, 0);
 
-    while (1)
-    {
+
+void canUpdate(){
       if (chEvtWaitAnyTimeout(ALL_EVENTS, MS2ST(100)) == 0)
-        continue;
+        return;
       while ( canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK)
             {
-              /* Process message.*/
-              palTogglePad(GPIOB,14); 
-              txmsg.data32[0] = rxmsg.data32[0];
-              txmsg.data32[1] = rxmsg.data32[1];
               can_handler(rxmsg);
             }
-      chThdSleepMilliseconds( 10 );
+};
 
-
-    }
-    chEvtUnregister(&CAND1.rxfull_event, &el1);
-
-  }
 
 /*
  * Transmitter thread.
@@ -71,22 +52,22 @@ static THD_WORKING_AREA(can_tx_wa, 256);
 static THD_FUNCTION(can_tx, p) {
   (void)p;
   chRegSetThreadName("transmitter");
-  txmsg.IDE = CAN_IDE_EXT;
-  txmsg.EID = 0x01234567;
-  txmsg.RTR = CAN_RTR_DATA;
-  txmsg.DLC = 8;
-  txmsg.data32[0] = 0x55AA55AA;
-  txmsg.data32[1] = 0x00FF00FF;
+  // txmsg.IDE = CAN_IDE_EXT;
+  // txmsg.EID = 0x01234567;
+  // txmsg.RTR = CAN_RTR_DATA;
+  // txmsg.DLC = 8;
 
   while (true) {
+  // txmsg.data32[0] = flow_comp_m_x();
+  // txmsg.data32[1] = 0x00FF00FF;
+  //   if( canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, MS2ST(100)) == MSG_OK){
+  //        palTogglePad(GPIOB,7);
+  //   }else{
+  //        palToggleLine(LINE_LED3); 
+  //   }
+      //px4_filter();
 
-    /*if( canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, MS2ST(100)) == MSG_OK){
-         palTogglePad(GPIOB,7);
-    }else{
-         palTogglePad(GPIOB,14); 
-    }*/
-
-    chThdSleepMilliseconds(500);
+    chThdSleepMilliseconds(10);
   }
 }
 
@@ -96,7 +77,6 @@ void can_init ( void )
   //Setting pin mode
     palSetPadMode(GPIOD,1,PAL_MODE_ALTERNATE(9));
     palSetPadMode(GPIOD,0,PAL_MODE_ALTERNATE(9));
-
 
   // Setting can filters
     CANFilter can_filter[8] = {\
@@ -114,8 +94,8 @@ void can_init ( void )
 
     //start Can
     canStart(&CAND1, &cancfg);
-    chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 7, can_rx, NULL);
-    //chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 6, can_tx, NULL);
+    //chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 7, can_tx, NULL);
+
 
 }
 
@@ -129,8 +109,8 @@ void can_handler(CANRxFrame msg){
       break;
     case PGN_CRUISE_CONTROL_AND_VEHICL_SPEED:
       gazel.Speed = ((msg.data8[2]<<8)|msg.data8[1])/256.0;
-      gazel.BrakeSwitch = (msg.data8[3]>>4) & 0x03;
-      gazel.ClutchSwitch =(msg.data8[3]>>6) & 0x03;
+      gazel.BrakeSwitch = (msg.data8[4]>>4) & 0x03;
+      gazel.ClutchSwitch =(msg.data8[4]>>6) & 0x03;
       break;
     case PGN_ELECTRONIC_ENGINE_CONTROLLER_2:
       gazel.AcceleratorPedalPosition = 0.4*msg.data8[1];
@@ -151,4 +131,6 @@ void can_handler(CANRxFrame msg){
 }
 
 
-
+gazelParam* GazleGetStruct(){
+  return &gazel;
+};

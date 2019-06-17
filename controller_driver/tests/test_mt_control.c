@@ -1,6 +1,9 @@
 #include <tests.h>
 #include <chprintf.h>
 
+#include <pedals.h>
+#include <MT.h>
+
 
 static const SerialConfig sdcfg = {
   .speed = 115200,
@@ -21,6 +24,7 @@ void TestMtControl ( void )
 
 
     uint8_t gear = -1;
+    uint8_t sd_buff[10];
 
     while(1) {
 
@@ -38,11 +42,11 @@ void TestMtControl ( void )
             setTrackedModePositionGorisontalMotor ( atoi(sd_buff) );
         }
 
-        if(sd_buff[0]=='c') { stopClutchPedal (); stopBrakePedal (); }
-        if(sd_buff[0]=='z') pressBrakePedal ( 3000 );
-        if(sd_buff[0]=='o') releaseClutchPedal( 3000 );
-        if(sd_buff[0]=='x') pressBrakePedal( 3000 );
-        if(sd_buff[0]=='f') releaseBrakePedal( 3000 );
+        if(sd_buff[0]=='c') { pedalsClutchStop(); pedalsBrakeStop(); }
+        if(sd_buff[0]=='z') pedalsBrakePress( 3000 );
+        if(sd_buff[0]=='o') pedalsBrakeRelease( 3000 );
+        if(sd_buff[0]=='x') pedalsClutchPress( 3000 );
+        if(sd_buff[0]=='f') pedalsClutchRelease( 3000 );
 
 
         //**** Gear Shift commands ****//

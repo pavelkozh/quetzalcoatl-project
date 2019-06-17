@@ -1,11 +1,15 @@
 
 
 PROJECT_MODULES =	src/lld_control.c         \
-                    src/mt_control.c          \
+                    src/MT.c                  \
                     src/lld_can.c             \
                     scr/lld_ext_dac.c         \
-                    src/controllers.c         \
+                    src/lld_px4flow.c         \
                     src/pedals.c              \
+                    src/pid.c                 \
+                    src/feedback.c            \
+                    src/speed.c               \
+                    src/mt_control.c          \
 
 PROJECT_TESTS   =	tests/test_mt_control.c   \
 

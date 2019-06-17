@@ -11,8 +11,10 @@
 
 
 /* encoder ticks units 4000 ticks = 1 rev ( or 5mm translational movement) */
-#define CLUTCH_MAX_POS            90000
-#define BRAKE_MAX_POS             40000
+#define CLUTCH_MAX_POS                      90000
+#define BRAKE_MAX_POS                       40000
+#define ACCELERATOR_DAC_MIN_VAL             57
+#define ACCELERATOR_DAC_MAX_VAL             240
 
 
 /* Service callback functions declaration*/
@@ -98,7 +100,7 @@ void pedalsInit ( void ){
  * @note      speed(rpm) = PWM frequency/PWM period/(quantity of encoder impulses per revolution * 4)*60
  * @return    current position
  */
-int32_t moveClutchPedal (double position, uint16_t speed ){
+int32_t pedalsClutchMove (double position, uint16_t speed ){
     MotorRunTracking( &ClutchM,   speed);
     ClutchM.tracked_position = position;
     return  ClutchM.position;
@@ -108,7 +110,7 @@ int32_t moveClutchPedal (double position, uint16_t speed ){
  * @brief     Fully press clutch pedal
  * @params    speed - movement speed (look "moveClutchPedal" function description )
  */
-void pressClutchPedal ( uint16_t speed ){
+void pedalsClutchPress ( uint16_t speed ){
     MotorRunContinuous(&ClutchM, 0, speed);
 }
 
@@ -116,19 +118,19 @@ void pressClutchPedal ( uint16_t speed ){
  * @brief     Fully release clutch pedal
  * @params    speed - movement speed (look "moveClutchPedal" function description )
  */
-void releaseClutchPedal ( uint16_t speed ){
+void pedalsClutchRelease ( uint16_t speed ){
     MotorRunContinuous(&ClutchM, 1, speed);
 }
 
 /* Service function */
-void calibrateClutchPedal( bool dir, uint16_t speed, uint16_t step ){
+void pedalsClutchCalibrate( bool dir, uint16_t speed, uint16_t step ){
     MotorRunCaclibration( &ClutchM, dir, speed, step );
 }
 
 /*
  * @brief     stops clutch pedal motor
  */
-void stopClutchPedal ( void ){
+void pedalsClutchStop ( void ){
     MotorStop( &ClutchM );
 }
 
@@ -136,28 +138,53 @@ void stopClutchPedal ( void ){
  * @brief     Function can change motor speed  "on the fly"
  * @params    new_speed (look "moveClutchPedal" function description for units )
  */
-void changeSpeedClutchPedal ( uint16_t new_speed ){
+void pedalsClutchChangeSpeed ( uint16_t new_speed ){
     MotorSetSpeed( &ClutchM, new_speed );
 }
 
 /*******************************/
-/* @brief    Get additional information about clutch pedal motor
- * @note     This is not a feedback information,
- *           but a values which microcontroller was send to driver
+/* @brief       Get additional information about clutch pedal motor
+ * @note        This is not a feedback information,
+ *              but a values which microcontroller was send to driver
+ * @return      position [0...BRAKE_MAX_POS] (BRAKE_MAX_POS - define in pedals.h)
+ *                  -> 0.0 corresponds to fully released pedal
+ *                  -> BRAKE_MAX_POS corresponds to fully pressed pedal
  */
-int32_t getClutchPedalPosition ( void ){
+int32_t pedalsClutchGetPosition ( void ){
     return ClutchM.position;
 }
 
-bool getClutchPedalState ( void ){
+/*
+ * @brief        Get additional information about clutch pedal motor
+ * @note         This is not a feedback information,
+ *               but a values which microcontroller was send to driver
+ * @return       1 - moving  //  0 - stop
+ */
+bool pedalsClutchGetState ( void ){
     return ClutchM.state;
 }
 
-uint8_t getClutchPedalMode ( void ){
+/*
+ * @brief        Get additional information about clutch pedal motor
+ * @note         This is not a feedback information,
+ *               but a values which microcontroller was send to driver
+ * @return       2 - MOTOR_MODE_SHOT
+ *               3 - MOTOR_MODE_TRACKING
+ *               4 - MOTOR_MODE_CONTINUOUS
+ *               5 - MOTOR_MODE_CALIBRATION
+ */
+uint8_t pedalsClutchGetMode ( void ){
     return ClutchM.mode;
 }
 
-uint16_t getClutchPedalSpeed ( void ){
+/* @brief        Get additional information about clutch pedal motor
+ * @note         This is not a feedback information,
+ *               but a values which microcontroller was send to driver
+ * @return       speed [X...500]    -> movement speed in PWM period. *
+ *                 -> 500 is a max speed
+ *                 -> min speed have not boundary
+ */
+uint16_t pedalsClutchGetSpeed ( void ){
     return  ClutchM.pwmd->period;
 }
 /*******************************/
@@ -179,7 +206,7 @@ uint16_t getClutchPedalSpeed ( void ){
  * @note      speed(rpm) = PWM frequency/PWM period/(quantity of encoder impulses per revolution * 4)*60
  * @return    current position
  */
-int32_t moveBrakePedal (double position, uint16_t speed ){
+int32_t pedalsBrakeMove (double position, uint16_t speed ){
     MotorRunTracking( &BreakM,   speed);
     BreakM.tracked_position = position;
     return BreakM.position;
@@ -189,7 +216,7 @@ int32_t moveBrakePedal (double position, uint16_t speed ){
  * @brief     Fully press Brake pedal
  * @params    speed - movement speed (look "moveBrakePedal" function description )
  */
-void pressBrakePedal ( uint16_t speed ){
+void pedalsBrakePress ( uint16_t speed ){
     MotorRunContinuous(&BreakM, 0, speed);
 }
 
@@ -197,19 +224,19 @@ void pressBrakePedal ( uint16_t speed ){
  * @brief     Fully release Brake pedal
  * @params    speed - movement speed (look "moveBrakePedal" function description )
  */
-void releaseBrakePedal ( uint16_t speed ){
+void pedalsBrakeRelease( uint16_t speed ){
     MotorRunContinuous(&BreakM, 1, speed);
 }
 
 /* Service function */
-void calibrateBrakePedal( bool dir, uint16_t speed, uint16_t step ){
+void pedalsBrakeCalibrate ( bool dir, uint16_t speed, uint16_t step ){
     MotorRunCaclibration( &BreakM, dir, speed, step );
 }
 
 /*
  * @brief     stops Brake pedal motor
  */
-void stopBrakePedal ( void ){
+void pedalsBrakeStop ( void ){
     MotorStop( &BreakM );
 }
 
@@ -217,28 +244,53 @@ void stopBrakePedal ( void ){
  * @brief     Function can change motor speed  "on the fly"
  * @params    new_speed (look "moveClutchPedal" function description for units )
  */
-void changeSpeedBrakePedal ( uint16_t new_speed ){
+void pedalsBrakeChangeSpeed ( uint16_t new_speed ){
     MotorSetSpeed( &BreakM, new_speed );
 }
 
 
-/* @brief    Get additional information about clutch pedal motor
- * @note     This is not a feedback information,
- *           but a values which microcontroller was send to driver
+/* @brief       Get additional information about brake pedal motor
+ * @note        This is not a feedback information,
+ *              but a values which microcontroller was send to driver
+ * @return      position [0...BRAKE_MAX_POS] (BRAKE_MAX_POS - define in pedals.h)
+ *                  -> 0.0 corresponds to fully released pedal
+ *                  -> BRAKE_MAX_POS corresponds to fully pressed pedal
  */
-int32_t getBrakePedalPosition ( void ){
+int32_t pedalsBrakeGetPosition ( void ){
     return BreakM.position;
 }
 
-bool getBrakePedalState ( void ){
+/*
+ * @brief        Get additional information about brake pedal motor
+ * @note         This is not a feedback information,
+ *               but a values which microcontroller was send to driver
+ * @return       1 - moving  //  0 - stop
+ */
+bool pedalsBrakeGetState ( void ){
     return BreakM.state;
 }
 
-uint8_t getBrakePedalMode ( void ){
+/*
+ * @brief        Get additional information about brake pedal motor
+ * @note         This is not a feedback information,
+ *               but a values which microcontroller was send to driver
+ * @return       2 - MOTOR_MODE_SHOT
+ *               3 - MOTOR_MODE_TRACKING
+ *               4 - MOTOR_MODE_CONTINUOUS
+ *               5 - MOTOR_MODE_CALIBRATION
+ */
+uint8_t pedalsBrakeGetMode ( void ){
     return BreakM.mode;
 }
 
-uint16_t getBrakePedalSpeed ( void ){
+/* @brief        Get additional information about brake pedal motor
+ * @note         This is not a feedback information,
+ *               but a values which microcontroller was send to driver
+ * @return       speed [X...500]    -> movement speed in PWM period. *
+ *                 -> 500 is a max speed
+ *                 -> min speed have not boundary
+ */
+uint16_t pedalsBrakeGetSpeed ( void ){
     return  BreakM.pwmd->period;
 }
 
@@ -253,9 +305,9 @@ uint16_t getBrakePedalSpeed ( void ){
  * @brief    set external DAC output (8bit)
  * @params   accelerator_pedal_pos [0...100%]
  */
-void acceleratorPedalControl ( uint8_t accelerator_pedal_pos )
+void pedalsAcceleratorControl ( uint8_t accelerator_pedal_pos )
 {
-    uint8_t val = uint8_map (accelerator_pedal_pos, 0, 100, 57, 240);
+    uint8_t val = uint8_map (accelerator_pedal_pos, 0, 100, ACCELERATOR_DAC_MIN_VAL, ACCELERATOR_DAC_MAX_VAL);
     extDacSetValue( ( uint8_t)( val*0.55 ) , val );
 }
 
