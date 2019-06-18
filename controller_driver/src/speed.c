@@ -47,7 +47,7 @@ uint32_t speedEngineSpeedControl( uint32_t engine_speed_rpm )
 
     //engine_speed_rpm  = CLIP_VALUE( engine_speed_rpm, 0, 100 );
 
-    int16_t current_engine_speed = uint32_map(gazleGetEngineSpeed (),0,5000,0,5000);
+    int16_t current_engine_speed = uint32_map(gazelGetEngineSpeed (),0,5000,0,5000);
 
     int16_t error = engine_speed_rpm - current_engine_speed;
 
@@ -81,7 +81,7 @@ uint32_t speedEngineSpeedControl( uint32_t engine_speed_rpm )
 uint32_t speedVehicleSpeedControl( uint32_t speed )
 {
     speed = uint32_map(speed,0,100,0,1000);
-    int32_t current_speed = uint32_map(gazleGetSpeed(),0,100,0,1000);
+    int32_t current_speed = uint32_map(gazelGetSpeed(),0,100,0,1000);
     int32_t error = speed - current_speed;
 
     /* Dead zone for (p) error */
@@ -112,7 +112,7 @@ static THD_WORKING_AREA(pid_wa, 256);
 
     while(1){
 
-        if(( gazleGetBrakeSwitch() == 1 ) || ( gazleGetClutchSwitch() == 1 )) speedResetVehicleControlStart();
+        if(( gazelGetBrakeSwitch() == 1 ) || ( gazelGetClutchSwitch() == 1 )) speedResetVehicleControlStart();
 
 
 
@@ -182,4 +182,17 @@ void speedSetVehiclePIDReferenceValue ( float val ){
 
 void speedSetEnginePIDReferenceValue ( float val ){
     Eref = val;
+}
+
+
+
+/************** DEBUG FUNCTIONS********************/
+float speedGetVehicleReference (void)
+{
+    return Vref;
+}
+
+float speedGetEngineReference (void)
+{
+    return Eref;
 }

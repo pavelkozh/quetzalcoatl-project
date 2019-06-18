@@ -46,35 +46,35 @@ typedef struct i2c_integral_frame
 } i2c_integral_frame;
 
  
-    void px4flowInit(void);
-    bool update(void);
-    bool update_integral(void);
+    void px4flowInit( void );
+    bool update( void );
+    bool update_integral( void );
 
     // Simple frame
-    uint16_t frame_count(void);
-    int16_t pixel_flow_x_sum(void);
-    int16_t pixel_flow_y_sum(void);
-    int16_t flow_comp_m_x(void);
-    int16_t flow_comp_m_y(void);
-    int16_t gyro_x_rate(void);
-    int16_t gyro_y_rate(void);
-    int16_t gyro_z_rate(void);
-    int16_t qual(void);
-    uint8_t sonar_timestamp(void);
-    int16_t ground_distance(void);
+    uint16_t frame_count( void );
+    int16_t pixel_flow_x_sum( void );
+    int16_t pixel_flow_y_sum( void );
+    int16_t flow_comp_m_x( void );
+    int16_t flow_comp_m_y( void );
+    int16_t gyro_x_rate( void );
+    int16_t gyro_y_rate( void );
+    int16_t gyro_z_rate( void );
+    int16_t qual( void );
+    uint8_t sonar_timestamp( void );
+    int16_t ground_distance( void );
 
     // Integral frame
-    uint16_t frame_count_since_last_readout(void);
-    int16_t pixel_flow_x_integral(void);
-    int16_t pixel_flow_y_integral(void);
-    int16_t gyro_x_rate_integral(void);
-    int16_t gyro_y_rate_integral(void);
-    int16_t gyro_z_rate_integral(void);
-    uint32_t integration_timespan(void);
-    uint32_t sonar_timestamp_integral(void);
-    int16_t ground_distance_integral(void);
-    int16_t gyro_temperature(void);
-    uint8_t quality_integral(void);
+    uint16_t frame_count_since_last_readout( void );
+    int16_t pixel_flow_x_integral( void );
+    int16_t pixel_flow_y_integral( void );
+    int16_t gyro_x_rate_integral( void );
+    int16_t gyro_y_rate_integral( void );
+    int16_t gyro_z_rate_integral( void );
+    uint32_t integration_timespan( void );
+    uint32_t sonar_timestamp_integral( void );
+    int16_t ground_distance_integral( void );
+    int16_t gyro_temperature( void );
+    uint8_t quality_integral( void );
 
     bool wait(int count);
     uint32_t read32(uint8_t a,uint8_t b,uint8_t c,uint8_t d) ;

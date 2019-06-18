@@ -1,31 +1,17 @@
 #include <lld_px4flow.h>
 
+#define I2C_TEST_CALLBACK 0
+
 
     struct i2c_frame frame;
     struct i2c_integral_frame iframe;
-    static i2cflags_t errors = 0;
+    //static i2cflags_t errors = 0;
     static uint8_t rxbuf[25];
     static uint8_t txbuf = 0x0;
       msg_t status = MSG_OK;
     systime_t tmo = MS2ST(10);
 
 
-#if 0
-// Following numbers give 500kHz I2C clock - waveform significantly more low than high
-static const I2CConfig i2cfg2 = {
-     STM32_TIMINGR_PRESC(5U)  |
-     STM32_TIMINGR_SCLDEL(3U) | STM32_TIMINGR_SDADEL(3U) |
-     STM32_TIMINGR_SCLH(3U)   | STM32_TIMINGR_SCLL(9U),
-    0,              // CR1
-    0,              // CR2
-#if I2C_TEST_CALLBACK
-    &i2cCallbackFunc
-#else
-    NULL            // Receive callback
-#endif
-};
-#else
-// Following numbers trimmed to give 100kHz clock - waveform reasonably symmetrical
 static const I2CConfig i2cfg2 = {
      STM32_TIMINGR_PRESC(15U)  |
      STM32_TIMINGR_SCLDEL(9U) | STM32_TIMINGR_SDADEL(9U) |
@@ -38,7 +24,6 @@ static const I2CConfig i2cfg2 = {
     NULL            // Receive callback
 #endif
 };
-#endif
 
 
 void px4flowInit(void){
@@ -53,92 +38,92 @@ void px4flowInit(void){
 
 
 // Simple frame
-uint16_t frame_count() {
+uint16_t frame_count(void) {
   return frame.frame_count;
 }
 
-int16_t pixel_flow_x_sum() {
+int16_t pixel_flow_x_sum(void) {
   return frame.pixel_flow_x_sum;
 }
 
-int16_t pixel_flow_y_sum() {
+int16_t pixel_flow_y_sum(void) {
   return frame.pixel_flow_y_sum;
 }
 
-int16_t flow_comp_m_x() {
+int16_t flow_comp_m_x(void) {
   return frame.flow_comp_m_x;
 }
 
-int16_t flow_comp_m_y() {
+int16_t flow_comp_m_y(void) {
   return frame.flow_comp_m_y;
 }
 
-int16_t gyro_x_rate() {
+int16_t gyro_x_rate(void) {
   return frame.gyro_x_rate;
 }
 
-int16_t gyro_y_rate() {
+int16_t gyro_y_rate(void) {
   return frame.gyro_y_rate;
 }
 
-int16_t gyro_z_rate() {
+int16_t gyro_z_rate(void) {
   return frame.gyro_z_rate;
 }
 
-int16_t qual() {
+int16_t qual(void) {
   return frame.qual;
 }
 
-uint8_t sonar_timestamp() {
+uint8_t sonar_timestamp(void) {
   return frame.sonar_timestamp;
 }
 
-int16_t ground_distance() {
+int16_t ground_distance(void) {
   return frame.ground_distance;
 }
 
 // Integral frame
-uint16_t frame_count_since_last_readout() {
+uint16_t frame_count_since_last_readout(void) {
   return iframe.frame_count_since_last_readout;
 }
 
-int16_t pixel_flow_x_integral() {
+int16_t pixel_flow_x_integral(void) {
   return iframe.pixel_flow_x_integral;
 }
 
-int16_t pixel_flow_y_integral() {
+int16_t pixel_flow_y_integral(void) {
   return iframe.pixel_flow_y_integral;
 }
 
-int16_t gyro_x_rate_integral() {
+int16_t gyro_x_rate_integral(void) {
   return iframe.gyro_x_rate_integral;
 }
 
-int16_t gyro_y_rate_integral() {
+int16_t gyro_y_rate_integral(void) {
   return iframe.gyro_y_rate_integral;
 }
 
-int16_t gyro_z_rate_integral() {
+int16_t gyro_z_rate_integral(void) {
   return iframe.gyro_z_rate_integral;
 }
 
-uint32_t integration_timespan() {
+uint32_t integration_timespan(void) {
   return iframe.integration_timespan;
 }
 
-uint32_t sonar_timestamp_integral() {
+uint32_t sonar_timestamp_integral(void) {
   return iframe.sonar_timestamp;
 }
       
-int16_t ground_distance_integral() {
+int16_t ground_distance_integral(void) {
   return iframe.ground_distance;
 }
 
-int16_t gyro_temperature() {
+int16_t gyro_temperature(void) {
   return iframe.gyro_temperature;
 }
 
-uint8_t quality_integral() {
+uint8_t quality_integral(void) {
   return iframe.quality;
 }
 
@@ -154,7 +139,7 @@ uint8_t read8( uint8_t a) {
   return rxbuf[a];
 }
 
-bool update()
+bool update(void)
 {
     txbuf = 0x0;
     i2cAcquireBus(&I2CD2);
@@ -188,7 +173,7 @@ bool update()
     return MSG_OK;
 }
 
-bool update_integral()
+bool update_integral(void)
 {
       txbuf = 0x16;
     //send 0x16 to PX4FLOW module and receive back 25 Bytes data 

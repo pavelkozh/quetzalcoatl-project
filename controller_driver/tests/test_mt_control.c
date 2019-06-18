@@ -18,7 +18,7 @@ void TestMTControl ( void )
 {
     sdStart( &SD3, &sdcfg );
     palSetPadMode( GPIOD, 8, PAL_MODE_ALTERNATE(7) );   // TX
-    palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
+    palSetPadMode ( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
 
     palSetPadMode( GPIOB, 7, PAL_MODE_OUTPUT_PUSHPULL );    //Led
     palSetPadMode( GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL );    //Led
@@ -35,11 +35,11 @@ void TestMTControl ( void )
         sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
 
 
-        if(sd_buff[1]=='g') current_gear = mannualyShiftGear ( atoi(sd_buff) );
+        if(sd_buff[1]=='g') current_gear = mannualyShiftGear ( (uint8_t)atoi(sd_buff) );
         if(sd_buff[0]=='y') setGearBoxControlEnableFlag();
         if(sd_buff[0]=='h') resetGearBoxControlEnableFlag();
 
-        if(sd_buff[4]=='s') speedSetVehiclePIDReferenceValue ( atoi(sd_buff)/10.0 ) ;
+        if(sd_buff[4]=='s') speedSetVehiclePIDReferenceValue ( (float) (atoi(sd_buff)/10.0) ) ;
         if(sd_buff[0]=='e') speedSetVehicleControlStart();
 
         if(sd_buff[0]=='d') speedResetVehicleControlStart();

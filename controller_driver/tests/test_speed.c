@@ -24,6 +24,7 @@ void TestSpeed ( void )
 
     //palSetLine(LINE_LED2);
     speedPIDInit();
+    feedbackInit();
 
 
     uint8_t sd_buff[10];
@@ -31,23 +32,23 @@ void TestSpeed ( void )
 
     while(1) {
 
-        palToggleLine(LINE_LED1);
+        //palToggleLine(LINE_LED1);
 
         sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
 
 
-        if(sd_buff[4]=='s') speedSetVehiclePIDReferenceValue ( atoi(sd_buff)/10.0 ) ;
+        if(sd_buff[4]=='s') speedSetVehiclePIDReferenceValue ( (float)(atoi(sd_buff)/10.0) ) ;
         if(sd_buff[0]=='y') speedSetVehicleControlStart();
         if(sd_buff[0]=='h') speedResetVehicleControlStart();
 
-        if(sd_buff[4]=='a') speedSetEnginePIDReferenceValue ( atoi(sd_buff)/10.0 ) ;
+        if(sd_buff[4]=='a') speedSetEnginePIDReferenceValue ( (float)(atoi(sd_buff)) ) ;
         if(sd_buff[0]=='e') speedSetEngineControlStart();
         if(sd_buff[0]=='d') speedResetEngineControlStart();
 
 
 
-        chprintf( (BaseSequentialStream *)&SD3, " Speed %d\t EngSpeed  %d\t \n\r", 100, 53 );
-        //chprintf( (BaseSequentialStream *)&SD3, " Speed %d\t EngSpeed  %d\t \n\r", (uint16_t) gazleGetSpeed()*100, (uint16_t) gazleGetEngineSpeed()*100 );
+       // chprintf( (BaseSequentialStream *)&SD3, " Speed %d\t EngSpeed  %d\t \n\r", 100, 53 );
+        chprintf( (BaseSequentialStream *)&SD3, " Speed  %.02f %\t EngSpeed %.02f %\t Vref %.02f %\t  Eref %.02f %\t \n\r", gazelGetSpeed(), gazelGetEngineSpeed(), speedGetVehicleReference(),speedGetEngineReference() );
 
 
 

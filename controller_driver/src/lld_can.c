@@ -1,8 +1,5 @@
 #include <lld_can.h>
 
-static CANRxFrame rxmsg;
-static CANTxFrame txmsg;
-
 
 static const CANConfig cancfg= {
 CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP,
@@ -11,6 +8,7 @@ CAN_BTR_TS1(5) | CAN_BTR_BRP(26)
 };
 
 
+static CANRxFrame rxmsg;
 
 /*0b100 - Data with EID or (0b110 - RemoteFrame with EID)*/
 #define set_can_eid_data(x) ((x << 3)|0b100)
@@ -19,7 +17,7 @@ CAN_BTR_TS1(5) | CAN_BTR_BRP(26)
 #define set_can_eid_mask(x) ((x << 3)|0b110)
 
 
-extern gazelParam gazel = {
+static gazelParam gazel = {
   .EngineSpeed = 0.0 ,
   .DriverIsDemandEnginePercentTorque = 0,
   .ActualEnginePercentTorque  = 0,
@@ -38,7 +36,7 @@ extern gazelParam gazel = {
 
 
 
-void canUpdate(){
+void canUpdate(void){
       if (chEvtWaitAnyTimeout(ALL_EVENTS, MS2ST(100)) == 0)
         return;
       while ( canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK)
@@ -48,31 +46,31 @@ void canUpdate(){
 };
 
 
-/*
- * Transmitter thread.
- */
-static THD_WORKING_AREA(can_tx_wa, 256);
-static THD_FUNCTION(can_tx, p) {
-  (void)p;
-  chRegSetThreadName("transmitter");
-  // txmsg.IDE = CAN_IDE_EXT;
-  // txmsg.EID = 0x01234567;
-  // txmsg.RTR = CAN_RTR_DATA;
-  // txmsg.DLC = 8;
+// /*
+//  * Transmitter thread.
+//  */
+// static THD_WORKING_AREA(can_tx_wa, 256);
+// static THD_FUNCTION(can_tx, p) {
+//   (void)p;
+//   chRegSetThreadName("transmitter");
+//   // txmsg.IDE = CAN_IDE_EXT;
+//   // txmsg.EID = 0x01234567;
+//   // txmsg.RTR = CAN_RTR_DATA;
+//   // txmsg.DLC = 8;
 
-  while (true) {
-  // txmsg.data32[0] = flow_comp_m_x();
-  // txmsg.data32[1] = 0x00FF00FF;
-  //   if( canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, MS2ST(100)) == MSG_OK){
-  //        palTogglePad(GPIOB,7);
-  //   }else{
-  //        palToggleLine(LINE_LED3); 
-  //   }
-      //px4_filter();
+//   while (true) {
+//   // txmsg.data32[0] = flow_comp_m_x();
+//   // txmsg.data32[1] = 0x00FF00FF;
+//   //   if( canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, MS2ST(100)) == MSG_OK){
+//   //        palTogglePad(GPIOB,7);
+//   //   }else{
+//   //        palToggleLine(LINE_LED3); 
+//   //   }
+//       //px4_filter();
 
-    chThdSleepMilliseconds(10);
-  }
-}
+//     chThdSleepMilliseconds(10);
+//   }
+// }
 
 
 void can_init ( void )
@@ -134,6 +132,6 @@ void can_handler(CANRxFrame msg){
 }
 
 
-gazelParam* GazleGetStruct(){
+gazelParam* gazelGetStruct(void){
   return &gazel;
 };

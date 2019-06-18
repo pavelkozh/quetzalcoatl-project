@@ -48,4 +48,10 @@ void speedSetEnginePIDReferenceValue ( float val );
 
 
 
+
+
+float speedGetVehicleReference (void);
+float speedGetEngineReference (void);
+
+
 #endif /* INCLUDE_SPEED_H_ */

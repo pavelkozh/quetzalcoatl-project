@@ -47,74 +47,75 @@ static THD_FUNCTION(can_rx, arg) {
     {
       canUpdate();
       px4_filter();
-      chThdSleepMilliseconds( 3 );
+      gaz -> Speed += 1; 
+      chThdSleepMilliseconds( 200 );
     }
     chEvtUnregister(&CAND1.rxfull_event, &el1);
 
   }
 
 void feedbackInit(void){
-  gaz = (gazelParam *)GazleGetStruct();
+  gaz = (gazelParam *)gazelGetStruct();
   can_init();
   px4flowInit();
   chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 5, can_rx, NULL);
 };
 
-float gazleGetEngineSpeed (void){
+float gazelGetEngineSpeed (void){
   return gaz->EngineSpeed ;
 };
 
-int8_t gazleGetDriverIsDemandEnginePercentTorque(void){
+int8_t gazelGetDriverIsDemandEnginePercentTorque(void){
   return gaz->DriverIsDemandEnginePercentTorque;
 };
 
-int8_t gazleGetActualEnginePercentTorque (void){
+int8_t gazelGetActualEnginePercentTorque (void){
   return gaz->ActualEnginePercentTorque ;
 };
 
-double gazleGetSpeed(void){
+double gazelGetSpeed(void){
   if(gaz->Speed > 6)
     return gaz->Speed;
   else
     return gaz->Speed_px4flow;
 };
 
-double gazleGetSpeed_px4flow(void){
+double gazelGetSpeed_px4flow(void){
   return gaz->Speed_px4flow;
 };
 
-uint8_t gazleGetBrakeSwitch(void){
+uint8_t gazelGetBrakeSwitch(void){
   return gaz->BrakeSwitch;
 };
 
-uint8_t gazleGetClutchSwitch(void){
+uint8_t gazelGetClutchSwitch(void){
   return gaz->ClutchSwitch;
 };
 
-float gazleGetAcceleratorPedalPosition(void){
+float gazelGetAcceleratorPedalPosition(void){
   return gaz->AcceleratorPedalPosition;
 };
 
-int8_t gazleGetPercentLoadAtCurrentSpeed(void){
+int8_t gazelGetPercentLoadAtCurrentSpeed(void){
   return gaz->PercentLoadAtCurrentSpeed;
 };
 
-double gazleGetEngineFuelRate(void){
+double gazelGetEngineFuelRate(void){
   return gaz->EngineFuelRate;
 };
 
-double gazleGetEngineInstantaneousFuelEconomy(void){
+double gazelGetEngineInstantaneousFuelEconomy(void){
   return gaz->EngineInstantaneousFuelEconomy;
 };
 
-double gazleGetEngineThrottleValve(void){
+double gazelGetEngineThrottleValve(void){
   return gaz->EngineThrottleValve;
 };
 
-double gazleGetBatteryPotential(void){
+double gazelGetBatteryPotential(void){
   return gaz->BatteryPotential;
 };
 
-double gazleGetBrakePedalPosition(void){
+double gazelGetBrakePedalPosition(void){
   return gaz->BrakePedalPosition;
 };
