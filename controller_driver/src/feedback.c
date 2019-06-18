@@ -54,68 +54,68 @@ static THD_FUNCTION(can_rx, arg) {
 
   }
 
-void feedbackInit(){
-  gaz = (gazelParam *)GazleGetStruct();
+void feedbackInit(void){
+  gaz = (gazelParam *)gazelGetStruct();
   can_init();
   px4flowInit();
   chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 5, can_rx, NULL);
 };
 
-float GazleGetEngineSpeed (){
+float gazelGetEngineSpeed (void){
   return gaz->EngineSpeed ;
 };
 
-int8_t GazleGetDriverIsDemandEnginePercentTorque(){
+int8_t gazelGetDriverIsDemandEnginePercentTorque(void){
   return gaz->DriverIsDemandEnginePercentTorque;
 };
 
-int8_t GazleGetActualEnginePercentTorque (){
+int8_t gazelGetActualEnginePercentTorque (void){
   return gaz->ActualEnginePercentTorque ;
 };
 
-double GazleGetSpeed(){
+double gazelGetSpeed(void){
   if(gaz->Speed > 6)
     return gaz->Speed;
   else
     return gaz->Speed_px4flow;
 };
 
-double GazleGetSpeed_px4flow(){
+double gazelGetSpeed_px4flow(void){
   return gaz->Speed_px4flow;
 };
 
-uint8_t GazleGetBrakeSwitch(){
+uint8_t gazelGetBrakeSwitch(void){
   return gaz->BrakeSwitch;
 };
 
-uint8_t GazleGetClutchSwitch(){
+uint8_t gazelGetClutchSwitch(void){
   return gaz->ClutchSwitch;
 };
 
-float GazleGetAcceleratorPedalPosition(){
+float gazelGetAcceleratorPedalPosition(void){
   return gaz->AcceleratorPedalPosition;
 };
 
-int8_t GazleGetPercentLoadAtCurrentSpeed(){
+int8_t gazelGetPercentLoadAtCurrentSpeed(void){
   return gaz->PercentLoadAtCurrentSpeed;
 };
 
-double GazleGetEngineFuelRate(){
+double gazelGetEngineFuelRate(void){
   return gaz->EngineFuelRate;
 };
 
-double GazleGetEngineInstantaneousFuelEconomy(){
+double gazelGetEngineInstantaneousFuelEconomy(void){
   return gaz->EngineInstantaneousFuelEconomy;
 };
 
-double GazleGetEngineThrottleValve(){
+double gazelGetEngineThrottleValve(void){
   return gaz->EngineThrottleValve;
 };
 
-double GazleGetBatteryPotential(){
+double gazelGetBatteryPotential(void){
   return gaz->BatteryPotential;
 };
 
-double GazleGetBrakePedalPosition(){
+double gazelGetBrakePedalPosition(void){
   return gaz->BrakePedalPosition;
 };

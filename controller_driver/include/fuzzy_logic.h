@@ -119,15 +119,15 @@ static FuzzyVar dVSpeed_err = {
         .max_val = 0.03
 };
 
-static FuzzyVar Clutch_pos = {
-        .min_val = 0.0,
-        .max_val = 82500.0
-};
+// static FuzzyVar Clutch_pos = {
+//         .min_val = 0.0,
+//         .max_val = 82500.0
+// };
 
-static FuzzyVar Break_pos = {
-        .min_val = 0,
-        .max_val = 30000.0
-};
+// static FuzzyVar Break_pos = {
+//         .min_val = 0,
+//         .max_val = 30000.0
+// };
 static FuzzyVar Clutch_speed = {
         .min_val = -100.0,
         .max_val = 100.0
@@ -139,7 +139,7 @@ static FuzzyVar Break_speed = {
 /*
 *@brief Init fuction
 */
-void fuzzylogicInit();
+void fuzzylogicInit(void);
 /*
 *   @brief evenly splits the interval into 6 segments
 */

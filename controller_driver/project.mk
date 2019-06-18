@@ -6,6 +6,8 @@ PROJECT_MODULES =	src/lld_can.c \
 					src/lld_px4flow.c \
 					src/fuzzy_logic.c \
 					src/feedback.c \
+					src/pedals.c \
+					src/low_speed_control.c \
 
 PROJECT_TESTS   =	tests/fuzzy_logic_test.c   
           

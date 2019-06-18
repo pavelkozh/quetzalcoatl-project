@@ -266,7 +266,7 @@ void calculateFLReg(double _VSpeed_err, double _dVSpeed_err, double *res_buff){
 
     for(uint8_t i=0; i<rule_cnt; i++){
         double alpha = 0;
-        double  Vs=0,dVs=0,Cp=0,Bp=0;
+        double  Vs=0,dVs=0;//Cp=0,Bp=0;
 
         if( ((rules[i].Vs==VSpeed_err.ln) && (_VSpeed_err<=VSpeed_err.ln)) || ((rules[i].Vs==VSpeed_err.lp) && (_VSpeed_err>=VSpeed_err.lp))) {
             Vs = 1;

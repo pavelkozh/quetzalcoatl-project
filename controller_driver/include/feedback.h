@@ -5,19 +5,19 @@
 #include <lld_can.h>
 #include <lld_px4flow.h>
 
-float GazleGetEngineSpeed ();
-int8_t GazleGetDriverIsDemandEnginePercentTorque();
-int8_t GazleGetActualEnginePercentTorque ();
-double GazleGetSpeed();
-double GazleGetSpeed_px4flow();
-uint8_t GazleGetBrakeSwitch();
-uint8_t GazleGetClutchSwitch();
-float GazleGetAcceleratorPedalPosition();
-int8_t GazleGetPercentLoadAtCurrentSpeed();
-double GazleGetEngineFuelRate();
-double GazleGetEngineInstantaneousFuelEconomy();
-double GazleGetEngineThrottleValve();
-double GazleGetBatteryPotential();
-double GazleGetBrakePedalPosition();
+float gazelGetEngineSpeed (void);
+int8_t gazelGetDriverIsDemandEnginePercentTorque(void);
+int8_t gazelGetActualEnginePercentTorque (void);
+double gazelGetSpeed(void);
+double gazelGetSpeed_px4flow(void);
+uint8_t gazelGetBrakeSwitch(void);
+uint8_t gazelGetClutchSwitch(void);
+float gazelGetAcceleratorPedalPosition(void);
+int8_t gazelGetPercentLoadAtCurrentSpeed(void);
+double gazelGetEngineFuelRate(void);
+double gazelGetEngineInstantaneousFuelEconomy(void);
+double gazelGetEngineThrottleValve(void);
+double gazelGetBatteryPotential(void);
+double gazelGetBrakePedalPosition(void);
 
 #endif // INCLUDE_FEEDBACK_
