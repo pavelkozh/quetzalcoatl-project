@@ -86,10 +86,10 @@ void mtMotorsControlInit ( void )
     points_array[1].y = 15000; //first gear vertical coordinate
     /*second gear coordinates*/
     points_array[2].x = -15000; //second gear horizontal coordinate
-    points_array[2].y = -20000; //second gear vertical coordinate
+    points_array[2].y = -25000; //second gear vertical coordinate
     /*third gear coordinates*/
     points_array[3].x = 0; //third gear horizontal coordinate
-    points_array[3].y = 18000; //third gear vertical coordinate
+    points_array[3].y = 13000; //third gear vertical coordinate
     /*fourth gear coordinates*/
     points_array[4].x = 0; //fourth gear horizontal coordinate
     points_array[4].y = -18000; //fourth gear vertical coordinate
@@ -98,7 +98,7 @@ void mtMotorsControlInit ( void )
     points_array[5].y = 13000; //fifth gear vertical coordinate
     /*reverse gear coordinates*/
     points_array[6].x = 16000; //reverse gear horizontal coordinate
-    points_array[6].y = -22000; //reverse gear vertical coordinate
+    points_array[6].y = -24000; //reverse gear vertical coordinate
 }
 
 void setTrackedMode ( uint16_t vertical_speed, uint16_t gorisontal_speed )
@@ -259,6 +259,9 @@ int8_t shiftMTToNextGear (int8_t gear_num, uint16_t speed)
 //            {
 //                shiftMTToNeutral ( speed ); // firstly disable currently selected gear
 //            }
+
+
+
             shiftMTToNeutral ( speed ); // firstly disable currently selected gear
 
         }
