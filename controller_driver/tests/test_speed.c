@@ -2,9 +2,7 @@
 #include <chprintf.h>
 
 #include <speed.h>
-#include <MT.h>
-#include <MT_control.h>
-
+#include <feedback.h>
 
 
 static const SerialConfig sdcfg = {
@@ -14,7 +12,7 @@ static const SerialConfig sdcfg = {
 
 
 
-void TestMTControl ( void )
+void TestSpeed ( void )
 {
     sdStart( &SD3, &sdcfg );
     palSetPadMode( GPIOD, 8, PAL_MODE_ALTERNATE(7) );   // TX
@@ -24,30 +22,33 @@ void TestMTControl ( void )
     palSetPadMode( GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL );    //Led
     palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
 
+    //palSetLine(LINE_LED2);
+    speedPIDInit();
 
-    MTControlInit ();
 
     uint8_t sd_buff[10];
-    int8_t current_gear = -1;
+
 
     while(1) {
+
+        palToggleLine(LINE_LED1);
 
         sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
 
 
-        if(sd_buff[1]=='g') current_gear = mannualyShiftGear ( atoi(sd_buff) );
-        if(sd_buff[0]=='y') setGearBoxControlEnableFlag();
-        if(sd_buff[0]=='h') resetGearBoxControlEnableFlag();
-
         if(sd_buff[4]=='s') speedSetVehiclePIDReferenceValue ( atoi(sd_buff)/10.0 ) ;
-        if(sd_buff[0]=='e') speedSetVehicleControlStart();
+        if(sd_buff[0]=='y') speedSetVehicleControlStart();
+        if(sd_buff[0]=='h') speedResetVehicleControlStart();
 
-        if(sd_buff[0]=='d') speedResetVehicleControlStart();
-        if(sd_buff[0]=='z') speedResetEngineControlStart();
+        if(sd_buff[4]=='a') speedSetEnginePIDReferenceValue ( atoi(sd_buff)/10.0 ) ;
+        if(sd_buff[0]=='e') speedSetEngineControlStart();
+        if(sd_buff[0]=='d') speedResetEngineControlStart();
 
 
 
-        chprintf( (BaseSequentialStream *)&SD3, "current_gear %d\t flag %d\t  \n\r", current_gear, getGearBoxControlEnableFlag ());
+        chprintf( (BaseSequentialStream *)&SD3, " Speed %d\t EngSpeed  %d\t \n\r", 100, 53 );
+        //chprintf( (BaseSequentialStream *)&SD3, " Speed %d\t EngSpeed  %d\t \n\r", (uint16_t) gazleGetSpeed()*100, (uint16_t) gazleGetEngineSpeed()*100 );
+
 
 
 

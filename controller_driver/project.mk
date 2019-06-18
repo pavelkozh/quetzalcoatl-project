@@ -9,9 +9,11 @@ PROJECT_MODULES =	src/lld_control.c         \
                     src/pid.c                 \
                     src/feedback.c            \
                     src/speed.c               \
-                    src/mt_control.c          \
+                    src/MT_control.c          \
 
-PROJECT_TESTS   =	tests/test_mt_control.c   \
+PROJECT_TESTS   =	tests/test_pedals.c    \
+                    tests/test_speed.c     \
+                    tests/test_mt_control.c\
 
 
 PROJECT_CSRC    =	src/main.c src/common.c \

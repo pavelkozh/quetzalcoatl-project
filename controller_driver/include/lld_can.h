@@ -39,9 +39,6 @@ void can_handler(CANRxFrame msg);
 
 void canUpdate(void);
 
-static CANRxFrame rxmsg;
-static CANTxFrame txmsg;
-
 typedef struct 
 {
     float EngineSpeed ;

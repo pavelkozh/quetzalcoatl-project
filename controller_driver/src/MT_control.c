@@ -73,8 +73,8 @@ static THD_FUNCTION(gearshift, arg) {
                         gear = 2;
 
                         /*K1 = 149; K2 = 75.3; K3 = 49*/
-                        setEnginePIDReferenceValue( gazleGetSpeed() * 75.3 );
-                        setEngineControlStart();
+                        speedSetEnginePIDReferenceValue( gazleGetSpeed() * 75.3 );
+                        speedSetEngineControlStart();
                     }
                 }
                 if ( gear_num == 2  )
@@ -83,8 +83,8 @@ static THD_FUNCTION(gearshift, arg) {
                     if ( pedalsClutchGetState () == 0 )
                     {
                         shift_enable_flag = 0;
-                        resetEngineControlStart();
-                        setVehicleControlStart();
+                        speedResetEngineControlStart();
+                        speedSetVehicleControlStart();
                     }
                 }
             }
@@ -101,6 +101,10 @@ void setGearBoxControlEnableFlag ( void ) {
 
 void resetGearBoxControlEnableFlag( void ) {
     gear_shift_control = false;
+}
+
+bool getGearBoxControlEnableFlag ( void ){
+    return gear_shift_control;
 }
 
 
@@ -120,7 +124,7 @@ int8_t mannualyShiftGear ( uint8_t command_gear )
  */
 void MTControlInit ( void )
 {
-    mtControlInit ();
+    mtMotorsControlInit ();
     chThdCreateStatic(gearshift_wa, sizeof(gearshift_wa), NORMALPRIO + 7, gearshift, NULL);
     chThdCreateStatic(mt_control_wa, sizeof(mt_control_wa), NORMALPRIO + 7, mt_control, NULL);
 }

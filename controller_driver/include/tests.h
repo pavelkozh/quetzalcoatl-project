@@ -3,27 +3,11 @@
 
 #include <common.h>
 
-/*
- * @brief   Routine of CAN controller testing
- * @note    The routine has internal infinite loop
- * @note    SD7 is used for testing (PE7, PE8)
- */
 
-/*  Hardware connection for simulation
- *  CANRX (PD_0), CANTX (PD_1)
- *  Direct control of PA0 - led
- */
-void TestEngineSpeedRouting ( void );
 
-void TestADCRouting(void);
-
-void TestPWMRouting(void);
-
-void testTFCalcRouting(void);
-
-void TestEncoderRouting(void);
-
-void TestMtControl ( void );
+void TestPedals ( void );
+void TestMTControl ( void );
+void TestSpeed ( void );
 
 
 
@@ -31,28 +15,13 @@ void TestMtControl ( void );
 static inline void testsRoutines( void )
 {
 
-#if (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ADC)
+#if (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_PEDALS)
 
-    TestADCRouting();
-
-#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_PWM)
-
-    TestPWMRouting();
-
-#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_TRANSFER_FUNC)
-
-    testTFCalcRouting();
-
-#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ENCODER)
-
-    TestEncoderRouting();
-#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ENGINE_SPEED)
-
-    TestEngineSpeedRouting();
-
+    TestPedals ();
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_MT_CONTROL)
-
-    TestMtControl();
+    TestMTControl ();
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_SPEED)
+    TestSpeed ();
 
 #endif
 }

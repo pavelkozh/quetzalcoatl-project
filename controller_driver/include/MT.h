@@ -11,7 +11,7 @@
  *            driver control unit initialization
  * @note      In function sets up (x,y) coordinates of "gear" positions
  */
-void mtControlInit ( void );
+void mtMotorsControlInit ( void );
 
 /*
  * @brief    move carriage to neutral position

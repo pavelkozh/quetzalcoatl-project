@@ -1,7 +1,8 @@
-#include <common.h>
+#include <speed.h>
 #include <pid.h>
 #include <feedback.h>
 #include <pedals.h>
+
 
 static uint8_t     val = 57;  //57 = 1.1V
 static float       Eref = 770.0;
@@ -39,7 +40,7 @@ static PIDControllerContext_t  pidCtxV = {
  * @param    engine_speed_rpm - reference [rpm]
  * @return   engine_control_value - GAS control [dac units]
  */
-uint32_t engineSpeedControl( uint32_t engine_speed_rpm )
+uint32_t speedEngineSpeedControl( uint32_t engine_speed_rpm )
 {
 
     engine_speed_rpm = uint32_map(engine_speed_rpm,0,5000,0,5000);
@@ -77,7 +78,7 @@ uint32_t engineSpeedControl( uint32_t engine_speed_rpm )
  * @return    VehicleControl - GAS control [dac units]
  */
 
-uint32_t vehicleSpeedControl( uint32_t speed )
+uint32_t speedVehicleSpeedControl( uint32_t speed )
 {
     speed = uint32_map(speed,0,100,0,1000);
     int32_t current_speed = uint32_map(gazleGetSpeed(),0,100,0,1000);
@@ -107,15 +108,16 @@ static THD_WORKING_AREA(pid_wa, 256);
 	static THD_FUNCTION(pid, arg) {
 
     (void)arg;
+    palSetLine(LINE_LED3);
 
     while(1){
 
-        if(( gazleGetBrakeSwitch() == 1 ) || ( gazleGetClutchSwitch() == 1 )) setVehicleControlStart(false);
+        if(( gazleGetBrakeSwitch() == 1 ) || ( gazleGetClutchSwitch() == 1 )) speedResetVehicleControlStart();
 
 
 
         if ((engine_control_start )  && (!vehicle_control_start)  ){
-            val = engineSpeedControl(( uint32_t ) Eref);
+            val = speedEngineSpeedControl(( uint32_t ) Eref);
         }
         else{
                 pidCtx.err        = 0;
@@ -127,7 +129,7 @@ static THD_WORKING_AREA(pid_wa, 256);
 
 
         if ( (vehicle_control_start) && (!engine_control_start ) ){
-            val = vehicleSpeedControl((uint32_t) Vref);
+            val = speedVehicleSpeedControl((uint32_t) Vref);
         }
         else{
                 pidCtxV.err        = 0;
@@ -139,41 +141,45 @@ static THD_WORKING_AREA(pid_wa, 256);
 
         if( (!engine_control_start ) && (!vehicle_control_start) )
         {
-            val = 58;
+            val = 0;
         }
+
+
         pedalsAcceleratorControl ( val );
 
         if(engine_control_start)    chThdSleepMilliseconds( 20 );
-        else                        chThdSleepMilliseconds( 100 );
+        else                         chThdSleepMilliseconds( 100 );
 
     }
 }
-void PIDInit(void) {
+void speedPIDInit(void) {
 	PIDControlInit( &pidCtxV );
     PIDControlInit( &pidCtx );
-	chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO + 10, pid, NULL);
+	chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO, pid, NULL);
+	pedalsInit();
+
 }
 
-void setEngineControlStart(void) {
+void speedSetEngineControlStart(void) {
 	engine_control_start = true;
 }
 
-void resetEngineControlStart(void) {
+void speedResetEngineControlStart(void) {
 	engine_control_start = false;
 }
 
-void setVehicleControlStart(void) {
+void speedSetVehicleControlStart(void) {
 	vehicle_control_start = true;
 }
 
-void resetVehicleControlStart(void) {
+void speedResetVehicleControlStart(void) {
 	vehicle_control_start = false;
 }
 
-void setVehiclePIDReferenceValue ( float val ){
+void speedSetVehiclePIDReferenceValue ( float val ){
     Vref = val;
 }
 
-void setEnginePIDReferenceValue ( float val ){
+void speedSetEnginePIDReferenceValue ( float val ){
     Eref = val;
 }

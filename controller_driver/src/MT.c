@@ -63,7 +63,7 @@ typedef struct {
 
 gearCoordinates points_array [7];
 
-void mtControlInit ( void )
+void mtMotorsControlInit ( void )
 {
     /*Motor driver Setting */
     palSetLineMode( PAL_LINE( GPIOF, 7),  PAL_MODE_ALTERNATE(3) );

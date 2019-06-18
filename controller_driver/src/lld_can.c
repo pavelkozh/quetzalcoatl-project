@@ -1,5 +1,8 @@
 #include <lld_can.h>
 
+static CANRxFrame rxmsg;
+static CANTxFrame txmsg;
+
 
 static const CANConfig cancfg= {
 CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP,
