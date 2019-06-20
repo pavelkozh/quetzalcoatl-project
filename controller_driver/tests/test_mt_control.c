@@ -28,6 +28,7 @@ void TestMTControl ( void )
     MTControlInit ();
 
     uint8_t sd_buff[10];
+    /* no gear */
     int8_t current_gear = -1;
 
     while(1) {
