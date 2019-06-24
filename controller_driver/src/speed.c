@@ -129,6 +129,7 @@ static THD_WORKING_AREA(pid_wa, 256);
 
 
         if ( (vehicle_control_start) && (!engine_control_start ) ){
+            palToggleLine(LINE_LED1);
             val = speedVehicleSpeedControl((uint32_t) Vref);
         }
         else{
