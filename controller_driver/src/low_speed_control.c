@@ -154,12 +154,12 @@ void lowSpeedSetReference( double ref){
 	vs = ref;
 };
 
-void lowSpeedGetErr(void){
+double lowSpeedGetErr(void){
 	return VSpeed_e;
 };
 
 
-void lowSpeedGetdErr(void){
+double lowSpeedGetdErr(void){
 	return dErr;
 };
 

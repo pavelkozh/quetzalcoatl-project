@@ -98,8 +98,8 @@ addRule(VSpeed_err.mn, dVSpeed_err.lp, Clutch_speed.ln, Break_speed.no);
 addRule(VSpeed_err.sn, dVSpeed_err.ln, Clutch_speed.lp, Break_speed.no);
 addRule(VSpeed_err.sn, dVSpeed_err.mn, Clutch_speed.lp, Break_speed.no);
 addRule(VSpeed_err.sn, dVSpeed_err.sn, Clutch_speed.mp, Break_speed.no);
-addRule(VSpeed_err.sn, dVSpeed_err.no, Clutch_speed.no, Break_speed.no);
-addRule(VSpeed_err.sn, dVSpeed_err.sp, Clutch_speed.sp, Break_speed.no);
+addRule(VSpeed_err.sn, dVSpeed_err.no, Clutch_speed.sp, Break_speed.no);
+addRule(VSpeed_err.sn, dVSpeed_err.sp, Clutch_speed.sn, Break_speed.no);
 addRule(VSpeed_err.sn, dVSpeed_err.mp, Clutch_speed.mn, Break_speed.no);
 addRule(VSpeed_err.sn, dVSpeed_err.lp, Clutch_speed.ln, Break_speed.no);
 
@@ -128,9 +128,9 @@ addRule(VSpeed_err.mp, dVSpeed_err.mp, Clutch_speed.ln, Break_speed.no);
 addRule(VSpeed_err.mp, dVSpeed_err.lp, Clutch_speed.ln, Break_speed.no);
 
 addRule(VSpeed_err.lp, dVSpeed_err.ln, Clutch_speed.lp, Break_speed.no);
-addRule(VSpeed_err.lp, dVSpeed_err.mn, Clutch_speed.lp, Break_speed.no);
-addRule(VSpeed_err.lp, dVSpeed_err.sn, Clutch_speed.sp, Break_speed.no);
-addRule(VSpeed_err.lp, dVSpeed_err.no, Clutch_speed.sn, Break_speed.no);
+addRule(VSpeed_err.lp, dVSpeed_err.mn, Clutch_speed.mp, Break_speed.no);
+addRule(VSpeed_err.lp, dVSpeed_err.sn, Clutch_speed.sn, Break_speed.no);
+addRule(VSpeed_err.lp, dVSpeed_err.no, Clutch_speed.mn, Break_speed.no);
 addRule(VSpeed_err.lp, dVSpeed_err.sp, Clutch_speed.ln, Break_speed.no);
 addRule(VSpeed_err.lp, dVSpeed_err.mp, Clutch_speed.ln, Break_speed.no);
 addRule(VSpeed_err.lp, dVSpeed_err.lp, Clutch_speed.ln, Break_speed.no);

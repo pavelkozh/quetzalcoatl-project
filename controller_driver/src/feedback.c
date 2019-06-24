@@ -78,11 +78,11 @@ int8_t gazelGetActualEnginePercentTorque (void){
 
 double gazelGetSpeed(void){
 
- // if(gaz->Speed > 6)
+  if(gaz->Speed > 10)
     return gaz->Speed;
-  /*else
+  else
     return gaz->Speed_px4flow;
-    */
+
 
 };
 

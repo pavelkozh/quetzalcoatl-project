@@ -1,7 +1,7 @@
 #include <tests.h>
 // #include <lld_can.h>
 #include <lld_ext_dac.h>
-#include <controllers.h>
+#include <speed.h>
 #include <lld_control.h>
 //#include <fuzzy_logic.h>
 // #include <lld_px4flow.h>
@@ -31,13 +31,15 @@ void TestFLRouting ( void )
     extDacInit();
     lowSpeedControlIntit();
     feedbackInit();
+    pedalsInit();
+    speedPIDInit();
 
 
     uint32_t CPSpeed = 5000;
     uint32_t steps = 4000;
     uint16_t speed = 6000;
     int32_t filter_px4flow = 0;
-
+    float vs = 0;
 
     double res_buff2[2] = {0.0,0.0};
     double speed222 = gazelGetSpeed();
@@ -45,7 +47,7 @@ void TestFLRouting ( void )
     static char  sd_buff[10] = {'?','?','?','?','?','?','?','?','?','?'} ;
 
     while(1) {
-//*************
+
         sdReadTimeout( &SD3, sd_buff, 10, TIME_IMMEDIATE   );
 
 
@@ -55,7 +57,7 @@ void TestFLRouting ( void )
             pedalsBrakeStop();
         }
 
-        // //*****MOTOR CONTROL*******//
+         //*****MOTOR CONTROL*******//
 
         if(sd_buff[0]=='r') {lowSpeedStop(); pedalsClutchRelease( speed );}
         if(sd_buff[0]=='f') {lowSpeedStop(); pedalsClutchPress( speed );}
@@ -66,13 +68,14 @@ void TestFLRouting ( void )
 
         //*****Fuzzy CONTROL*******//
 
-        if(sd_buff[0]=='q') lowSpeedSetReference( atoi(&sd_buff[1])/100.0 ); 
+        if(sd_buff[0]=='q') { vs = (float) (atoi(&sd_buff[1])/100.0); lowSpeedSetReference( vs ); };
         if(sd_buff[0]=='x') lowSpeedStart();
         if(sd_buff[0]=='c') lowSpeedStop();
 
-        //chprintf( (BaseSequentialStream *)&SD3,"vs:\t%.2f\tESp:\t%.2f\tPx4flow:\t%.02f\tdGazSp:\t%.3f\tCsp:\t%.2f\tClutchM:\t%d\tBreakM:\t%d\t engS:\t%.02f\tSdil:%0.2f\n\r",vs, VSpeed_e,(gazel.Speed_px4flow/20.0)*0.0036,dErr, res_buff[0],ClutchM.position,BreakM.position,gazel. EngineSpeed,VSpeed_e_filter); 
+        //chprintf( (BaseSequentialStream *)&SD3,"vs:\t%.2f\tESp:\t%.2f\tPx4flow:\t%.02f\tdGazSp:\t%.3f\tCsp:\tClutchM:\t%d\tBreakM:\t%d\t engS:\t%.02f\n\r",vs, lowSpeedGetErr(),gazelGetSpeed(),lowSpeedGetdErr(),pedalsClutchGetPosition(),pedalsBrakeGetPosition(),gazelGetEngineSpeed());
+        chprintf( (BaseSequentialStream *)&SD3,"vs: %.02f E: %.02f Speed: %.02f dE: %.02f ClutchM: %d BreakM: %d EngSpeed: %.02f \n\r",vs,lowSpeedGetErr(),gazelGetSpeed(),lowSpeedGetdErr(),pedalsClutchGetPosition(),pedalsBrakeGetPosition(),gazelGetEngineSpeed());
         //chprintf( (BaseSequentialStream *)&SD3,"P %.02f GazSp: %.2f\t x: %.02f\t gnd: %.02f\n\r", flow_comp_m_x()*0.0036,ground_distance()/1000.0);
-        chprintf((BaseSequentialStream *)&SD3," VALUEL: %.2f \n\r",gazelGetSpeed());
+        //chprintf((BaseSequentialStream *)&SD3," VALUEL: %.2f \n\r",gazelGetSpeed());
         palTogglePad( GPIOB, 0);
         for (int i = 0; i < 9; i++)
         {

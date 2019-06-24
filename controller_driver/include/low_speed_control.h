@@ -6,7 +6,7 @@ void lowSpeedStart(void);
 void lowSpeedStop(void);
 void lowSpeedSetReference( double ref);
 void lowSpeedControlIntit(void);
-void lowSpeedGetErr(void);
-void lowSpeedGetdErr(void);
+double lowSpeedGetErr(void);
+double lowSpeedGetdErr(void);
 
 #endif //LOW_SPEED_CONTROL

@@ -15,7 +15,7 @@
 #define     PROGRAM_ROUTINE_TEST_SPEED                  6
 
 
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_MT_CONTROL
+#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_FUZZY_LOGIC
 
 
 
