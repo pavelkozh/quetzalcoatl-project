@@ -18,11 +18,14 @@ typedef struct
     controllerRate_t    ki;
     controllerRate_t    kd;
     float               integrLimit;
-	controllerError_t   err;
+    controllerError_t   err;
 
     /* Service parameters */
     float               integrSum;
     controllerError_t   prevErr;
+
+    float               integZone; // in %/100
+    float               integZone_abs; // reference * %
 
 } PIDControllerContext_t;
 

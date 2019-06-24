@@ -9,7 +9,6 @@ int main(void)
     halInit();
 
 
-
     #if (MAIN_PROGRAM_ROUTINE != PROGRAM_ROUTINE_MASTER) // need fixing
 
         testsRoutines();

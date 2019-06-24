@@ -8,20 +8,26 @@
 #include <stdlib.h>
 
 #define     PROGRAM_ROUTINE_MASTER                      1
-#define     PROGRAM_ROUTINE_TEST_ADC                    2
-#define     PROGRAM_ROUTINE_TEST_PWM                    3
-#define     PROGRAM_ROUTINE_TEST_TRANSFER_FUNC          4
-#define     PROGRAM_ROUTINE_TEST_ENCODER                5
-#define     PROGRAM_ROUTINE_TEST_CAN                 	7
-#define		PROGRAM_ROUTINE_TEST_ENGINE_SPEED			8
-//KPP 9 
-#define		PROGRAM_ROUTINE_TEST_FUZZY_LOGIC			10
-#define     PROGRAM_ROUTINE_TEST_PX4FLOW                11
+#define		PROGRAM_ROUTINE_TEST_FUZZY_LOGIC			2
+#define     PROGRAM_ROUTINE_TEST_PX4FLOW                3
+#define     PROGRAM_ROUTINE_TEST_PEDALS                 4
+#define     PROGRAM_ROUTINE_TEST_MT_CONTROL             5
+#define     PROGRAM_ROUTINE_TEST_SPEED                  6
 
 
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_FUZZY_LOGIC
+#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_MT_CONTROL
 
 
+
+
+
+
+/**************/
+/*** Macros ***/
+/**************/
+
+#define CLIP_VALUE(x, min, max) ((x) < (min) ? (min) : \
+(x) > (max) ? (max) : (x))
 
 
 /**
@@ -32,11 +38,13 @@
 void commonExtDriverInit ( void );
 
 
-/**************/
-/*** Macros ***/
-/**************/
+/**
+ * @brief
+ */
+uint8_t uint8_map(uint8_t x, uint8_t in_min, uint8_t in_max, uint8_t out_min, uint8_t out_max);
+uint32_t uint32_map(uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_min, uint32_t out_max);
+double double_map(double x, double in_min, double in_max, double out_min, double out_max);
 
-#define CLIP_VALUE(x, min, max) ((x) < (min) ? (min) : \
-(x) > (max) ? (max) : (x))
 
 #endif /* INCLUDE_COMMON_H_ */
+

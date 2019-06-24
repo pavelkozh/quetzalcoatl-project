@@ -62,7 +62,7 @@ typedef struct {
   */
     int32_t             max_position;
  /**
-  * @brief: Min motor position. 
+  * @brief: Min motor position.
   */
     int32_t             min_position;
  /**
