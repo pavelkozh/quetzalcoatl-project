@@ -109,14 +109,18 @@ static THD_WORKING_AREA(pid_wa, 256);
 
     (void)arg;
     palSetLine(LINE_LED3);
+    bool CBflag =0;
 
     while(1){
 
-        if(( gazelGetBrakeSwitch() == 1 ) || ( gazelGetClutchSwitch() == 1 )) speedResetVehicleControlStart();
+        if(( gazelGetBrakeSwitch() == 1 ) || ( gazelGetClutchSwitch() == 1 ))
+            CBflag = 0;
+        else
+            CBflag = 1;
 
 
 
-        if ((engine_control_start )  && (!vehicle_control_start)  ){
+        if ( (engine_control_start )  && ( !(vehicle_control_start && CBflag) ) ){
             val = speedEngineSpeedControl(( uint32_t ) Eref);
         }
         else{
@@ -128,7 +132,8 @@ static THD_WORKING_AREA(pid_wa, 256);
 
 
 
-        if ( (vehicle_control_start) && (!engine_control_start ) ){
+        if ( (vehicle_control_start) && (!engine_control_start ) && (CBflag) ){
+            palToggleLine(LINE_LED1);
             val = speedVehicleSpeedControl((uint32_t) Vref);
         }
         else{
@@ -139,7 +144,7 @@ static THD_WORKING_AREA(pid_wa, 256);
         }
 
 
-        if( (!engine_control_start ) && (!vehicle_control_start) )
+        if( (!engine_control_start ) && (!(vehicle_control_start && CBflag)) )
         {
             val = 0;
         }
@@ -195,4 +200,14 @@ float speedGetVehicleReference (void)
 float speedGetEngineReference (void)
 {
     return Eref;
+}
+
+bool speedGetVehicleControlFlag (void)
+{
+    return vehicle_control_start;
+}
+
+bool speedGetEngineControlFlag (void)
+{
+    return engine_control_start;
 }

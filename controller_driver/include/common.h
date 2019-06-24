@@ -13,7 +13,7 @@
 #define     PROGRAM_ROUTINE_TEST_SPEED                  4
 
 
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_SPEED
+#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_MT_CONTROL
 
 
 

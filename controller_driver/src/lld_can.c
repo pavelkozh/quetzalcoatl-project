@@ -110,8 +110,8 @@ void can_handler(CANRxFrame msg){
       break;
     case PGN_CRUISE_CONTROL_AND_VEHICL_SPEED:
       gazel.Speed = ((msg.data8[2]<<8)|msg.data8[1])/256.0;
-      gazel.BrakeSwitch = (msg.data8[4]>>4) & 0x03;
-      gazel.ClutchSwitch =(msg.data8[4]>>6) & 0x03;
+      gazel.BrakeSwitch = (msg.data8[3]>>4) & 0x03;
+      gazel.ClutchSwitch = (msg.data8[3]>>6) & 0x03;
       break;
     case PGN_ELECTRONIC_ENGINE_CONTROLLER_2:
       gazel.AcceleratorPedalPosition = 0.4*msg.data8[1];
@@ -135,3 +135,41 @@ void can_handler(CANRxFrame msg){
 gazelParam* gazelGetStruct(void){
   return &gazel;
 };
+
+
+// void canEngineSpeed(void){
+//   return gazel.EngineSpeed;
+// }
+// void canDriverIsDemandEnginePercentTorque(void){
+//   return gazel.DriverIsDemandEnginePercentTorque;
+// }
+// void canActualEnginePercentTorque(void){
+//   return gazel.ActualEnginePercentTorque;
+// }
+// void canSpeed(void){
+//   return gazel.Speed;
+// }
+// void canSpeed_px4flow(void){
+//   return gazel.Speed_px4flow;
+// }
+// void canAcceleratorPedalPosition(void){
+//   return gazel.AcceleratorPedalPosition;
+// }
+// void canPercentLoadAtCurrentSpeed(void){
+//   return gazel.PercentLoadAtCurrentSpeed;
+// }
+// void canEngineFuelRate(void){
+//   return gazel.EngineFuelRate;
+// }
+// void canEngineInstantaneousFuelEconomy(void){
+//   return gazel.EngineInstantaneousFuelEconomy;
+// }
+// void canEngineThrottleValve(void){
+//   return gazel.EngineThrottleValve;
+// }
+// void canBatteryPotential(void){
+//   return gazel.BatteryPotential;
+// }
+// void canBrakePedalPosition(void){
+//   return gazel.BrakePedalPosition;
+// }
