@@ -50,7 +50,7 @@ void TestMTControl ( void )
 
 
 
-        chprintf( (BaseSequentialStream *)&SD3, "current_gear %d\t flag %d\t  Vref %.02f\t Cl_sw %d\t Br_sw %d\t  Espeed %.02f\t Speed %.02f\t   \n\r", current_gear, getGearBoxControlEnableFlag (),speedGetVehicleReference (),gazelGetClutchSwitch(),gazelGetBrakeSwitch(),gazelGetEngineSpeed(),gazelGetSpeed());
+        chprintf( (BaseSequentialStream *)&SD3, "current_gear %d\t flagG %d\t flagV %d\t flagE %d\t  Vref %.02f\t  Gaz %.02f\t Espeed %.02f\t Speed %.02f\t  ClSw %d\t BrSw %d\t \n\r", MTControlGetCurrentGear (), getGearBoxControlEnableFlag (), speedGetVehicleControlFlag(), speedGetEngineControlFlag(), speedGetVehicleReference (), gazelGetAcceleratorPedalPosition(),gazelGetEngineSpeed(),gazelGetSpeed(), gazelGetClutchSwitch(), gazelGetBrakeSwitch());
 
 
 

@@ -6,7 +6,7 @@
 
 
 
-#define ENGINE_SPEED_THRESHOLD 1100 // engine speed, when gear shifting occur
+#define ENGINE_SPEED_THRESHOLD 1500 // engine speed, when gear shifting occur
 
 static thread_reference_t trp_gearshift = NULL;
 
@@ -80,7 +80,7 @@ static THD_FUNCTION(gearshift, arg) {
                         gear = 2;
 
                         /*K1 = 149; K2 = 75.3; K3 = 49*/
-                        speedSetEnginePIDReferenceValue( gazelGetSpeed() * 75.3 );
+                        speedSetEnginePIDReferenceValue( 17* 75.3);//gazelGetSpeed() * 75.3 );
                         speedSetEngineControlStart();
                     }
                 }
@@ -138,6 +138,11 @@ void MTControlInit ( void )
     mtMotorsControlInit ();
     chThdCreateStatic(gearshift_wa, sizeof(gearshift_wa), NORMALPRIO + 7, gearshift, NULL);
     chThdCreateStatic(mt_control_wa, sizeof(mt_control_wa), NORMALPRIO + 7, mt_control, NULL);
+}
+
+void MTControlGetCurrentGear (void)
+{
+    return gear_num;
 }
 
 

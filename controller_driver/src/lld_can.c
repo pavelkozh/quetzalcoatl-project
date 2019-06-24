@@ -135,3 +135,41 @@ void can_handler(CANRxFrame msg){
 gazelParam* gazelGetStruct(void){
   return &gazel;
 };
+
+
+// void canEngineSpeed(void){
+//   return gazel.EngineSpeed;
+// }
+// void canDriverIsDemandEnginePercentTorque(void){
+//   return gazel.DriverIsDemandEnginePercentTorque;
+// }
+// void canActualEnginePercentTorque(void){
+//   return gazel.ActualEnginePercentTorque;
+// }
+// void canSpeed(void){
+//   return gazel.Speed;
+// }
+// void canSpeed_px4flow(void){
+//   return gazel.Speed_px4flow;
+// }
+// void canAcceleratorPedalPosition(void){
+//   return gazel.AcceleratorPedalPosition;
+// }
+// void canPercentLoadAtCurrentSpeed(void){
+//   return gazel.PercentLoadAtCurrentSpeed;
+// }
+// void canEngineFuelRate(void){
+//   return gazel.EngineFuelRate;
+// }
+// void canEngineInstantaneousFuelEconomy(void){
+//   return gazel.EngineInstantaneousFuelEconomy;
+// }
+// void canEngineThrottleValve(void){
+//   return gazel.EngineThrottleValve;
+// }
+// void canBatteryPotential(void){
+//   return gazel.BatteryPotential;
+// }
+// void canBrakePedalPosition(void){
+//   return gazel.BrakePedalPosition;
+// }
