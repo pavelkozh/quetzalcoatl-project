@@ -81,7 +81,7 @@ static THD_FUNCTION(gearshift, arg) {
 
                         /*K1 = 149; K2 = 75.3; K3 = 49*/
                         speedSetEnginePIDReferenceValue( 17* 75.3);//gazelGetSpeed() * 75.3 );
-                        speedSetEngineControlStart();
+                        speedEngineControlStart();
                     }
                 }
                 if ( gear_num == 2  )
@@ -90,8 +90,8 @@ static THD_FUNCTION(gearshift, arg) {
                     if ( pedalsClutchGetState () == 0 )
                     {
                         shift_enable_flag = 0;
-                        speedResetEngineControlStart();
-                        speedSetVehicleControlStart();
+                        speedEngineControlStop();
+                        //speedVehicleControlStart();  //////////????????????
                     }
                 }
             }

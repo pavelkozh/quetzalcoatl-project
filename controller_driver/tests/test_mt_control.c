@@ -28,7 +28,7 @@ void TestMTControl ( void )
 
     MTControlInit ();
     feedbackInit();
-    speedPIDInit();
+    speedInit();
 
     uint8_t sd_buff[10];
     int8_t current_gear = -1;
@@ -43,10 +43,10 @@ void TestMTControl ( void )
         if(sd_buff[0]=='h') resetGearBoxControlEnableFlag();
 
         if(sd_buff[4]=='s') speedSetVehiclePIDReferenceValue ( (float) (atoi(sd_buff)/10.0) ) ;
-        if(sd_buff[0]=='e') speedSetVehicleControlStart();
+        if(sd_buff[0]=='e') speedVehicleControlStart();
 
-        if(sd_buff[0]=='d') speedResetVehicleControlStart();
-        if(sd_buff[0]=='z') speedResetEngineControlStart();
+        if(sd_buff[0]=='d') speedVehicleControlStop();
+        if(sd_buff[0]=='z') speedEngineControlStop();
 
 
 
