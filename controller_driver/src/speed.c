@@ -102,8 +102,8 @@ uint32_t speedVehicleControl( uint32_t speed )
     VehicleControl = uint32_map(VehicleControl,0,1000,0,100);
 
     return VehicleControl;
-
 }
+
 static THD_WORKING_AREA(pid_wa, 256);
 	static THD_FUNCTION(pid, arg) {
 

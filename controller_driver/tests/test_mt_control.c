@@ -42,7 +42,7 @@ void TestMTControl ( void )
         if(sd_buff[0]=='y') mtControlStart();
         if(sd_buff[0]=='h') mtControlStop();
 
-        if(sd_buff[4]=='s') speedSetVehiclePIDReferenceValue ( (float) (atoi(sd_buff)/10.0) ) ;
+        if(sd_buff[4]=='s') speedSetVehiclePIDReferenceValue ( (float) (atoi(sd_buff)/10.0) );
         if(sd_buff[0]=='e') speedVehicleControlStart();
 
         if(sd_buff[0]=='d') speedVehicleControlStop();
@@ -50,7 +50,7 @@ void TestMTControl ( void )
 
 
 
-        chprintf( (BaseSequentialStream *)&SD3, "current_gear %d\t flagG %d\t flagV %d\t flagE %d\t  Vref %.02f\t  Gaz %.02f\t Espeed %.02f\t Speed %.02f\t  ClSw %d\t BrSw %d\t \n\r", mtControlGetCurrentGearNum(), mtControlGetEnableFlag(), speedGetVehicleControlFlag(), speedGetEngineControlFlag(), speedGetVehicleReference (), gazelGetAcceleratorPedalPosition(),gazelGetEngineSpeed(),gazelGetSpeed(), gazelGetClutchSwitch(), gazelGetBrakeSwitch());
+       // chprintf( (BaseSequentialStream *)&SD3, "current_gear %d\t flagG %d\t flagV %d\t flagE %d\t  Vref %.02f\t  Gaz %.02f\t Espeed %.02f\t Speed %.02f\t  ClSw %d\t BrSw %d\t \n\r", mtControlGetCurrentGearNum(), mtControlGetEnableFlag(), speedGetVehicleControlFlag(), speedGetEngineControlFlag(), speedGetVehicleReference (), gazelGetAcceleratorPedalPosition(),gazelGetEngineSpeed(),gazelGetSpeed(), gazelGetClutchSwitch(), gazelGetBrakeSwitch());
 
 
 

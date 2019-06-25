@@ -8,6 +8,7 @@
 void TestPedals ( void );
 void TestMTControl ( void );
 void TestSpeed ( void );
+void TestHSC1 ( void );
 
 
 
@@ -22,6 +23,8 @@ static inline void testsRoutines( void )
     TestMTControl ();
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_SPEED)
     TestSpeed ();
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_HSC)
+    TestHSC1();
 
 #endif
 }

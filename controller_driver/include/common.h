@@ -11,9 +11,10 @@
 #define     PROGRAM_ROUTINE_TEST_PEDALS                 2
 #define     PROGRAM_ROUTINE_TEST_MT_CONTROL             3
 #define     PROGRAM_ROUTINE_TEST_SPEED                  4
+#define     PROGRAM_ROUTINE_TEST_HSC                    5
 
 
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_MT_CONTROL
+#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_HSC
 
 
 

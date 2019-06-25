@@ -61,7 +61,7 @@ static THD_FUNCTION(gearshift, arg) {
     while(1){
             if ( ( gazelGetEngineSpeed () >= ENGINE_SPEED_THRESHOLD ) && (gear_shift_control == 1) && ( gear_num != 2 ) )
             {
-                palToggleLine(LINE_LED2);
+                //palToggleLine(LINE_LED2);
                 shift_enable_flag = 1;
             }
 

@@ -58,6 +58,7 @@ void feedbackInit(void){
   gaz = (gazelParam *)gazelGetStruct();
   can_init();
   px4flowInit();
+  palSetLine(LINE_LED2);
   chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 5, can_rx, NULL);
 };
 
