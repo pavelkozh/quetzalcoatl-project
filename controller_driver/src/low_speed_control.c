@@ -83,6 +83,7 @@ static THD_FUNCTION(fl, arg) {
                     pedalsBrakeRelease( br_sp ); //100 + res_buff becouse max_break_speed < min_break_speed and res_buff < 0
                 }else
                     if((res_buff[1]>0) && (pedalsBrakeGetPosition() <= max_break_pos)){
+
                         uint32_t br_sp =   map(100 - res_buff[1], 0,100, max_break_speed, min_break_speed);
                         pedalsBrakePress( br_sp); //100 + res_buff becouse max_break_speed < min_break_speed and res_buff < 0
                     }else 
