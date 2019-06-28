@@ -25,8 +25,10 @@ static uint32_t min_clutch_pos     = 50000;
 static uint16_t max_break_pos     = 2000;
 static uint16_t min_break_pos      = 0;
 
-static uint32_t max_clutch_speed = 4000;
+static uint32_t max_clutch_speed = 3500;
 static uint32_t min_clutch_speed = 20000;
+static uint32_t max_break_speed = 6000;
+static uint32_t min_break_speed = 20000;
 
 static THD_WORKING_AREA(fl_wa, 256);
 static THD_FUNCTION(fl, arg) {
@@ -38,39 +40,9 @@ static THD_FUNCTION(fl, arg) {
     fuzzylogicInit();
 
     while(1){
-        /*
-        if(pedal_calibration_start_fag >= 1){
-            fl_start_flag = 0;
-            if((gazel.ClutchSwitch==1) && (pedal_calibration_start_fag == 1))
-                MotorRunContinuous( &ClutchM, 1, 1000 );
-            else
-                MotorRunContinuous( &ClutchM, 0, 1000 );
-            if((gazel.BrakeSwitch==1) && (pedal_calibration_start_fag == 1))
-                MotorRunContinuous( &BreakM, 1, 1000 );
-            else
-                MotorRunContinuous( &BreakM, 0, 1000 );
 
-            pedal_calibration_start_fag = 2;
-            if((gazel.ClutchSwitch != Clutch_old) && (pedal_calibration_start_fag == 2)){
-                MotorStop( &ClutchM );
-                pedal_calibration_start_fag = 0;
-            }
-            if((gazel.BrakeSwitch != Break_old) && (pedal_calibration_start_fag == 2)){
-                MotorStop( &BreakM );
-                pedal_calibration_start_fag = 0;
-            }
-        }else{
-           Clutch_old = gazel.ClutchSwitch;
-           Break_old = gazel.BrakeSwitch;
-        }
-         */
         if(fl_start_flag == 1){
-                // MotorRunTracking( &ClutchM, 3000); MotorRunTracking( &BreakM, 3000);
-                // if(vs==0){
-                //     MotorRunContinuous( &ClutchM, 0, 5000 ); //100 + res_buff becouse max_clutch_speed < min_clutch_speed and res_buff < 0
-                //     if(ClutchM.State == 0)
-                //         MotorRunContinuous( &BreakM, 0, 5000 );
-                // }else{
+
 
                 if(target_zone_flag == 0 ){
 
@@ -79,37 +51,22 @@ static THD_FUNCTION(fl, arg) {
                     else
                         pedalsClutchRelease( 35000 );
 
-                    if( gazelGetSpeed() >= 0.2){
-                        max_clutch_pos = pedalsClutchGetPosition() + 5000;
-                        min_clutch_pos = pedalsClutchGetPosition() -40000;
+                    if( gazelGetSpeed() >= 0.1){
+                        max_clutch_pos = pedalsClutchGetPosition() + 7000;
+                        min_clutch_pos = pedalsClutchGetPosition() -15000;
                         target_zone_flag = 1;
                     }
                 }else{
 
                     VSpeed_e= vs - gazelGetSpeed();
 
-                    // VSpeed_e_sum -= VSpeed_e_buf[E_cnt];
-                    // VSpeed_e_buf[E_cnt] = VSpeed_e;
-                    // VSpeed_e_sum += VSpeed_e_buf[E_cnt];
-                    // E_cnt = E_cnt >= 19 ? 0 : E_cnt+1;
-
-                    // VSpeed_e_filter = (VSpeed_e_sum/20.0);
                     dErr =  VSpeed_e - VSpeed_e_prev;
 
                     //calculate fl
                     calculateFLReg(VSpeed_e, dErr, &res_buff);
                     VSpeed_e_prev = VSpeed_e;
 
-                    // MotorRunTracking( &ClutchM, 1500);
-                    // MotorRunTracking( &BreakM, 3000);
-                    // if(res_buff[0]<0){
-                    //     BreakM.tracked_position = 0;
-                    //     ClutchM.tracked_position = map(res_buff[0]+100,0,100,min_clutch_pos,max_clutch_pos);
-                    // }
-                    // if (res_buff[0]>0){
-                    //     ClutchM.tracked_position = max_clutch_pos;
-                    //     BreakM.tracked_position = map(res_buff[0],0,100,min_break_pos,max_break_pos);
-                    // }
+
 
                 if( (res_buff[0]<0) && (pedalsClutchGetPosition() >= min_clutch_pos)){
                     uint32_t cl_sp =  map(100 + res_buff[0], 0,100, max_clutch_speed, min_clutch_speed);
@@ -120,8 +77,17 @@ static THD_FUNCTION(fl, arg) {
                         pedalsClutchPress ( cl_sp); //100 + res_buff becouse max_clutch_speed < min_clutch_speed and res_buff < 0
                     }else 
                         pedalsClutchStop();
+                
+                if( (res_buff[1]<0) && (pedalsBrakeGetPosition() >= min_break_pos)){
+                    uint32_t br_sp =  map(100 + res_buff[1], 0,100, max_break_speed, min_break_speed);
+                    pedalsBrakeRelease( br_sp ); //100 + res_buff becouse max_break_speed < min_break_speed and res_buff < 0
+                }else
+                    if((res_buff[1]>0) && (pedalsBrakeGetPosition() <= max_break_pos)){
+                        uint32_t br_sp =   map(100 - res_buff[1], 0,100, max_break_speed, min_break_speed);
+                        pedalsBrakePress( br_sp); //100 + res_buff becouse max_break_speed < min_break_speed and res_buff < 0
+                    }else 
+                        pedalsBrakeStop();
                 }
-
 
                 // if(res_buff[1]<0)
                 //     MotorRunContinuous( &BreakM, 1, map(100 + res_buff[1], 0,100, max_break_speed, min_break_speed) ); //100 + res_buff becouse max_breake_speed < min_break_speed and res_buff < 0
