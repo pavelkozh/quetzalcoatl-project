@@ -54,12 +54,19 @@ static THD_FUNCTION(can_rx, arg) {
 
   }
 
+static bool if_feedback_module_initialized = 0;
+
 void feedbackInit(void){
-  gaz = (gazelParam *)gazelGetStruct();
-  can_init();
-  px4flowInit();
-  palSetLine(LINE_LED2);
-  chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 5, can_rx, NULL);
+
+    if ( if_feedback_module_initialized )
+        return
+
+    gaz = (gazelParam *)gazelGetStruct();
+    can_init();
+    px4flowInit();
+    chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 5, can_rx, NULL);
+    if_feedback_module_initialized = 1;
+
 };
 
 float gazelGetEngineSpeed (void){

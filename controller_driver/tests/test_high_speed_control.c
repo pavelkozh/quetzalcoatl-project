@@ -23,7 +23,7 @@ void TestHSC1 ( void )
 
 
     hscInit();
-    //feedbackInit();
+    feedbackInit();
     pedalsInit();
 
 
@@ -45,9 +45,10 @@ void TestHSC1 ( void )
         if(sd_buff[4]=='s') hscTestSetSpeedRef (  atoi(sd_buff) );
        // if(sd_buff[4]=='f') hscTestSetCurrentSpeed (  atoi(sd_buff) );
 
+//gazelGetSpeed()
+//pedalsBrakeGetPosition()
 
-
-       // chprintf( (BaseSequentialStream *)&SD3, "speed %.02f \t brake %d \t \r\n",gazelGetSpeed(), pedalsBrakeGetPosition() );
+        chprintf( (BaseSequentialStream *)&SD3, "speed %.02f \t brake %d \t \r\n", gazelGetSpeed(), pedalsBrakeGetPosition()  );
 
 
         for (int i = 0; i < 9; i++)

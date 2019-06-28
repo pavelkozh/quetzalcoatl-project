@@ -14,16 +14,27 @@
 static int8_t vehicle_speed_ref = 20; // call usb function
 static double vehicle_speed = 0.0,
        vehicle_speed_err = 0.0;
+static bool hsc_thd_sleep = false;
 
 
 /* FUNCTIONS */
 
-
+static thread_reference_t trp_hsc = NULL;
 
 void hscStart ( void )
 {
-    speedVehicleControlStart();
     mtControlStart();
+    speedVehicleControlStart();
+
+    // resume hsc (high speed control module wake up)
+    chSysLock();
+    chThdResume(&trp_hsc, MSG_OK);
+    chSysUnlock();
+
+    // resume mt_control (mt_control.c)
+    // resume vehicle control (speed.c)
+
+
 }
 
 void hscStop ( void )
@@ -31,6 +42,15 @@ void hscStop ( void )
     mtControlStop();
     speedVehicleControlStop();
     speedEngineControlStop(); //???
+
+    /* mt_control module goes to sleep until call (resume) */
+    hsc_thd_sleep = true;
+
+    // where (in which .c file) create flag?
+
+
+
+
 
 }
 
@@ -76,7 +96,7 @@ static THD_FUNCTION(hsc_brake, arg) {
 
 
         brake_force =  brakeControl();
-        if ( brake_force == 0 )
+        if ( brake_force == 0 ) //??  press brake pedal while stop ??
         {
             pedalsBrakeRelease(1000);
         }
@@ -115,6 +135,15 @@ static THD_FUNCTION(hsc, arg) {
             pedalsClutchRelease( 2000 );
         }
 
+        if ( hsc_thd_sleep )
+        {
+            /* high speed control module goes to sleep until call (resume) */
+            chSysLock();
+            chThdSuspendS(&trp_hsc);
+            chSysUnlock();
+        }
+
+
         chThdSleepMilliseconds( 100 );
 
     }
@@ -123,9 +152,9 @@ static THD_FUNCTION(hsc, arg) {
 
 void hscInit ( void )
 {
-    mtControlInit ();
+    mtControlInit (); // two threads which controls gearshifing start working!
     feedbackInit();
-    speedInit();
+    speedInit(); // acceleration control thread starts working!
     pedalsInit();
     chThdCreateStatic(hsc_brake_wa, sizeof(hsc_brake_wa), NORMALPRIO + 7, hsc_brake, NULL);
     chThdCreateStatic(hsc_wa, sizeof(hsc_wa), NORMALPRIO + 7, hsc, NULL);

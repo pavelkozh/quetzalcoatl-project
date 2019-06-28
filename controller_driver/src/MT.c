@@ -63,8 +63,12 @@ typedef struct {
 
 gearCoordinates points_array [7];
 
+static bool if_mt_motors_control_module_initialized = 0;
 void mtMotorsControlInit ( void )
 {
+    if ( if_mt_motors_control_module_initialized )
+        return;
+
     /*Motor driver Setting */
     palSetLineMode( PAL_LINE( GPIOF, 7),  PAL_MODE_ALTERNATE(3) );
     palSetLineMode( m_vertical.dir_line, PAL_MODE_OUTPUT_PUSHPULL);
@@ -99,6 +103,8 @@ void mtMotorsControlInit ( void )
     /*reverse gear coordinates*/
     points_array[6].x = 16000; //reverse gear horizontal coordinate
     points_array[6].y = -24000; //reverse gear vertical coordinate
+
+    if_mt_motors_control_module_initialized = 1;
 }
 
 void setTrackedMode ( uint16_t vertical_speed, uint16_t gorisontal_speed )
@@ -332,7 +338,7 @@ static void extcb_horizontal_right_sensor(EXTDriver *extp, expchannel_t channel)
     (void)extp;
     (void)channel;
 
-    palToggleLine(LINE_LED3);
+   // palToggleLine(LINE_LED3);
     gorisontalMotorStop ();
 
     //gorisontalCaclibration( 1, 20000, 2000 );

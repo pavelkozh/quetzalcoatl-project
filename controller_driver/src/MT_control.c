@@ -130,14 +130,20 @@ int8_t mtControlMannualyShiftGear ( uint8_t command_gear )
     return gear_num;
 }
 
+static bool if_mtControl_module_initialized = 0;
+
 /*
  * @brief    Initialization of manual transmition controller
  */
 void mtControlInit ( void )
 {
+    if ( if_mtControl_module_initialized )
+        return
+
     mtMotorsControlInit ();
     chThdCreateStatic(gearshift_wa, sizeof(gearshift_wa), NORMALPRIO + 7, gearshift, NULL);
     chThdCreateStatic(mt_control_wa, sizeof(mt_control_wa), NORMALPRIO + 7, mt_control, NULL);
+    if_mtControl_module_initialized = 1;
 }
 
 int8_t mtControlGetCurrentGearNum (void)

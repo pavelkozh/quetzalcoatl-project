@@ -108,7 +108,7 @@ static THD_WORKING_AREA(pid_wa, 256);
 	static THD_FUNCTION(pid, arg) {
 
     (void)arg;
-    palSetLine(LINE_LED3);
+   // palSetLine(LINE_LED3);
     bool CBflag =0;
 
     while(1){
@@ -157,11 +157,22 @@ static THD_WORKING_AREA(pid_wa, 256);
 
     }
 }
+
+static bool if_speed_control_module_initialized = false;
+
 void speedInit(void) {
+    if ( if_speed_control_module_initialized )
+    {
+        return;
+    }
+
+
+
 	PIDControlInit( &pidCtxV );
     PIDControlInit( &pidCtx );
 	chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO, pid, NULL);
 	pedalsInit();
+	if_speed_control_module_initialized = true;
 
 }
 

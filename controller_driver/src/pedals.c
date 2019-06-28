@@ -65,11 +65,15 @@ void fallingEdgeBreakMCallback(PWMDriver *pwmd){
     fallingEdgeCb(&BreakM);
 }
 
+static bool if_pedals_module_initialized = 0;
 
 /*
  * @brief      Perephery setup and lld initialization
  */
 void pedalsInit ( void ){
+     if ( if_pedals_module_initialized )
+         return;
+
      /* Clutch init*/
      palSetLineMode( PAL_LINE( GPIOC, 6),  PAL_MODE_ALTERNATE(2) );
      palSetLineMode( ClutchM.dir_line, PAL_MODE_OUTPUT_PUSHPULL);
@@ -82,6 +86,7 @@ void pedalsInit ( void ){
 
      /* Accelerator pedal init*/
      extDacInit();
+     if_pedals_module_initialized = 1;
 }
 
 

@@ -4,7 +4,9 @@
 
 #include <common.h>
 
-
+void hscInit ( void );
+void hscStart ( void );
+void hscStop ( void );
 
 
 #endif /* HIGH_SPEED_CONTROL_H */
