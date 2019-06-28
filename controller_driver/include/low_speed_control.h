@@ -1,6 +1,7 @@
 #ifndef LOW_SPEED_CONTROL
 #define LOW_SPEED_CONTROL
 #include <fuzzy_logic.h>
+#include <pedals.h>
 #include <feedback.h> 
 void lowSpeedStart(void);
 void lowSpeedStop(void);
