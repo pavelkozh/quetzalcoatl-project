@@ -12,8 +12,9 @@
 #define     PROGRAM_ROUTINE_TEST_MT_CONTROL             3
 #define     PROGRAM_ROUTINE_TEST_SPEED                  4
 #define     PROGRAM_ROUTINE_TEST_STEER                  5
+#define 	PROGRAM_ROUTINE_TEST_EMERGENCY_STOP			6
 
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_STEER
+#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_EMERGENCY_STOP
 
 
 
