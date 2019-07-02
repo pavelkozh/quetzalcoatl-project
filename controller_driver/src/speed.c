@@ -146,6 +146,7 @@ static THD_WORKING_AREA(pid_wa, 256);
         if( (!engine_control_start ) && (!(vehicle_control_start && CBflag)) )
         {
             val = 0;
+            pedalsBrakeRelease(1000);
         }
 
 
@@ -158,8 +159,7 @@ static THD_WORKING_AREA(pid_wa, 256);
         /* Brake */
         else if ( val < 0 )
         {
-            brake_force = uint32_map(val,-100,-1,500,5000);
-            pedalsBrakePress(brake_force);
+            pedalsBrakePress( uint32_map(val,-100,-1,500,5000) );
         }
         // else [if val == 0] do nothing
 

@@ -42,7 +42,7 @@ void TestHSC1 ( void )
         if(sd_buff[0]=='u') pedalsClutchRelease(5000);
         if(sd_buff[0]=='k') pedalsClutchPress(10000);
 
-        if(sd_buff[4]=='s') hscTestSetSpeedRef (  atoi(sd_buff) );
+
        // if(sd_buff[4]=='f') hscTestSetCurrentSpeed (  atoi(sd_buff) );
 
 //gazelGetSpeed()
