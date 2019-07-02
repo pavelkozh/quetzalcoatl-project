@@ -33,6 +33,7 @@
 #define PGN_ELECTRONIC_BRAKE_CONTROLLER     0x00EBC100
 
 
+
 typedef struct 
 {
     float EngineSpeed ;
@@ -58,7 +59,19 @@ void can_handler(CANRxFrame msg);
 
 void canUpdate( void );
 
+
 gazelParam* gazelGetStruct(void);
 
-
+ // canEngineSpeed(void)
+ // canDriverIsDemandEnginePercentTorque(void)
+ // canActualEnginePercentTorque(void)
+ // canSpeed(void)
+ // canSpeed_px4flow(void)
+ // canAcceleratorPedalPosition(void)
+ // canPercentLoadAtCurrentSpeed(void)
+ // canEngineFuelRate(void)
+ // canEngineInstantaneousFuelEconomy(void)
+ // canEngineThrottleValve(void)
+ // canBatteryPotential(void)
+ // canBrakePedalPosition(void)
 #endif /* INCLUDE_LLD_CAN_H_ */

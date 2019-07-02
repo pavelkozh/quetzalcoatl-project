@@ -6,8 +6,9 @@
 
 
 
-#define ENGINE_SPEED_THRESHOLD 1900 // engine speed, when gear shifting occur
+#define ENGINE_SPEED_THRESHOLD 1500 // engine speed, when gear shifting occur
 
+static thread_reference_t trp_gearshift = NULL;
 
 
 
@@ -25,10 +26,15 @@ static THD_FUNCTION(mt_control, arg) {
 
     (void)arg;
     while(1){
+
+
         switch(gear){
-        case 0: gear_num = shiftMTToNeutral(1000); break;
+        case 0: gear_num = shiftMTToNeutral ( 1000 ); break;
         case 1: gear_num = shiftMTToNextGear(1,1000); break;
         case 2: gear_num = shiftMTToNextGear(2,1000); break;
+        case 3: gear_num = shiftMTToNextGear(3,1000); break;
+        case 4: gear_num = shiftMTToNextGear(4,1000); break;
+        case 5: gear_num = shiftMTToNextGear(5,1000); break;
         case 6: gear_num = shiftMTToNextGear(6,1000); break;
         }
 
@@ -36,7 +42,7 @@ static THD_FUNCTION(mt_control, arg) {
         if (gear_num == gear)
         {
             chSysLock();
-            chThdSuspendS(&mt_control);
+            chThdSuspendS(&trp_gearshift);
             chSysUnlock();
         }
 
@@ -53,8 +59,9 @@ static THD_FUNCTION(gearshift, arg) {
 
     (void)arg;
     while(1){
-            if ( ( gazleGetEngineSpeed () >= ENGINE_SPEED_THRESHOLD ) && (gear_shift_control == 1) && ( gear_num != 2 ) )
+            if ( ( gazelGetEngineSpeed () >= ENGINE_SPEED_THRESHOLD ) && (gear_shift_control == 1) && ( gear_num != 2 ) )
             {
+                palToggleLine(LINE_LED2);
                 shift_enable_flag = 1;
             }
 
@@ -67,13 +74,13 @@ static THD_FUNCTION(gearshift, arg) {
                     {
                         /* Shifting is start and thread wake up! */
                         chSysLock();
-                        chThdResume(&mt_control, MSG_OK);
+                        chThdResume(&trp_gearshift, MSG_OK);
                         chSysUnlock();
 
                         gear = 2;
 
                         /*K1 = 149; K2 = 75.3; K3 = 49*/
-                        speedSetEnginePIDReferenceValue( gazleGetSpeed() * 75.3 );
+                        speedSetEnginePIDReferenceValue( 17* 75.3);//gazelGetSpeed() * 75.3 );
                         speedSetEngineControlStart();
                     }
                 }
@@ -110,10 +117,14 @@ bool getGearBoxControlEnableFlag ( void ){
 
 int8_t mannualyShiftGear ( uint8_t command_gear )
 {
+
     /* Shifting is start and thread wake up! */
     chSysLock();
-    chThdResume(&mt_control, MSG_OK);
+    chThdResume(&trp_gearshift, MSG_OK);
     chSysUnlock();
+
+   // palSetLine(LINE_LED2);
+
 
     gear = command_gear;
     return gear_num;
@@ -127,6 +138,11 @@ void MTControlInit ( void )
     mtMotorsControlInit ();
     chThdCreateStatic(gearshift_wa, sizeof(gearshift_wa), NORMALPRIO + 7, gearshift, NULL);
     chThdCreateStatic(mt_control_wa, sizeof(mt_control_wa), NORMALPRIO + 7, mt_control, NULL);
+}
+
+void MTControlGetCurrentGear (void)
+{
+    return gear_num;
 }
 
 

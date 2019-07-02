@@ -13,8 +13,11 @@
 #define     PROGRAM_ROUTINE_TEST_SPEED                  4
 #define     PROGRAM_ROUTINE_TEST_STEER                  5
 #define 	PROGRAM_ROUTINE_TEST_EMERGENCY_STOP			6
+#define		PROGRAM_ROUTINE_TEST_FUZZY_LOGIC			7
+#define     PROGRAM_ROUTINE_TEST_PX4FLOW                8
 
 #define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_EMERGENCY_STOP
+
 
 
 
@@ -25,6 +28,7 @@
 
 #define CLIP_VALUE(x, min, max) ((x) < (min) ? (min) : \
 (x) > (max) ? (max) : (x))
+
 
 /**
  * @brief   Initialize EXT driver with empty config
@@ -43,3 +47,4 @@ double double_map(double x, double in_min, double in_max, double out_min, double
 
 
 #endif /* INCLUDE_COMMON_H_ */
+

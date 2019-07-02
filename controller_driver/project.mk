@@ -12,6 +12,8 @@ PROJECT_MODULES =	src/lld_control.c         \
                     src/MT_control.c          \
                     src/steer.c               \
                     src/emergency_stop.c      \
+                    src/fuzzy_logic.c         \
+                    src/low_speed_control.c   \
 
 
 PROJECT_TESTS   =	tests/test_pedals.c    \
@@ -19,6 +21,7 @@ PROJECT_TESTS   =	tests/test_pedals.c    \
                     tests/test_mt_control.c\
                     tests/test_steer.c     \
                     tests/test_emergency_stop.c     \
+                    tests/fuzzy_logic_test.c \
 
 
 PROJECT_CSRC    =	src/main.c src/common.c \

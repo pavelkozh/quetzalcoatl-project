@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "chibios",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "D:\\STM32_ChibiOS-master\\ChibiStudio_Preview20\\ChibiOS\\**",
+                "D:\\STM32_ChibiOS-master\\ChibiStudio_Preview20\\tools\\GNU Tools ARM Embedded\\7.0 2017q4\\lib\\gcc\\arm-none-eabi\\7.2.1\\**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "intelliSenseMode": "msvc-x64"
+        }
+    ],
+    "version": 4
+}

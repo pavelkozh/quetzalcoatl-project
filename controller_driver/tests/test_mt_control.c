@@ -4,6 +4,7 @@
 #include <speed.h>
 #include <MT.h>
 #include <MT_control.h>
+#include <feedback.h>
 
 
 
@@ -26,6 +27,8 @@ void TestMTControl ( void )
 
 
     MTControlInit ();
+    feedbackInit();
+    speedPIDInit();
 
     uint8_t sd_buff[10];
     /* no gear */
@@ -48,7 +51,7 @@ void TestMTControl ( void )
 
 
 
-        chprintf( (BaseSequentialStream *)&SD3, "current_gear %d\t flag %d\t  \n\r", current_gear, getGearBoxControlEnableFlag ());
+        chprintf( (BaseSequentialStream *)&SD3, "current_gear %d\t flagG %d\t flagV %d\t flagE %d\t  Vref %.02f\t  Gaz %.02f\t Espeed %.02f\t Speed %.02f\t  ClSw %d\t BrSw %d\t \n\r", MTControlGetCurrentGear (), getGearBoxControlEnableFlag (), speedGetVehicleControlFlag(), speedGetEngineControlFlag(), speedGetVehicleReference (), gazelGetAcceleratorPedalPosition(),gazelGetEngineSpeed(),gazelGetSpeed(), gazelGetClutchSwitch(), gazelGetBrakeSwitch());
 
 
 
