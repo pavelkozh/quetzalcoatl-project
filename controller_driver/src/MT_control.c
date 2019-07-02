@@ -21,8 +21,8 @@ static bool shift_enable_flag = 0;  // Gearshifting enable flag (service variabl
 
 
 
-static THD_WORKING_AREA(mt_control_wa, 256);
-static THD_FUNCTION(mt_control, arg) {
+static THD_WORKING_AREA(gearshift_wa, 256);
+static THD_FUNCTION(gearshift, arg) {
 
     (void)arg;
     while(1){
@@ -54,8 +54,8 @@ static THD_FUNCTION(mt_control, arg) {
 
 
 
-static THD_WORKING_AREA(gearshift_wa, 256);
-static THD_FUNCTION(gearshift, arg) {
+static THD_WORKING_AREA(mt_control_wa, 256);
+static THD_FUNCTION(mt_control, arg) {
 
     (void)arg;
     while(1){

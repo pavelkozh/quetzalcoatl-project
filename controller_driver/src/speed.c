@@ -78,7 +78,7 @@ uint32_t speedEngineControl( uint32_t engine_speed_rpm )
  * @return    VehicleControl - GAS control [dac units]
  */
 
-uint32_t speedVehicleControl( uint32_t speed )
+int32_t speedVehicleControl( uint32_t speed )
 {
     speed = uint32_map(speed,0,100,0,1000);
     int32_t current_speed = uint32_map(gazelGetSpeed(),0,100,0,1000);
@@ -98,8 +98,8 @@ uint32_t speedVehicleControl( uint32_t speed )
 
 
     /*  roughly reset integral */
-    VehicleControl = CLIP_VALUE(VehicleControl,0,1000);
-    VehicleControl = uint32_map(VehicleControl,0,1000,0,100);
+    VehicleControl = CLIP_VALUE(VehicleControl,-1000,1000);
+    VehicleControl = uint32_map(VehicleControl,-1000,1000,-100,100);
 
     return VehicleControl;
 }
@@ -108,7 +108,6 @@ static THD_WORKING_AREA(pid_wa, 256);
 	static THD_FUNCTION(pid, arg) {
 
     (void)arg;
-   // palSetLine(LINE_LED3);
     bool CBflag =0;
 
     while(1){
@@ -133,7 +132,7 @@ static THD_WORKING_AREA(pid_wa, 256);
 
 
         if ( (vehicle_control_start) && (!engine_control_start ) && (CBflag) ){
-            palToggleLine(LINE_LED1);
+            // call function for new Vref value!!!
             val = speedVehicleControl((uint32_t) Vref);
         }
         else{
@@ -150,7 +149,19 @@ static THD_WORKING_AREA(pid_wa, 256);
         }
 
 
-        pedalsAcceleratorControl ( val );
+        /* Acceleration */
+        if ( val > 0 )
+        {
+            pedalsBrakeRelease(1000);
+            pedalsAcceleratorControl ( val );
+        }
+        /* Brake */
+        else if ( val < 0 )
+        {
+            brake_force = uint32_map(val,-100,-1,500,5000);
+            pedalsBrakePress(brake_force);
+        }
+        // else [if val == 0] do nothing
 
         if(engine_control_start)    chThdSleepMilliseconds( 20 );
         else                         chThdSleepMilliseconds( 100 );
