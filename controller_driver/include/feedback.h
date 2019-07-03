@@ -5,6 +5,8 @@
 #include <lld_can.h>
 #include <lld_px4flow.h>
 
+
+void feedbackInit(void);
 float gazelGetEngineSpeed (void);
 int8_t gazelGetDriverIsDemandEnginePercentTorque(void);
 int8_t gazelGetActualEnginePercentTorque (void);

@@ -1,6 +1,7 @@
 #include <tests.h>
 #include <emergency_stop.h>
-#include <chprintf.h> 
+#include <chprintf.h>
+#include <pedals.h>
 
 static const SerialConfig sdcfg = {
     .speed  = 9600,
@@ -16,7 +17,8 @@ static const SerialConfig sdcfg = {
      emergencyStopInit();
      while (1) {
         int pin = palReadLine( PAL_LINE( GPIOA, 0 ) );
-        chprintf( (BaseSequentialStream *)&SD3, "Result %d\t\n\r", pin);
+        int32_t pos = pedalsClutchGetPosition();
+        chprintf( (BaseSequentialStream *)&SD3, "Result %d\t Position %d  \n\r", pin, pos);
         chThdSleepSeconds( 1 );
      }
 }

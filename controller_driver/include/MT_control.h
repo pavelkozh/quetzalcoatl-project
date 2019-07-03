@@ -4,7 +4,7 @@
 
 #include <common.h>
 
-
+void MTControlInit ( void );
 void setGearBoxControlEnableFlag ( void );
 void resetGearBoxControlEnableFlag ( void );
 int8_t mannualyShiftGear ( uint8_t command_gear );
