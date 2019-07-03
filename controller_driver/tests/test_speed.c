@@ -5,6 +5,7 @@
 #include <feedback.h>
 
 
+
 static const SerialConfig sdcfg = {
   .speed = 115200,
   .cr1 = 0, .cr2 = 0, .cr3 = 0
@@ -23,7 +24,7 @@ void TestSpeed ( void )
     palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
 
     //palSetLine(LINE_LED2);
-    speedPIDInit();
+    speedInit();
     feedbackInit();
 
 
@@ -38,17 +39,17 @@ void TestSpeed ( void )
 
 
         if(sd_buff[4]=='s') speedSetVehiclePIDReferenceValue ( (float)(atoi(sd_buff)/10.0) ) ;
-        if(sd_buff[0]=='y') speedSetVehicleControlStart();
-        if(sd_buff[0]=='h') speedResetVehicleControlStart();
+        if(sd_buff[0]=='y') speedVehicleControlStart();
+        if(sd_buff[0]=='h') speedVehicleControlStop();
 
         if(sd_buff[4]=='a') speedSetEnginePIDReferenceValue ( (float)(atoi(sd_buff)) ) ;
-        if(sd_buff[0]=='e') speedSetEngineControlStart();
-        if(sd_buff[0]=='d') speedResetEngineControlStart();
+        if(sd_buff[0]=='e') speedEngineControlStart();
+        if(sd_buff[0]=='d') speedEngineControlStop();
 
 
 
        // chprintf( (BaseSequentialStream *)&SD3, " Speed %d\t EngSpeed  %d\t \n\r", 100, 53 );
-        chprintf( (BaseSequentialStream *)&SD3, " Speed  %.02f %\t EngSpeed %.02f %\t Vref %.02f %\t  Eref %.02f %\t \n\r", gazelGetSpeed(), gazelGetEngineSpeed(), speedGetVehicleReference(),speedGetEngineReference() );
+        chprintf( (BaseSequentialStream *)&SD3, " Speed  %.02f %\t EngSpeed %.02f %\t Vref %.02f %\t  Eref %.02f %\t BrakePos %d %\t \n\r", gazelGetSpeed(), gazelGetEngineSpeed(), speedGetVehicleReference(),speedGetEngineReference(),pedalsBrakeGetPosition() );
 
 
 
