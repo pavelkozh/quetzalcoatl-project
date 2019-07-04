@@ -190,7 +190,7 @@ uint16_t pedalsBrakeGetSpeed ( void );
  * @brief    set external DAC output (8bit)
  * @params   accelerator_pedal_pos [0...100%]
  */
-void pedalsAcceleratorControl ( uint8_t accelerator_pedal_pos );
+void pedalsAcceleratorControl ( float accelerator_pedal_pos );
 
 
 

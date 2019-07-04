@@ -4,13 +4,13 @@
 #include <pedals.h>
 
 
-static uint8_t     val = 57;  //57 = 1.1V
+static float       val = 57;  //57 = 1.1V
 static float       Eref = 770.0;
 static float       Vref = 0;
 
 
-static int32_t VehicleControl = 0;
-static int32_t engine_control_value =0;
+static double VehicleControl = 0;
+static double engine_control_value =0;
 
 
 
@@ -43,13 +43,11 @@ static PIDControllerContext_t  pidCtxV = {
 uint32_t speedEngineControl( uint32_t engine_speed_rpm )
 {
 
-    engine_speed_rpm = uint32_map(engine_speed_rpm,0,5000,0,5000);
-
+    //engine_speed_rpm = uint32_map(engine_speed_rpm,0,5000,0,5000);
     //engine_speed_rpm  = CLIP_VALUE( engine_speed_rpm, 0, 100 );
+    //int16_t current_engine_speed = uint32_map(gazelGetEngineSpeed(),0,5000,0,5000);
 
-    int16_t current_engine_speed = uint32_map(gazelGetEngineSpeed (),0,5000,0,5000);
-
-    int16_t error = engine_speed_rpm - current_engine_speed;
+    int16_t error = engine_speed_rpm - gazelGetEngineSpeed();
 
     /* Dead zone for (p) error */
     if ( abs(error) < CSErrorDeadzoneHalfwidth )
@@ -61,7 +59,7 @@ uint32_t speedEngineControl( uint32_t engine_speed_rpm )
         pidCtx.err = error;
     }
     pidCtx.integZone_abs = engine_speed_rpm * pidCtx.integZone;
-    engine_control_value    = (int32_t) PIDControlResponse( &pidCtx );
+    engine_control_value    = PIDControlResponse( &pidCtx );
 
 
     /*  roughly reset integral */
@@ -78,11 +76,11 @@ uint32_t speedEngineControl( uint32_t engine_speed_rpm )
  * @return    VehicleControl - GAS control [dac units]
  */
 
-int32_t speedVehicleControl( uint32_t speed )
+float speedVehicleControl( float speed )
 {
-    speed = uint32_map(speed,0,100,0,1000);
-    int32_t current_speed = uint32_map(gazelGetSpeed(),0,100,0,1000);
-    int32_t error = speed - current_speed;
+    //speed = uint32_map(speed,0,100,0,1000);
+    //int32_t current_speed = uint32_map(gazelGetSpeed(),0,100,0,1000);
+    float error = speed - gazelGetSpeed();
 
     /* Dead zone for (p) error */
     if ( abs(error) < CSErrorDeadzoneHalfwidth )
@@ -94,12 +92,12 @@ int32_t speedVehicleControl( uint32_t speed )
         pidCtxV.err = error;
     }
     pidCtxV.integZone_abs = speed * pidCtxV.integZone;
-    VehicleControl    = (int32_t) PIDControlResponse( &pidCtxV );
+    VehicleControl    = PIDControlResponse( &pidCtxV );
 
 
     /*  roughly reset integral */
-    VehicleControl = CLIP_VALUE(VehicleControl,-1000,1000);
-    VehicleControl = uint32_map(VehicleControl,-1000,1000,-100,100);
+    VehicleControl = CLIP_VALUE(VehicleControl,-100.0,100.0);
+    //VehicleControl = uint32_map(VehicleControl,-1000,1000,-100,100);
 
     return VehicleControl;
 }
@@ -133,7 +131,7 @@ static THD_WORKING_AREA(pid_wa, 256);
 
         if ( (vehicle_control_start) && (!engine_control_start ) && (CBflag) ){
             // call function for new Vref value!!!
-            val = speedVehicleControl((uint32_t) Vref);
+            val = speedVehicleControl( Vref );
         }
         else{
                 pidCtxV.err        = 0;
@@ -149,12 +147,13 @@ static THD_WORKING_AREA(pid_wa, 256);
             pedalsBrakeRelease(1000);
         }
 
+        pedalsAcceleratorControl ( val ); // move this function to the thread body
+
 
         /* Acceleration */
         if ( val > 0 )
         {
             pedalsBrakeRelease(1000);
-            pedalsAcceleratorControl ( val ); // move this function to the thread body
         }
         /* Brake */
         else if ( val < 0 )
@@ -172,10 +171,10 @@ static THD_WORKING_AREA(pid_wa, 256);
 static bool if_speed_control_module_initialized = false;
 
 void speedInit(void) {
-    if ( if_speed_control_module_initialized )
-    {
-        return;
-    }
+//    if ( if_speed_control_module_initialized )
+//    {
+//        return;
+//    }
 
 
 
@@ -183,8 +182,8 @@ void speedInit(void) {
     PIDControlInit( &pidCtx );
 	chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO, pid, NULL);
 	pedalsInit();
-	feedbackInit();
-	if_speed_control_module_initialized = true;
+	//feedbackInit();
+//	if_speed_control_module_initialized = true;
 
 }
 
@@ -235,7 +234,22 @@ bool speedGetEngineControlFlag (void)
     return engine_control_start;
 }
 
-uint8_t speedGetPIDVal ( void )
+float speedGetPIDVal ( void )
 {
     return val;
+}
+
+float speedDbgGazelSpeed ( void )
+{
+    return gazelGetSpeed();
+}
+
+float speedDbgGazelEngSpeed ( void )
+{
+    return gazelGetEngineSpeed();
+}
+
+int32_t speedDbgBrakePos ( void )
+{
+    return pedalsBrakeGetPosition();
 }

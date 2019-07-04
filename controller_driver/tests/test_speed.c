@@ -3,7 +3,7 @@
 
 #include <speed.h>
 #include <feedback.h>
-#include <pedals.h>
+//#include <pedals.h>
 
 
 
@@ -27,7 +27,8 @@ void TestSpeed ( void )
     //palSetLine(LINE_LED2);
     speedInit();
     feedbackInit();
-    pedalsInit();
+    //feedbackInit();
+    //pedalsInit();
 
 
     uint8_t sd_buff[10];
@@ -57,7 +58,7 @@ void TestSpeed ( void )
 
 
        // chprintf( (BaseSequentialStream *)&SD3, " Speed %d\t EngSpeed  %d\t \n\r", 100, 53 );
-        chprintf( (BaseSequentialStream *)&SD3, " Speed  %.2f %\t EngSpeed %.2f %\t Vref %.02f %\t  Eref %.02f %\t pidVal %d %\t BrakePos %d %\t ClutchPos %d %\t \n\r", (float)gazelGetSpeed(), (float)gazelGetEngineSpeed(), speedGetVehicleReference(),speedGetEngineReference(), speedGetPIDVal(), pedalsBrakeGetPosition(),pedalsClutchGetPosition() );
+        chprintf( (BaseSequentialStream *)&SD3, " Speed  %.2f %\t EngSpeed %.2f %\t Vref %.02f %\t  Eref %.02f %\t pidVal %.02f %\t BrakePos %d %\t  \n\r", gazelGetSpeed(), gazelGetEngineSpeed(), speedGetVehicleReference(),speedGetEngineReference(), speedGetPIDVal(), speedDbgBrakePos() );
 
 
 
@@ -69,6 +70,7 @@ void TestSpeed ( void )
           sd_buff[i]='?';
         }
 
+        //pedalsAcceleratorControl ( 0 );
         chThdSleepMilliseconds( 500 );
     }
 }

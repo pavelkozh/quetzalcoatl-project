@@ -13,8 +13,8 @@
 /* encoder ticks units 4000 ticks = 1 rev ( or 5mm translational movement) */
 #define CLUTCH_MAX_POS                      90000
 #define BRAKE_MAX_POS                       40000
-#define ACCELERATOR_DAC_MIN_VAL             57
-#define ACCELERATOR_DAC_MAX_VAL             240
+#define ACCELERATOR_DAC_MIN_VAL             57.0
+#define ACCELERATOR_DAC_MAX_VAL             240.0
 
 
 /* Service callback functions declaration*/
@@ -72,7 +72,9 @@ static bool if_pedals_module_initialized = 0;
  */
 void pedalsInit ( void ){
      if ( if_pedals_module_initialized )
+     {
          return;
+     }
 
      /* Clutch init*/
      palSetLineMode( PAL_LINE( GPIOC, 6),  PAL_MODE_ALTERNATE(2) );
@@ -310,9 +312,10 @@ uint16_t pedalsBrakeGetSpeed ( void ){
  * @brief    set external DAC output (8bit)
  * @params   accelerator_pedal_pos [0...100%]
  */
-void pedalsAcceleratorControl ( uint8_t accelerator_pedal_pos )
+void pedalsAcceleratorControl ( float accelerator_pedal_pos )
 {
-    uint8_t val = uint8_map (accelerator_pedal_pos, 0, 100, ACCELERATOR_DAC_MIN_VAL, ACCELERATOR_DAC_MAX_VAL);
+    accelerator_pedal_pos = CLIP_VALUE(accelerator_pedal_pos,0.0,100.0);
+    uint8_t val = uint8_map (accelerator_pedal_pos, 0.0, 100.0, ACCELERATOR_DAC_MIN_VAL, ACCELERATOR_DAC_MAX_VAL);
     extDacSetValue( ( uint8_t)( val*0.55 ) , val );
 }
 
