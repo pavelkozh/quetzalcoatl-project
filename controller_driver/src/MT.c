@@ -1,4 +1,4 @@
-#include <mt_control.h>
+#include <MT_control.h>
 #include <lld_control.h>
 #include <common.h>
 
@@ -276,7 +276,7 @@ int8_t shiftMTToNextGear (int8_t gear_num, uint16_t speed)
             }
             if ((   m_vertical.position == m_vertical.tracked_position ) && ( m_gorisontal.position == m_gorisontal.tracked_position ))
             {
-                palSetLine(LINE_LED3);
+                //palSetLine(LINE_LED3);
                 currently_selected_gear = gear_num;
             }
         }

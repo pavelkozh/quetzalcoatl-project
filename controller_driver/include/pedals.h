@@ -196,3 +196,4 @@ void pedalsAcceleratorControl ( uint8_t accelerator_pedal_pos );
 
 
 #endif /* INCLUDE_PEDALS_H */
+

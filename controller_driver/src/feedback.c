@@ -26,7 +26,9 @@ void px4_filter(){
         }
       }
       else{
+
           chprintf( (BaseSequentialStream *)&SD3, "I2C error \r\n");
+
       }
       gaz->Speed_px4flow = (px4flow_sum /20.0)*0.0036 ; //0.0036  0.0144
 };
@@ -47,8 +49,9 @@ static THD_FUNCTION(can_rx, arg) {
     {
       canUpdate();
       px4_filter();
-      gaz -> Speed += 1; 
-      chThdSleepMilliseconds( 200 );
+
+      //gaz -> Speed += 1; 
+      chThdSleepMilliseconds( 5 );
     }
     chEvtUnregister(&CAND1.rxfull_event, &el1);
 
@@ -74,10 +77,13 @@ int8_t gazelGetActualEnginePercentTorque (void){
 };
 
 double gazelGetSpeed(void){
-  if(gaz->Speed > 6)
+
+  if(gaz->Speed > 10)
     return gaz->Speed;
   else
     return gaz->Speed_px4flow;
+
+
 };
 
 double gazelGetSpeed_px4flow(void){
@@ -118,4 +124,5 @@ double gazelGetBatteryPotential(void){
 
 double gazelGetBrakePedalPosition(void){
   return gaz->BrakePedalPosition;
+
 };
