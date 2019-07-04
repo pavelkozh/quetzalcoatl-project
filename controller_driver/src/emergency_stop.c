@@ -5,9 +5,16 @@
 
 static thread_reference_t trp_emergency_button_stop = NULL;
 
+// controlls thread's state: when false, thread sleeps
 bool flag = false;
 
 static THD_WORKING_AREA(emergency_button_stop_wa, 256);
+
+/*
+ * @brief function for emergency stop thread
+ * @note when flag is false, the emergency stop thread sleeps
+ *       when flag is true, wake up the thread, press clutch -> press brake -> turn gear to neutrall -> switch off
+ */
 static THD_FUNCTION(emergency_button_stop, arg) {
     (void)arg;
     while(1){
@@ -39,6 +46,10 @@ static THD_FUNCTION(emergency_button_stop, arg) {
     }
 }
 
+/*
+ * @brief interrupt handling function
+ * @note turn flag to true, then wake up the thread for stop process
+ */
 void extcb_base(EXTDriver *extp, expchannel_t channel)
 {
     palToggleLine(LINE_LED1);
@@ -52,6 +63,9 @@ void extcb_base(EXTDriver *extp, expchannel_t channel)
 
 static bool isInitialized = false;
 
+/*
+ * @brief   Initialize pedals module, interrupt for emergency stop button and create thread for stop process
+ */
 void emergencyStopInit( void ) {
 
 	if ( isInitialized )
@@ -66,10 +80,10 @@ void emergencyStopInit( void ) {
 	commonExtDriverInit();
 	EXTChannelConfig base_conf = {
 	    .mode = EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, 
-	    .cb = extcb_base // имя обработчика
+	    .cb = extcb_base
 	};
 
-	extSetChannelMode( &EXTD1, 0, &base_conf ); // 0 - номер пина, порт раньше
+	extSetChannelMode( &EXTD1, 0, &base_conf );
 
 
 

@@ -10,6 +10,11 @@ static const SerialConfig sdcfg = {
     .cr3    = 0
 };
 
+
+/*
+ * @brief test of emergency stob button
+ * @note Implements all functions of emergency stop module, and also types button state and clutch pedal's position
+ */
  void testEmergencyStop ( void ) {
  	sdStart( &SD3, &sdcfg );
      palSetPadMode( GPIOE, 8, PAL_MODE_ALTERNATE(8) );    // TX
