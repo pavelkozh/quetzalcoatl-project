@@ -14,7 +14,7 @@
 #define     PROGRAM_ROUTINE_TEST_HSC                    5
 
 
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_SPEED
+#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_PEDALS
 
 
 

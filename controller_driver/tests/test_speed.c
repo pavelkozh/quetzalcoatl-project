@@ -57,7 +57,7 @@ void TestSpeed ( void )
 
 
        // chprintf( (BaseSequentialStream *)&SD3, " Speed %d\t EngSpeed  %d\t \n\r", 100, 53 );
-        chprintf( (BaseSequentialStream *)&SD3, " Speed  %.02f %\t EngSpeed %.02f %\t Vref %.02f %\t  Eref %.02f %\t pidVal %d %\t BrakePos %d %\t ClutchPos %d %\t \n\r", gazelGetSpeed(), gazelGetEngineSpeed(), speedGetVehicleReference(),speedGetEngineReference(), speedGetPIDVal(), pedalsBrakeGetPosition(),pedalsClutchGetPosition() );
+        chprintf( (BaseSequentialStream *)&SD3, " Speed  %.2f %\t EngSpeed %.2f %\t Vref %.02f %\t  Eref %.02f %\t pidVal %d %\t BrakePos %d %\t ClutchPos %d %\t \n\r", (float)gazelGetSpeed(), (float)gazelGetEngineSpeed(), speedGetVehicleReference(),speedGetEngineReference(), speedGetPIDVal(), pedalsBrakeGetPosition(),pedalsClutchGetPosition() );
 
 
 

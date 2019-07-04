@@ -54,8 +54,8 @@ void TestPedals ( void )
         chprintf( (BaseSequentialStream *)&SD3, "ClState %d\t ClMode %d\t ClStatePos %d\t ClSpeed %d\t BrState %d\t BrMode %d\t BrStatePos %d\t BrSpeed %d\t \n\r",pedalsClutchGetState(), pedalsClutchGetMode(), pedalsClutchGetPosition(), pedalsClutchGetSpeed(),pedalsBrakeGetState(), pedalsBrakeGetMode(), pedalsBrakeGetPosition(), pedalsBrakeGetSpeed());
 //        chprintf( (BaseSequentialStream *)&SD3, "BrState %d\t BrMode %d\t BrStatePos %d\t BrSpeed %d\t \n\r",pedalsBrakeGetState(), pedalsBrakeGetMode(), pedalsBrakeGetPosition(), pedalsBrakeGetSpeed());
 
-        /* Accelerator pedal test*/
-//        if(sd_buff[4]=='u') pedalsAcceleratorControl ( atoi(sd_buff) );
+        /* Accelerator pedal test */
+        if(sd_buff[4]=='u') pedalsAcceleratorControl ( atoi(sd_buff) );
 
 
 

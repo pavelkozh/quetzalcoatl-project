@@ -154,7 +154,7 @@ static THD_WORKING_AREA(pid_wa, 256);
         if ( val > 0 )
         {
             pedalsBrakeRelease(1000);
-            pedalsAcceleratorControl ( val );
+            pedalsAcceleratorControl ( val ); // move this function to the thread body
         }
         /* Brake */
         else if ( val < 0 )
@@ -183,6 +183,7 @@ void speedInit(void) {
     PIDControlInit( &pidCtx );
 	chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO, pid, NULL);
 	pedalsInit();
+	feedbackInit();
 	if_speed_control_module_initialized = true;
 
 }
