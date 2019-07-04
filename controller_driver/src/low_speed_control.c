@@ -42,31 +42,24 @@ static THD_FUNCTION(fl, arg) {
     while(1){
 
         if(fl_start_flag == 1){
-
-
                 if(target_zone_flag == 0 ){
-
                     if(pedalsClutchGetPosition()> 72000)
                         pedalsClutchRelease( 1000 );
                     else
                         pedalsClutchRelease( 35000 );
 
-                    if( gazelGetSpeed() >= 0.1){
+                    if( gazelGetSpeed_px4flow() >= 0.1){
                         max_clutch_pos = pedalsClutchGetPosition() + 7000;
                         min_clutch_pos = pedalsClutchGetPosition() -15000;
                         target_zone_flag = 1;
                     }
                 }else{
 
-                    VSpeed_e= vs - gazelGetSpeed();
-
+                    VSpeed_e= vs - gazelGetSpeed_px4flow();
                     dErr =  VSpeed_e - VSpeed_e_prev;
-
                     //calculate fl
                     calculateFLReg(VSpeed_e, dErr, &res_buff);
                     VSpeed_e_prev = VSpeed_e;
-
-
 
                 if( (res_buff[0]<0) && (pedalsClutchGetPosition() >= min_clutch_pos)){
                     uint32_t cl_sp =  map(100 + res_buff[0], 0,100, max_clutch_speed, min_clutch_speed);
@@ -77,7 +70,6 @@ static THD_FUNCTION(fl, arg) {
                         pedalsClutchPress ( cl_sp); //100 + res_buff becouse max_clutch_speed < min_clutch_speed and res_buff < 0
                     }else 
                         pedalsClutchStop();
-                
                 if( (res_buff[1]<0) && (pedalsBrakeGetPosition() >= min_break_pos)){
                     uint32_t br_sp =  map(100 + res_buff[1], 0,100, max_break_speed, min_break_speed);
                     pedalsBrakeRelease( br_sp ); //100 + res_buff becouse max_break_speed < min_break_speed and res_buff < 0
@@ -92,7 +84,7 @@ static THD_FUNCTION(fl, arg) {
 
                 // if(res_buff[1]<0)
                 //     MotorRunContinuous( &BreakM, 1, map(100 + res_buff[1], 0,100, max_break_speed, min_break_speed) ); //100 + res_buff becouse max_breake_speed < min_break_speed and res_buff < 0
-                // else if(res_buff[1]>0)
+                // else if(res
                 //     MotorRunContinuous( &BreakM, 0, map(100 - res_buff[1], 0,100, max_break_speed, min_break_speed) ); //100 + res_buff becouse max_breake_speed < min_break_speed and res_buff < 0
                 // else 
                 //     MotorStop(&BreakM);

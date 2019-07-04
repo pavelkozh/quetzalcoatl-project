@@ -29,8 +29,8 @@ static THD_FUNCTION(mt_control, arg) {
 
 
         switch(gear){
-        case 0: gear_num = shiftMTToNeutral ( 1000 ); break;
-        case 1: gear_num = shiftMTToNextGear(1,1000); break;
+        case 0: gear_num = shiftMTToNeutral ( 15000 ); break;
+        case 1: gear_num = shiftMTToNextGear(1,15000); break;
         case 2: gear_num = shiftMTToNextGear(2,1000); break;
         case 3: gear_num = shiftMTToNextGear(3,1000); break;
         case 4: gear_num = shiftMTToNextGear(4,1000); break;
@@ -61,7 +61,7 @@ static THD_FUNCTION(gearshift, arg) {
     while(1){
             if ( ( gazelGetEngineSpeed () >= ENGINE_SPEED_THRESHOLD ) && (gear_shift_control == 1) && ( gear_num != 2 ) )
             {
-                palToggleLine(LINE_LED2);
+                //palToggleLine(LINE_LED2);
                 shift_enable_flag = 1;
             }
 
@@ -81,7 +81,7 @@ static THD_FUNCTION(gearshift, arg) {
 
                         /*K1 = 149; K2 = 75.3; K3 = 49*/
                         speedSetEnginePIDReferenceValue( 17* 75.3);//gazelGetSpeed() * 75.3 );
-                        speedSetEngineControlStart();
+                        speedEngineControlStart();
                     }
                 }
                 if ( gear_num == 2  )
@@ -90,8 +90,8 @@ static THD_FUNCTION(gearshift, arg) {
                     if ( pedalsClutchGetState () == 0 )
                     {
                         shift_enable_flag = 0;
-                        speedResetEngineControlStart();
-                        speedSetVehicleControlStart();
+                        speedEngineControlStop();
+                        //speedVehicleControlStart();  //////////????????????
                     }
                 }
             }
@@ -102,20 +102,20 @@ static THD_FUNCTION(gearshift, arg) {
 
 }
 
-void setGearBoxControlEnableFlag ( void ) {
+void mtControlStart ( void ) {
     gear_shift_control = true;
 }
 
-void resetGearBoxControlEnableFlag( void ) {
+void mtControlStop( void ) {
     gear_shift_control = false;
 }
 
-bool getGearBoxControlEnableFlag ( void ){
+bool mtControlGetEnableFlag ( void ){
     return gear_shift_control;
 }
 
 
-int8_t mannualyShiftGear ( uint8_t command_gear )
+int8_t mtControlMannualyShiftGear ( uint8_t command_gear )
 {
 
     /* Shifting is start and thread wake up! */
@@ -130,24 +130,23 @@ int8_t mannualyShiftGear ( uint8_t command_gear )
     return gear_num;
 }
 
+static bool if_mtControl_module_initialized = 0;
+
 /*
  * @brief    Initialization of manual transmition controller
  */
-void MTControlInit ( void )
+void mtControlInit ( void )
 {
+    if ( if_mtControl_module_initialized )
+        return
+
     mtMotorsControlInit ();
     chThdCreateStatic(gearshift_wa, sizeof(gearshift_wa), NORMALPRIO + 7, gearshift, NULL);
     chThdCreateStatic(mt_control_wa, sizeof(mt_control_wa), NORMALPRIO + 7, mt_control, NULL);
+    if_mtControl_module_initialized = 1;
 }
 
-void MTControlGetCurrentGear (void)
+int8_t mtControlGetCurrentGearNum (void)
 {
     return gear_num;
 }
-
-
-
-
-
-
-

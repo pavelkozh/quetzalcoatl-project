@@ -11,7 +11,7 @@
 
 
 /* encoder ticks units 4000 ticks = 1 rev ( or 5mm translational movement) */
-#define CLUTCH_MAX_POS                      90000
+#define CLUTCH_MAX_POS                      100000
 #define BRAKE_MAX_POS                       40000
 #define ACCELERATOR_DAC_MIN_VAL             57
 #define ACCELERATOR_DAC_MAX_VAL             240
