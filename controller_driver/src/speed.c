@@ -20,16 +20,16 @@ static bool        engine_control_start = 0;
 static bool        vehicle_control_start = 0;
 
 static PIDControllerContext_t  pidCtx = {
-    .kp   = 3.5,
-    .ki   = 0.06,
+    .kp   = 1.0,
+    .ki   = 0.0,
     .kd   = 0,
     .integrLimit  = 5000,
     .integZone = 0.5
 };
 
 static PIDControllerContext_t  pidCtxV = {
-    .kp   = 4,
-    .ki   = 0.3,
+    .kp   = 5.0,
+    .ki   = 0.1,
     .kd   = 0,
     .integrLimit  = 100,
     .integZone = 0.9
@@ -158,9 +158,12 @@ static THD_WORKING_AREA(pid_wa, 256);
         /* Brake */
         else if ( val < 0 )
         {
-            pedalsBrakePress( uint32_map(val,-100,-1,500,5000) );
+            pedalsBrakeMove(uint32_map(-val,0,100,0,40000),3000);
         }
-        // else [if val == 0] do nothing
+        else //[if val == 0] do nothing
+        {
+            pedalsBrakeRelease(1000);
+        }
 
         if(engine_control_start)    chThdSleepMilliseconds( 20 );
         else                         chThdSleepMilliseconds( 100 );
@@ -182,7 +185,7 @@ void speedInit(void) {
     PIDControlInit( &pidCtx );
 	chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO, pid, NULL);
 	pedalsInit();
-	//feedbackInit();
+	feedbackInit();
 //	if_speed_control_module_initialized = true;
 
 }
@@ -239,12 +242,12 @@ float speedGetPIDVal ( void )
     return val;
 }
 
-float speedDbgGazelSpeed ( void )
+double speedDbgGazelSpeed ( void )
 {
     return gazelGetSpeed();
 }
 
-float speedDbgGazelEngSpeed ( void )
+double speedDbgGazelEngSpeed ( void )
 {
     return gazelGetEngineSpeed();
 }

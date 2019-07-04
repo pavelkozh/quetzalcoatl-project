@@ -48,7 +48,10 @@ void speedSetEnginePIDReferenceValue ( float val );
 
 
 
-
+double speedDbgGazelSpeed ( void );
+double speedDbgGazelEngSpeed ( void );
+int32_t speedDbgBrakePos ( void );
+float speedGetPIDVal ( void );
 
 float speedGetVehicleReference (void);
 float speedGetEngineReference (void);

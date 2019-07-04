@@ -26,7 +26,6 @@ void TestSpeed ( void )
 
     //palSetLine(LINE_LED2);
     speedInit();
-    feedbackInit();
     //feedbackInit();
     //pedalsInit();
 
@@ -58,7 +57,7 @@ void TestSpeed ( void )
 
 
        // chprintf( (BaseSequentialStream *)&SD3, " Speed %d\t EngSpeed  %d\t \n\r", 100, 53 );
-        chprintf( (BaseSequentialStream *)&SD3, " Speed  %.2f %\t EngSpeed %.2f %\t Vref %.02f %\t  Eref %.02f %\t pidVal %.02f %\t BrakePos %d %\t  \n\r", gazelGetSpeed(), gazelGetEngineSpeed(), speedGetVehicleReference(),speedGetEngineReference(), speedGetPIDVal(), speedDbgBrakePos() );
+        chprintf( (BaseSequentialStream *)&SD3, " Speed  %.02f %\t EngSpeed %.02f %\t Vref %.02f %\t  Eref %.02f %\t pidVal %.02f %\t BrakePos %d %\t  \n\r", speedDbgGazelSpeed(), speedDbgGazelEngSpeed(), speedGetVehicleReference(),speedGetEngineReference(), speedGetPIDVal(), speedDbgBrakePos() );
 
 
 
