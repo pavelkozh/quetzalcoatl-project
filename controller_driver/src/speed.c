@@ -233,3 +233,8 @@ bool speedGetEngineControlFlag (void)
 {
     return engine_control_start;
 }
+
+uint8_t speedGetPIDVal ( void )
+{
+    return val;
+}

@@ -3,6 +3,7 @@
 
 #include <speed.h>
 #include <feedback.h>
+#include <pedals.h>
 
 
 
@@ -26,6 +27,7 @@ void TestSpeed ( void )
     //palSetLine(LINE_LED2);
     speedInit();
     feedbackInit();
+    pedalsInit();
 
 
     uint8_t sd_buff[10];
@@ -46,10 +48,16 @@ void TestSpeed ( void )
         if(sd_buff[0]=='e') speedEngineControlStart();
         if(sd_buff[0]=='d') speedEngineControlStop();
 
+        if(sd_buff[0]=='f') pedalsClutchRelease( 3000 );
+        if(sd_buff[0]=='k') pedalsClutchCalibrate(0,5000,4000);
+        if(sd_buff[0]=='l') pedalsClutchCalibrate(1,5000,4000);
+        if(sd_buff[0]=='o') pedalsBrakeRelease( 3000 );
+        if(sd_buff[0]=='i') pedalsBrakeCalibrate(0,5000,4000);
+        if(sd_buff[0]=='p') pedalsBrakeCalibrate(1,5000,4000); //??? send negative pos!
 
 
        // chprintf( (BaseSequentialStream *)&SD3, " Speed %d\t EngSpeed  %d\t \n\r", 100, 53 );
-        chprintf( (BaseSequentialStream *)&SD3, " Speed  %.02f %\t EngSpeed %.02f %\t Vref %.02f %\t  Eref %.02f %\t BrakePos %d %\t \n\r", gazelGetSpeed(), gazelGetEngineSpeed(), speedGetVehicleReference(),speedGetEngineReference(),pedalsBrakeGetPosition() );
+        chprintf( (BaseSequentialStream *)&SD3, " Speed  %.02f %\t EngSpeed %.02f %\t Vref %.02f %\t  Eref %.02f %\t pidVal %d %\t BrakePos %d %\t ClutchPos %d %\t \n\r", gazelGetSpeed(), gazelGetEngineSpeed(), speedGetVehicleReference(),speedGetEngineReference(), speedGetPIDVal(), pedalsBrakeGetPosition(),pedalsClutchGetPosition() );
 
 
 
