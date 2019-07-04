@@ -79,7 +79,7 @@ void emergencyStopInit( void ) {
 	palSetLineMode( PAL_LINE(GPIOA,0), PAL_MODE_INPUT_PULLUP);
 	commonExtDriverInit();
 	EXTChannelConfig base_conf = {
-	    .mode = EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, 
+	    .mode = EXT_CH_MODE_FALLING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, 
 	    .cb = extcb_base
 	};
 
