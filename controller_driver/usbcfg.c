@@ -15,7 +15,6 @@
 */
 
 #include "hal.h"
-#include <communication.h>
 
 /* Virtual serial port over USB.*/
 SerialUSBDriver SDU1;
@@ -316,7 +315,6 @@ static void usb_event(USBDriver *usbp, usbevent_t event) {
 static void sof_handler(USBDriver *usbp) {
 
   (void)usbp;
-
   osalSysLockFromISR();
   sduSOFHookI(&SDU1);
   osalSysUnlockFromISR();
