@@ -41,16 +41,17 @@ void TestPedals ( void )
         if(sd_buff[5]=='q') pedalsClutchCalibrate(1, 3000, atoi(sd_buff));
         if(sd_buff[6]=='n') pedalsClutchChangeSpeed ( atoi(sd_buff) );
 
-        chprintf( (BaseSequentialStream *)&SD3, "ClState %d\t ClMode %d\t ClStatePos %d\t ClSpeed %d\t \n\r",pedalsClutchGetState(), pedalsClutchGetMode(), pedalsClutchGetPosition(), pedalsClutchGetSpeed());
+
 //
         /* Brake test*/
-//        if(sd_buff[0]=='z') pedalsBrakePress( 3000 );
-//        if(sd_buff[0]=='o') pedalsBrakeRelease( 3000 );
-//        if(sd_buff[6]=='r') pedalsBrakeMove(atoi(sd_buff), 3000);
-//        if(sd_buff[5]=='h') pedalsBrakeCalibrate (0, 3000, atoi(sd_buff));
-//        if(sd_buff[5]=='w') pedalsBrakeCalibrate (1, 3000, atoi(sd_buff));
-//        if(sd_buff[6]=='g') pedalsBrakeChangeSpeed ( atoi(sd_buff) );
+        if(sd_buff[0]=='z') pedalsBrakePress( 3000 );
+        if(sd_buff[0]=='o') pedalsBrakeRelease( 3000 );
+        if(sd_buff[6]=='r') pedalsBrakeMove(atoi(sd_buff), 3000);
+        if(sd_buff[5]=='h') pedalsBrakeCalibrate (0, 3000, atoi(sd_buff));
+        if(sd_buff[5]=='w') pedalsBrakeCalibrate (1, 3000, atoi(sd_buff));
+        if(sd_buff[6]=='g') pedalsBrakeChangeSpeed ( atoi(sd_buff) );
 
+        chprintf( (BaseSequentialStream *)&SD3, "ClState %d\t ClMode %d\t ClStatePos %d\t ClSpeed %d\t BrState %d\t BrMode %d\t BrStatePos %d\t BrSpeed %d\t \n\r",pedalsClutchGetState(), pedalsClutchGetMode(), pedalsClutchGetPosition(), pedalsClutchGetSpeed(),pedalsBrakeGetState(), pedalsBrakeGetMode(), pedalsBrakeGetPosition(), pedalsBrakeGetSpeed());
 //        chprintf( (BaseSequentialStream *)&SD3, "BrState %d\t BrMode %d\t BrStatePos %d\t BrSpeed %d\t \n\r",pedalsBrakeGetState(), pedalsBrakeGetMode(), pedalsBrakeGetPosition(), pedalsBrakeGetSpeed());
 
         /* Accelerator pedal test*/
