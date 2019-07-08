@@ -29,8 +29,8 @@ static THD_FUNCTION(gearshift, arg) {
 
 
         switch(gear){
-        case 0: gear_num = shiftMTToNeutral ( 1000 ); break;
-        case 1: gear_num = shiftMTToNextGear(1,1000); break;
+        case 0: gear_num = shiftMTToNeutral ( 15000 ); break;
+        case 1: gear_num = shiftMTToNextGear(1,15000); break;
         case 2: gear_num = shiftMTToNextGear(2,1000); break;
         case 3: gear_num = shiftMTToNextGear(3,1000); break;
         case 4: gear_num = shiftMTToNextGear(4,1000); break;
@@ -150,10 +150,3 @@ int8_t mtControlGetCurrentGearNum (void)
 {
     return gear_num;
 }
-
-
-
-
-
-
-

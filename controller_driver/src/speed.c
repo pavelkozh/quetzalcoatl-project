@@ -76,7 +76,9 @@ uint32_t speedEngineControl( uint32_t engine_speed_rpm )
  * @return    VehicleControl - GAS control [dac units]
  */
 
+
 float speedVehicleControl( float speed )
+
 {
     //speed = uint32_map(speed,0,100,0,1000);
     //int32_t current_speed = uint32_map(gazelGetSpeed(),0,100,0,1000);
@@ -103,9 +105,10 @@ float speedVehicleControl( float speed )
 }
 
 static THD_WORKING_AREA(pid_wa, 256);
-	static THD_FUNCTION(pid, arg) {
+    static THD_FUNCTION(pid, arg) {
 
     (void)arg;
+
     bool CBflag =0;
 
     while(1){
@@ -130,8 +133,10 @@ static THD_WORKING_AREA(pid_wa, 256);
 
 
         if ( (vehicle_control_start) && (!engine_control_start ) && (CBflag) ){
+
             // call function for new Vref value!!!
             val = speedVehicleControl( Vref );
+
         }
         else{
                 pidCtxV.err        = 0;
@@ -174,19 +179,20 @@ static THD_WORKING_AREA(pid_wa, 256);
 static bool if_speed_control_module_initialized = false;
 
 void speedInit(void) {
-//    if ( if_speed_control_module_initialized )
-//    {
-//        return;
-//    }
+
+    if ( if_speed_control_module_initialized )
+    {
+        return;
+    }
 
 
 
-	PIDControlInit( &pidCtxV );
+    PIDControlInit( &pidCtxV );
     PIDControlInit( &pidCtx );
-	chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO, pid, NULL);
-	pedalsInit();
-	feedbackInit();
-//	if_speed_control_module_initialized = true;
+    chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO, pid, NULL);
+    pedalsInit();
+    if_speed_control_module_initialized = true;
+
 
 }
 
@@ -204,7 +210,10 @@ void speedVehicleControlStart(void) {
 
 void speedVehicleControlStop(void) {
 	vehicle_control_start = false;
+
 }
+
+
 
 void speedSetVehiclePIDReferenceValue ( float val ){
     Vref = val;
@@ -235,6 +244,7 @@ bool speedGetVehicleControlFlag (void)
 bool speedGetEngineControlFlag (void)
 {
     return engine_control_start;
+
 }
 
 float speedGetPIDVal ( void )
@@ -256,3 +266,4 @@ int32_t speedDbgBrakePos ( void )
 {
     return pedalsBrakeGetPosition();
 }
+

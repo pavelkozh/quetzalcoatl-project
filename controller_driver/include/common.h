@@ -3,6 +3,9 @@
 
 #include <ch.h>
 #include <hal.h>
+#include <MT_control.h>
+#include <feedback.h> 
+#include <pedals.h>
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -17,7 +20,7 @@
 #define     PROGRAM_ROUTINE_TEST_HSC                    7
 
 
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_FUZZY_LOGIC
+#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_MASTER
 
 
 

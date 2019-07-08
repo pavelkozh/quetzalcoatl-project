@@ -282,7 +282,7 @@ int8_t shiftMTToNextGear (int8_t gear_num, uint16_t speed)
             }
             if ((   m_vertical.position == m_vertical.tracked_position ) && ( m_gorisontal.position == m_gorisontal.tracked_position ))
             {
-                //palSetLine(LINE_LED3);
+                palToggleLine(LINE_LED3);
                 currently_selected_gear = gear_num;
             }
         }

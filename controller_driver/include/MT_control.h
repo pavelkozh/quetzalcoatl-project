@@ -9,9 +9,11 @@ void mtControlStart ( void );
 void mtControlStop( void );
 int8_t mtControlGetCurrentGearNum (void);
 
+
 /* Servis functions*/
 bool mtControlGetEnableFlag ( void );
 int8_t mtControlMannualyShiftGear ( uint8_t command_gear );
+
 
 
 
