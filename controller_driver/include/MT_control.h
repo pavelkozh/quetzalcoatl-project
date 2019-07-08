@@ -4,11 +4,16 @@
 
 #include <common.h>
 
+void mtControlInit ( void );
+void mtControlStart ( void );
+void mtControlStop( void );
+int8_t mtControlGetCurrentGearNum (void);
 
-void setGearBoxControlEnableFlag ( void );
-void resetGearBoxControlEnableFlag ( void );
-int8_t mannualyShiftGear ( uint8_t command_gear );
-bool getGearBoxControlEnableFlag ( void );
+/* Servis functions*/
+bool mtControlGetEnableFlag ( void );
+int8_t mtControlMannualyShiftGear ( uint8_t command_gear );
+
+
 
 
 

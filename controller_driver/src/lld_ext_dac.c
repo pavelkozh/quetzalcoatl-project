@@ -40,6 +40,7 @@ void extDacInit( ){
 
 	//SPI init
 	spiStart(EXTERNAL_DAC_SPI_DRIVER, &spicfg);
+	palSetLine(LINE_LED1);
 }
 
 

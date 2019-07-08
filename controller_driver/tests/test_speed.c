@@ -3,6 +3,8 @@
 
 #include <speed.h>
 #include <feedback.h>
+//#include <pedals.h>
+
 
 
 static const SerialConfig sdcfg = {
@@ -23,8 +25,9 @@ void TestSpeed ( void )
     palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
 
     //palSetLine(LINE_LED2);
-    speedPIDInit();
-    feedbackInit();
+    speedInit();
+    //feedbackInit();
+    //pedalsInit();
 
 
     uint8_t sd_buff[10];
@@ -38,17 +41,23 @@ void TestSpeed ( void )
 
 
         if(sd_buff[4]=='s') speedSetVehiclePIDReferenceValue ( (float)(atoi(sd_buff)/10.0) ) ;
-        if(sd_buff[0]=='y') speedSetVehicleControlStart();
-        if(sd_buff[0]=='h') speedResetVehicleControlStart();
+        if(sd_buff[0]=='y') speedVehicleControlStart();
+        if(sd_buff[0]=='h') speedVehicleControlStop();
 
         if(sd_buff[4]=='a') speedSetEnginePIDReferenceValue ( (float)(atoi(sd_buff)) ) ;
-        if(sd_buff[0]=='e') speedSetEngineControlStart();
-        if(sd_buff[0]=='d') speedResetEngineControlStart();
+        if(sd_buff[0]=='e') speedEngineControlStart();
+        if(sd_buff[0]=='d') speedEngineControlStop();
 
+        if(sd_buff[0]=='f') pedalsClutchRelease( 3000 );
+        if(sd_buff[0]=='k') pedalsClutchCalibrate(0,5000,4000);
+        if(sd_buff[0]=='l') pedalsClutchCalibrate(1,5000,4000);
+        if(sd_buff[0]=='o') pedalsBrakeRelease( 3000 );
+        if(sd_buff[0]=='i') pedalsBrakeCalibrate(0,5000,4000);
+        if(sd_buff[0]=='p') pedalsBrakeCalibrate(1,5000,4000); //??? send negative pos!
 
 
        // chprintf( (BaseSequentialStream *)&SD3, " Speed %d\t EngSpeed  %d\t \n\r", 100, 53 );
-        chprintf( (BaseSequentialStream *)&SD3, " Speed  %.02f %\t EngSpeed %.02f %\t Vref %.02f %\t  Eref %.02f %\t \n\r", gazelGetSpeed(), gazelGetEngineSpeed(), speedGetVehicleReference(),speedGetEngineReference() );
+        chprintf( (BaseSequentialStream *)&SD3, " Speed  %.02f %\t EngSpeed %.02f %\t Vref %.02f %\t  Eref %.02f %\t pidVal %.02f %\t BrakePos %d %\t  \n\r", speedDbgGazelSpeed(), speedDbgGazelEngSpeed(), speedGetVehicleReference(),speedGetEngineReference(), speedGetPIDVal(), speedDbgBrakePos() );
 
 
 
@@ -60,6 +69,7 @@ void TestSpeed ( void )
           sd_buff[i]='?';
         }
 
+        //pedalsAcceleratorControl ( 0 );
         chThdSleepMilliseconds( 500 );
     }
 }
