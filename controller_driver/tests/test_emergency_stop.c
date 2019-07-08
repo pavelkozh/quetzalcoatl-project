@@ -12,7 +12,7 @@ static const SerialConfig sdcfg = {
 
 
 /*
- * @brief test of emergency stob button
+ * @brief test of emergency stop button
  * @note Implements all functions of emergency stop module, and also types button state and clutch pedal's position
  */
  void testEmergencyStop ( void ) {

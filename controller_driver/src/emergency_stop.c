@@ -4,21 +4,23 @@
 #define EMERGENCY_STOP_LINE PAL_LINE( GPIOA, 0 )
 
 static thread_reference_t trp_emergency_button_stop = NULL;
-
-// controlls thread's state: when false, thread sleeps
-bool flag = false;
+// controls thread's state: when false, thread sleeps
+static bool is_braking_thread_work = false;
+/* flag is true when button for emergency stop control was pressed
+   (after bounce of contacts is filtered) */
+static bool is_emergency_stop_btn_pressed = false;
 
 static THD_WORKING_AREA(emergency_button_stop_wa, 256);
 
 /*
  * @brief function for emergency stop thread
- * @note when flag is false, the emergency stop thread sleeps
- *       when flag is true, wake up the thread, press clutch -> press brake -> turn gear to neutrall -> switch off
+ * @note when is_braking_thread_work is false, the emergency stop thread sleeps
+ *       when is_braking_thread_work is true, wake up the thread, press clutch -> press brake -> turn gear to neutrall -> switch off
  */
 static THD_FUNCTION(emergency_button_stop, arg) {
     (void)arg;
     while(1){
-        if ( flag == false )
+        if ( is_braking_thread_work == false )
         {
             chSysLock();
             chThdSuspendS(&trp_emergency_button_stop);
@@ -34,7 +36,7 @@ static THD_FUNCTION(emergency_button_stop, arg) {
               {
                   // gear = neutral!
                   // zagiganie off!!!
-                  flag = false;
+                  is_braking_thread_work = false;
                   chSysLock();
                   chThdSuspendS(&trp_emergency_button_stop);
                   chSysUnlock();
@@ -48,17 +50,24 @@ static THD_FUNCTION(emergency_button_stop, arg) {
 
 /*
  * @brief interrupt handling function
- * @note turn flag to true, then wake up the thread for stop process
+ * @note turn is_braking_thread_work to true, then wake up the thread for stop process
  */
 void extcb_base(EXTDriver *extp, expchannel_t channel)
 {
-    palToggleLine(LINE_LED1);
-    flag = true;
+    /* To avoid warnings*/
+    (void)extp;
+    (void)channel;
+
+    /* Set flag */
+    //palToggleLine(LINE_LED1);
+    is_braking_thread_work = true;
+
+    /* Wake up braking thread */
     chSysLock();
     chThdResume(&trp_emergency_button_stop, MSG_OK);
     chSysUnlock();
-    (void)extp;
-    (void)channel;
+
+
 }
 
 static bool isInitialized = false;
