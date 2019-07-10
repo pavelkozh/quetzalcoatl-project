@@ -51,6 +51,9 @@ static inline void testsRoutines( void )
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_FUZZY_LOGIC)
 TestFLRouting();
 
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTNE_TEST_COMMUNICATION)
+    testCommunication();
+
 
 
 #endif

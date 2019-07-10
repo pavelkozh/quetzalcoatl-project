@@ -19,11 +19,12 @@
 #define     PROGRAM_ROUTINE_TEST_MT_CONTROL             5
 #define     PROGRAM_ROUTINE_TEST_SPEED                  6
 #define     PROGRAM_ROUTINE_TEST_HSC                    7
-#define 	PROGRAM_ROUTINE_TEST_EMERGENCY_STOP			6
-#define     PROGRAM_ROUTINE_TEST_STEER                  5
+#define 	PROGRAM_ROUTINE_TEST_EMERGENCY_STOP			8
+#define     PROGRAM_ROUTINE_TEST_STEER                  9
+#define     PROGRAM_ROUTNE_TEST_COMMUNICATION           10
 
 
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_MASTER
+#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTNE_TEST_COMMUNICATION
 
 
 

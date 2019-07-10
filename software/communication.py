@@ -192,34 +192,34 @@ if __name__ == "__main__":
 
     while(1):
         
-        # if time.time() - check_time > 1:
-        #     check_time = time.time()
+        if time.time() - check_time > 1:
+            check_time = time.time()
 
-        #     # speed, angle = input("Put speed, angle ").split()
-        #     # Connection.set_control(speed, angle)
+            # speed, angle = input("Put speed, angle ").split()
+            # Connection.set_control(speed, angle)
 
-        #     spst_pair = (np.random.randint(-100, 100),
-        #                  np.random.randint(-100, 100))
-        #     print('New speed/steer pair: {}'.format(spst_pair))
+            spst_pair = (np.random.randint(-100, 100),
+                         np.random.randint(-100, 100))
+            print('New speed/steer pair: {}'.format(spst_pair))
             
-        #     Connection.set_control(spst_pair[0], spst_pair[1])
+            Connection.set_control(spst_pair[0], spst_pair[1])
        
         time.sleep(0.5)
         Connection.on_start()
         time.sleep(0.5)
         Connection.on_stop()
-        time.sleep(0.5)
-        speed, angle = input('Print speed and angle: ').split()
-        Connection.set_control(int(speed), int(angle))
-        # inp = Connection.get_debug_line()
-        # if inp:
-        #     print('I get: {}'.format(inp))
-            
-        #     if String_pars.parsing_(inp) != String_pars.UNKNOWN_LVL:
-        #         print("Logger")
 
-        #     if String_pars.parsing_(inp) != String_pars.INFO_LVL and String_pars.parsing_(inp) != String_pars.NOT_FOUND:
-        #         print("State Pub")
+        # speed, angle = input('Print speed and angle: ').split()
+        # Connection.set_control(int(speed), int(angle))
+        inp = Connection.get_debug_line()
+        if inp:
+            print('I get: {}'.format(inp))
+            
+            if String_pars.parsing_(inp) != String_pars.UNKNOWN_LVL:
+                print("Logger")
+
+            if String_pars.parsing_(inp) != String_pars.INFO_LVL and String_pars.parsing_(inp) != String_pars.NOT_FOUND:
+                print("State Pub")
 
 
 
