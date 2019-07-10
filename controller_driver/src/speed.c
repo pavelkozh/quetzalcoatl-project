@@ -149,26 +149,26 @@ static THD_WORKING_AREA(pid_wa, 256);
         if( (!engine_control_start ) && (!(vehicle_control_start && CBflag)) )
         {
             val = 0;
-            pedalsBrakeRelease(1000);
+            //pedalsBrakeRelease(1000);
         }
 
         pedalsAcceleratorControl ( val ); // move this function to the thread body
 
 
-        /* Acceleration */
-        if ( val > 0 )
-        {
-            pedalsBrakeRelease(1000);
-        }
-        /* Brake */
-        else if ( val < 0 )
-        {
-            pedalsBrakeMove(uint32_map(-val,0,100,0,40000),3000);
-        }
-        else //[if val == 0] do nothing
-        {
-            pedalsBrakeRelease(1000);
-        }
+//        /* Decceleration */
+//        if ( val > 0 )
+//        {
+//            pedalsBrakeRelease(1000);
+//        }
+//        /* Brake */
+//        else if ( val < 0 )
+//        {
+//            pedalsBrakeMove(uint32_map(-val,0,100,0,40000),3000);
+//        }
+//        else //[if val == 0] do nothing
+//        {
+//            pedalsBrakeRelease(1000);
+//        }
 
         if(engine_control_start)    chThdSleepMilliseconds( 20 );
         else                         chThdSleepMilliseconds( 100 );
