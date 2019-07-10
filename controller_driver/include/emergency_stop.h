@@ -6,5 +6,9 @@
  * @brief   Initialize pedals module, interrupt for emergency stop button and create thread for stop process
  */
 void emergencyStopInit( void );
+/*
+ * @brief   Executes full stop WITHOUT swiching off. Can de called from any module
+ */
+void emergencyFullStop (void) ;
 
 #endif  /*INCLUDE_EMERGENCY_STOP_H */
