@@ -23,7 +23,7 @@
 #define     PROGRAM_ROUTINE_TEST_STEER                  5
 
 
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_EMERGENCY_STOP
+#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_MASTER
 
 
 

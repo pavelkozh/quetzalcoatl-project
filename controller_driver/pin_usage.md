@@ -1,4 +1,9 @@
 # Controller periphery usage
+ 
+## NOTE!!!
+1) PE6 do not connected to board
+2) PC11, PC10 do not working when try to pull down    
+
 
 ## Throttle position (DAC)
 Driver | Pins | Input / Output | Description
