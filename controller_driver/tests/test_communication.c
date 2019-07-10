@@ -14,21 +14,28 @@ Obtaining speed and angle values and sending them is processed.
 
 void funct_on_stop(void){
     palToggleLine(LINE_LED1);
+
+    comm_dbgprintf_warning("Warning! I'm stop \n ");
     chThdSleepMilliseconds(200);
 }
 
 void funct_on_start(void){
     palToggleLine(LINE_LED2);
+
+    comm_dbgprintf_error("Oops... Error I'm start\n");
     chThdSleepMilliseconds(200);
 }
 
 void fucnt_on_set(uint8_t speed, uint8_t street)
 {
+
     palToggleLine(LINE_LED3);
+    // chThdSleepMilliseconds(20);
+    comm_dbgprintf_info("I'm get value speed dbg %d, value angle dbg %d\n", speed, street);
     chThdSleepMilliseconds(200);
 }
 
-int main(void)
+void testCommunication(void)
 {
     chSysInit();
     halInit();
@@ -52,7 +59,7 @@ int main(void)
         // value_speed_dbg = comm_get_speed();
         // value_angle_dbg = comm_get_steer();
 
-        // comm_dbgprintf_info("value speed dbg %d, value angle dbg %d\n", value_speed_dbg, value_angle_dbg);
+        // comm_dbgprintf_info("value speed dbg %d, value angle dbg %d\n", 1, 2);
 
         // comm_dbgprintf_warning("Warning!\n");
         // comm_dbgprintf_error("Oops... Error\n");

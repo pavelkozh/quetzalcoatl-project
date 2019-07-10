@@ -15,6 +15,8 @@ PROJECT_MODULES =	src/lld_can.c             \
                     src/MT.c                  \
                     src/MT_control.c          \
                     src/high_speed_control.c  \
+                    src/communication.c       \
+                    src/usbcfg.c              \
 
 
 PROJECT_TESTS   =	tests/test_pedals.c            \
@@ -22,6 +24,7 @@ PROJECT_TESTS   =	tests/test_pedals.c            \
                     tests/test_mt_control.c        \
                     tests/fuzzy_logic_test.c       \
                     test/test_high_speed_control.c \
+                    tests/test_communication.c       \
 
 
 

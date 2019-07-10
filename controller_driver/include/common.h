@@ -25,9 +25,10 @@
 #define     PROGRAM_ROUTINE_TEST_HSC                    7
 #define 	PROGRAM_ROUTINE_TEST_EMERGENCY_STOP			8
 #define     PROGRAM_ROUTINE_TEST_STEER                  9
+#define     PROGRAM_ROUTNE_TEST_COMMUNICATION           10
 
 
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_MASTER
+#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTNE_TEST_COMMUNICATION
 
 
 
