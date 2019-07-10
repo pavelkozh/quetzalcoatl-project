@@ -6,6 +6,9 @@
 #include <MT_control.h>
 #include <feedback.h> 
 #include <pedals.h>
+#include <speed.h>
+#include <steer.h>
+#include <emergency_stop.h>
 
 #include <stdint.h>
 #include <stdlib.h>

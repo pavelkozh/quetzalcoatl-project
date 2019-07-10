@@ -9,6 +9,6 @@ void emergencyStopInit( void );
 /*
  * @brief   Executes full stop WITHOUT swiching off. Can de called from any module
  */
-void emergencyFullStop (void) ;
+bool emergencyFullStop (void) ;
 
 #endif  /*INCLUDE_EMERGENCY_STOP_H */
