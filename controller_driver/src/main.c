@@ -41,14 +41,14 @@ void onStop( void ) {
 static double _speed = 0.0;
 
 static int8_t speed_state = 0 ;
-bool start( void ) {
 
+bool start( void ){
     if(mtControlGetCurrentGearNum() != 1){
+        speed_state = 0;
         if(pedalsClutchGetPosition() <= 90000)
             pedalsClutchPress(1000);
         else{
             mtControlMannualyShiftGear(1);
-            speed_state = 0;
         }
     }else{
         switch(speed_state){
@@ -57,7 +57,7 @@ bool start( void ) {
                     pedalsClutchRelease(1000);
                 else
                     pedalsClutchRelease(15000);
-                if(_speed>1.5)
+                if(gazelGetSpeed()>1.5)
                     speed_state = -1;
                 break;
 
@@ -68,7 +68,7 @@ bool start( void ) {
 
             case -1:
                     pedalsClutchRelease(20000);
-                    if(_speed>4.5)
+                    if(gazelGetSpeed()>4.5)
                         speed_state = 1;
                 break;
             default: break;
@@ -104,21 +104,21 @@ int main(void)
 while(1){
     sdReadTimeout( &SD3, sd_buff, 10, TIME_IMMEDIATE   );
 
-    if(sd_buff[0] == 's') _speed = atoi(&sd_buff[1])/10.0;
+    //if(sd_buff[0] == 's') _speed = atoi(&sd_buff[1])/10.0;
     if(sd_buff[0] == 'a') start_flag = 1;
     if(sd_buff[0] == 'o') start_flag = 0;
-    if(sd_buff[0] == 'q') mtControlMannualyShiftGear(0);
-    if(sd_buff[0] == 'w') mtControlMannualyShiftGear(1);
-    if(sd_buff[0] == 'e') mtControlMannualyShiftGear(2);
+    // if(sd_buff[0] == 'q') mtControlMannualyShiftGear(0);
+    // if(sd_buff[0] == 'w') mtControlMannualyShiftGear(1);
+    // if(sd_buff[0] == 'e') mtControlMannualyShiftGear(2);
     if(start_flag)
         state = start();
     else{
         state = -1;
-        //mtControlMannualyShiftGear(0);
+        mtControlMannualyShiftGear(0);
         pedalsClutchStop();
     }
 
-    chprintf( (BaseSequentialStream *)&SD3,"state:\t%d\tCl_pos:\t%d\tspeed\t%.2f\tgear: %d\n\r",state,pedalsClutchGetPosition(),_speed,mtControlGetCurrentGearNum());
+    chprintf( (BaseSequentialStream *)&SD3,"state:\t%d\tCl_pos:\t%d\tspeed\t%.2f\tgear: %d\n\r",state,pedalsClutchGetPosition(),gazelGetSpeed(),mtControlGetCurrentGearNum());
     for (int i = 0; i < 9; i++)
     {
       sd_buff[i]='?';
