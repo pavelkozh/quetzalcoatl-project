@@ -54,15 +54,15 @@ if __name__ == "__main__":
 
     test_work = True
 
-    def thread_pub():
+    def thread_pub(value):
         pub = MQTTControlPub()
 
         while test_work:
             # print('send')
-            pub.send('Hello!')
+            pub.send(value)
             time.sleep(1)
 
-    Thread(target=thread_pub).start()
+    Thread(target=thread_pub, args=(5,)).start()
 
     sub = MQTTControlSub(on_msg=on_msg)
 
