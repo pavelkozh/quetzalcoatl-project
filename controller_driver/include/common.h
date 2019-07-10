@@ -3,6 +3,7 @@
 
 #include <ch.h>
 #include <hal.h>
+#include <MT.h>
 #include <MT_control.h>
 #include <feedback.h> 
 #include <pedals.h>
