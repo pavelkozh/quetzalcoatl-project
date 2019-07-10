@@ -4,6 +4,7 @@
 #include <speed.h>
 #include <emergency_stop.h>
 
+bool start( void );
 
 static const SerialConfig sdcfg = {
   .speed = 115200,
@@ -12,9 +13,15 @@ static const SerialConfig sdcfg = {
 
 void onSet( float speed, float angle ) {
     if (speed < 1.0 && speed > -1.0) {
-       // emergen
+       speedVehicleControlStop();
+       emergencyFullStop();
     }
-    speedSetVehiclePIDReferenceValue( speed );
+    else if ( gazelGetSpeed() < 1.0 ) {
+        pedalsBrakeRelease( 1000 );
+        while (start() != 1) {};
+        speedSetVehiclePIDReferenceValue( speed );
+    }
+
     //steerSet...
 
 
@@ -34,7 +41,7 @@ void onStop( void ) {
 static double _speed = 0.0;
 
 static int8_t speed_state = 0 ;
-bool start( void ){
+bool start( void ) {
 
     if(mtControlGetCurrentGearNum() != 1){
         if(pedalsClutchGetPosition() <= 90000)
@@ -82,6 +89,8 @@ int main(void)
     feedbackInit();
     pedalsInit();
     mtControlInit();
+    speedInit();
+    emergencyStopInit();
 
     char  sd_buff[10] = {'?','?','?','?','?','?','?','?','?','?'} ;
     bool start_flag = 0;
