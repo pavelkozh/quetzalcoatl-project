@@ -4,4 +4,8 @@
 *.vscode
 *.vscode/*
 **/.DS_Store
+software/__pycache__/*
+software/command.pyc
+
+
 
