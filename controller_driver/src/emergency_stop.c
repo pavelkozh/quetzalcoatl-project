@@ -59,6 +59,7 @@ static THD_FUNCTION(emergency_button_stop, arg) {
                   // zagiganie off!!!
                 }
                   is_breaking_thread_work = false;
+                  is_emergency_stop_btn_pressed = false;
                   chSysLock();
                   chThdSuspendS(&trp_emergency_button_stop);
                   chSysUnlock();
@@ -74,11 +75,13 @@ static THD_FUNCTION(emergency_button_stop, arg) {
  * @brief   Executes full stop WITHOUT swiching off. Can de called from any module
  */
 void emergencyFullStop (void) {
-  is_breaking_thread_work = true;
-  /* Wake up braking thread */
-  chSysLock();
-  chThdResume(&trp_emergency_button_stop, MSG_OK);
-  chSysUnlock();
+  if (is_breaking_thread_work == false) {
+      is_breaking_thread_work = true;
+      /* Wake up braking thread */
+      chSysLock();
+      chThdResume(&trp_emergency_button_stop, MSG_OK);
+      chSysUnlock();
+  }
 }
 
 /*
@@ -92,14 +95,15 @@ void extcb_base(EXTDriver *extp, expchannel_t channel)
     (void)channel;
     /* Set flag */
     //palToggleLine(LINE_LED1);
-    is_emergency_stop_btn_pressed = true;
-    is_breaking_thread_work = true;
-    chprintf( (BaseSequentialStream *)&SD3, "In Interrupt\n\r");
-    /* Wake up braking thread */
-    chSysLock();
-    chThdResume(&trp_emergency_button_stop, MSG_OK);
-    chSysUnlock();
-
+    if (is_breaking_thread_work == false) {
+        is_emergency_stop_btn_pressed = true;
+        is_breaking_thread_work = true;
+        chprintf( (BaseSequentialStream *)&SD3, "In Interrupt\n\r");
+        /* Wake up braking thread */
+        chSysLock();
+        chThdResume(&trp_emergency_button_stop, MSG_OK);
+        chSysUnlock();
+    }
 
 }
 
