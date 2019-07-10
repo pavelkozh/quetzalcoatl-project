@@ -5,6 +5,7 @@
 #include <feedback.h>
 #include <low_speed_control.h>
 #include <chprintf.h>
+#include <pedals.h>
 
 
 static const SerialConfig sdcfg = {

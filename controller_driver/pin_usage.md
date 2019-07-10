@@ -1,4 +1,9 @@
 # Controller periphery usage
+ 
+## NOTE!!!
+1) PE6 do not connected to board
+2) PC11, PC10 do not working when try to pull down    
+
 
 ## Throttle position (DAC)
 Driver | Pins | Input / Output | Description
@@ -47,7 +52,15 @@ EXT1   |PG3   | Input          | horizontal axis left sensor
 EXT1   |PC11  | Input          | vertical   axis upper sensor
 EXT1   |PC12  | Input          | vertical   axis lower sensor   
 
+## Absolute encoder
+Driver | Pins | Input / Output | Description
+-------|------|----------------|----------
+SPI    | PB13 |                | clock
+SPI    | PA2  |                | MISO
+SPI    | PB15 |                | MOSI
+SPI    | PB12 |                | CS
 
-## Steer actuator control unit 
-Driver | Pins | Input / Output
--------|------|-------
+## Emergency stop button
+Driver | Pins | Input / Output | Description
+-------|------|----------------|----------
+EXT1   | PA0  |                | interrupt

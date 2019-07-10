@@ -1,12 +1,35 @@
 #include <common.h>
 #include <tests.h>
 #include <chprintf.h>
+#include <speed.h>
+#include <emergency_stop.h>
 
 
 static const SerialConfig sdcfg = {
   .speed = 115200,
   .cr1 = 0, .cr2 = 0, .cr3 = 0
 };
+
+void onSet( float speed, float angle ) {
+    if (speed < 1.0 && speed > -1.0) {
+       // emergen
+    }
+    speedSetVehiclePIDReferenceValue( speed );
+    //steerSet...
+
+
+}
+
+void onStart( void ) {
+    chprintf( (BaseSequentialStream *)&SD3,"In function onStart\n\r" );
+}
+
+void onStop( void ) {
+    chprintf( (BaseSequentialStream *)&SD3,"In function onStop\n\r" );
+}
+
+
+
 
 static double _speed = 0.0;
 
@@ -51,9 +74,11 @@ int main(void)
 {
     chSysInit();
     halInit();
+
     sdStart( &SD3, &sdcfg );
     palSetPadMode( GPIOD, 8, PAL_MODE_ALTERNATE(7) );   // TX
     palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
+
     feedbackInit();
     pedalsInit();
     mtControlInit();

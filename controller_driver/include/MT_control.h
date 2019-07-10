@@ -4,10 +4,12 @@
 
 #include <common.h>
 
+
 void mtControlInit ( void );
 void mtControlStart ( void );
 void mtControlStop( void );
 int8_t mtControlGetCurrentGearNum (void);
+
 
 
 /* Servis functions*/
