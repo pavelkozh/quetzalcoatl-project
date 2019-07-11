@@ -18,12 +18,22 @@ try:
 
 except:
 	joystick_disabled = True
-	print('except')
+	print('Connect your joystick') 
+	exit()
 
 json_str = None
 pub = command.CommandPub(ip = BROCKER_IP)
+isActive = True
+last_values = (0, 0)
+
+def sender_thread():
+	while isActive:
+		time.sleep(1)
+		pub.send_set(*last_values)
+
+Thread(target=sender_thread).start()
+
 try:
-	isActive = True
 	prev_type_ = None
 	vrt, hrz = 0, 0
 	type_ = None
@@ -59,6 +69,7 @@ try:
 								vrt = -15
 						else:
 							vrt = 0
+					last_values = (vrt, hrz)
 					pub.send_set(vrt, hrz)
 					print('send_enable: vrt = {}, hrz = {}'.format(vrt, hrz))
 

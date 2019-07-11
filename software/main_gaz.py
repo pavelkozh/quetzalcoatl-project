@@ -4,7 +4,7 @@ import time
 import command
 # MAIN for gazel computer
 
-BROCKER_IP = '127.0.0.1'
+BROCKER_IP = '10.139.1.131'
 
 print('start')
 comun = communication.CommunicationOnSerial('/dev/ttyACM0')
