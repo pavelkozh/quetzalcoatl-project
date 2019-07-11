@@ -24,7 +24,7 @@ class CommandParse(object):
 
 class CommandPub(object):
 	def __init__(self, ip='127.0.0.1'):
-		self.pub = mc.MQTTControlPub(ip='127.0.0.1')
+		self.pub = mc.MQTTControlPub(ip)
 	def send_enable(self):
 		json_str = CommandCreate.create(CommandTypes.COMM_ENABLE, None)
 		self.pub.send(json_str)
