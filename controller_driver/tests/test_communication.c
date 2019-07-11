@@ -12,23 +12,24 @@ Obtaining speed and angle values and sending them is processed.
 //     void (*on_stop)(void);
 // } structEventFun_t;
 
-void funct_on_stop(void){
+void funct_on_stop(void)
+{
     palToggleLine(LINE_LED1);
 
     comm_dbgprintf_warning("Warning! I'm stop \n ");
     chThdSleepMilliseconds(200);
 }
 
-void funct_on_start(void){
+void funct_on_start(void)
+{
     palToggleLine(LINE_LED2);
 
     comm_dbgprintf_error("Oops... Error I'm start\n");
     chThdSleepMilliseconds(200);
 }
 
-void fucnt_on_set(uint8_t speed, uint8_t street)
+void fucnt_on_set(comm_speed_t speed, comm_steer_t street)
 {
-
     palToggleLine(LINE_LED3);
     // chThdSleepMilliseconds(20);
     comm_dbgprintf_info("I'm get value speed dbg %d, value angle dbg %d\n", speed, street);
@@ -37,8 +38,8 @@ void fucnt_on_set(uint8_t speed, uint8_t street)
 
 void testCommunication(void)
 {
-    chSysInit();
-    halInit();
+    // chSysInit();
+    // halInit();
 
     // funcEvent_t structForFunc = getDefaultCfg();
     communicationEventFun_t structForFunc = {NULL, NULL, NULL};
@@ -52,18 +53,8 @@ void testCommunication(void)
     comm_speed_t value_speed_dbg = 0;
     comm_steer_t value_angle_dbg = 0;
 
-    
-
     while ( true )
     {   
-        // value_speed_dbg = comm_get_speed();
-        // value_angle_dbg = comm_get_steer();
-
-        // comm_dbgprintf_info("value speed dbg %d, value angle dbg %d\n", 1, 2);
-
-        // comm_dbgprintf_warning("Warning!\n");
-        // comm_dbgprintf_error("Oops... Error\n");
-        // palToggleLine(LINE_LED3);
-        chThdSleepMilliseconds(200);
+        chThdSleepMilliseconds(1000);
     }
 }

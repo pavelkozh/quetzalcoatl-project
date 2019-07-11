@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import serial
 import numpy as np
 import time
@@ -73,8 +75,8 @@ class CommunicationOnSerial(object):
 
             self.__push_msg(pkg)
         else:
-            print('Disable connection')
-            print(self.work_resolution)
+            print('Disabled connection! Activate it first!')
+            # print(self.work_resolution)
 
     def enable_debugging(self):
         """Передача разрешения для отладки."""
@@ -94,14 +96,13 @@ class CommunicationOnSerial(object):
 
 
     def __push_msg(self, pkg):
-        print('Send package: {} / hex: {}'.format(list(pkg), pkg))
+        # print('Send package: {} / hex: {}'.format(list(pkg), pkg))
         self.ser.write(pkg)
 
     def get_debug_line(self):
         """Получения отладочной информации."""
         
         data_2_read = self.ser.inWaiting()
-        
         if data_2_read > 0:
             self.ser_buffer += self.ser.read(data_2_read).decode('ascii')
         
@@ -111,7 +112,7 @@ class CommunicationOnSerial(object):
         if nl_idx >= 0:
             result = self.ser_buffer[:nl_idx]
             self.ser_buffer = self.ser_buffer[nl_idx+1:]
-        
+
         return result
 
 
@@ -137,8 +138,6 @@ class StateMessage(object):
 
     def __init__(self):
         pass
-
-
 
     def parsing_(self, msg):
         """Принимает сообщение приоритет которого необходимо узнать."""
@@ -203,11 +202,10 @@ if __name__ == "__main__":
             print('New speed/steer pair: {}'.format(spst_pair))
             
             Connection.set_control(spst_pair[0], spst_pair[1])
-       
-        time.sleep(0.5)
-        Connection.on_start()
-        time.sleep(0.5)
-        Connection.on_stop()
+
+            print('Send start/stop')
+            Connection.on_start()
+            Connection.on_stop()
 
         # speed, angle = input('Print speed and angle: ').split()
         # Connection.set_control(int(speed), int(angle))

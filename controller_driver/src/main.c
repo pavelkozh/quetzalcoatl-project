@@ -17,7 +17,7 @@
 
 //Start funtcion parameters
 #define FORWARD  1
-#define BACKWARD 6 // так как в функцию mtControlMannualyShiftGear удобнее передавать 6 для включения задней передачи=))
+#define BACKWARD 6 // пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ mtControlMannualyShiftGear пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 6 пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ=))
 
 
 bool start( uint8_t dir );
@@ -123,6 +123,13 @@ int main(void)
     chSysInit();
     halInit();
 
+
+#if (MAIN_PROGRAM_ROUTINE != PROGRAM_ROUTINE_MASTER) // need fixing
+
+    testsRoutines();
+
+#else
+
     sdStart( &SD3, &sdcfg );
     palSetPadMode( GPIOD, 8, PAL_MODE_ALTERNATE(7) );   // TX
     palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
@@ -136,113 +143,105 @@ int main(void)
     char  sd_buff[10] = {'?','?','?','?','?','?','?','?','?','?'} ;
     bool start_flag = 0;
     int8_t state = 0;
-    #if (MAIN_PROGRAM_ROUTINE != PROGRAM_ROUTINE_MASTER) // need fixing
 
-        testsRoutines();
+    while(1){
+        sdReadTimeout( &SD3, sd_buff, 10, TIME_IMMEDIATE   );
 
-    #else
+        if(sd_buff[0] == 's')  onSet( atoi(&sd_buff[1]), 0);
+        if(sd_buff[0] == 'p')  main_state = MAIN_STATE_STOP;
+        if(sd_buff[0] == 'z')  _speed =  atoi(&sd_buff[1]);
 
+    //
+    //    chprintf( (BaseSequentialStream *)&SD3,"state:\t%d\tCl_pos:\t%d\tspeed\t%.2f\tgear: %d\n\r",state,pedalsClutchGetPosition(),gazelGetSpeed(),mtControlGetCurrentGearNum());
+        for (int i = 0; i < 9; i++)
+        {
+        sd_buff[i]='?';
+        }
 
+        switch (arr[speed_sign][speed_ref_sign]) {
+            case 1:
+                main_state = MAIN_STATE_SPEEED_CONTROL;
+                break;
+            case 2:
+                main_state = MAIN_STATE_STOP;
+                break;
+            case 3:
+                main_state = MAIN_STATE_STOP;
+                break;
+            case 4:
+                if( (main_state == MAIN_STATE_START) || (main_state == MAIN_STATE_START_CON))
+                    main_state = MAIN_STATE_START_CON;
+                else
+                    main_state  = MAIN_STATE_START;
+                break;
+            case 5:
+                main_state = MAIN_STATE_STOP;
+                break;
+            case 6:
+                if( (main_state == MAIN_STATE_BACKWARD) || (main_state == MAIN_STATE_BACKWARD_CON))
+                    main_state = MAIN_STATE_BACKWARD_CON;
+                else
+                    main_state  = MAIN_STATE_BACKWARD;
+                break;
+            case 7:
+                main_state = MAIN_STATE_STOP;
+                break;
+            case 8:
+                main_state = MAIN_STATE_STOP;
+                break;
+            case 9:
+                main_state = MAIN_STATE_SPEEED_CONTROL;
+                break;
+            default:
+                break;
+        }
 
-
-while(1){
-    sdReadTimeout( &SD3, sd_buff, 10, TIME_IMMEDIATE   );
-
-    if(sd_buff[0] == 's')  onSet( atoi(&sd_buff[1]), 0);
-    if(sd_buff[0] == 'p')  main_state = MAIN_STATE_STOP;
-    if(sd_buff[0] == 'z')  _speed =  atoi(&sd_buff[1]);
-
-//
-//    chprintf( (BaseSequentialStream *)&SD3,"state:\t%d\tCl_pos:\t%d\tspeed\t%.2f\tgear: %d\n\r",state,pedalsClutchGetPosition(),gazelGetSpeed(),mtControlGetCurrentGearNum());
-    for (int i = 0; i < 9; i++)
-    {
-      sd_buff[i]='?';
-    }
-
-    switch (arr[speed_sign][speed_ref_sign]) {
-        case 1:
-            main_state = MAIN_STATE_SPEEED_CONTROL;
+        switch(main_state){
+        case MAIN_STATE_START:
+            speedVehicleControlStop();
+            statrt_fun_state = 0;
             break;
-        case 2:
-            main_state = MAIN_STATE_STOP;
+        case MAIN_STATE_START_CON:
+            if(start(FORWARD)){
+                speed_sign = 0;
+                main_state = MAIN_STATE_NOP;
+            }
             break;
-        case 3:
-            main_state = MAIN_STATE_STOP;
+
+        case MAIN_STATE_STOP:
+            speedVehicleControlStop();
+            if(emergencyFullStop()){
+                main_state = MAIN_STATE_NOP;
+                speed_sign = 1;
+            }
             break;
-        case 4:
-            if( (main_state == MAIN_STATE_START) || (main_state == MAIN_STATE_START_CON))
-                main_state = MAIN_STATE_START_CON;
-            else
-                main_state  = MAIN_STATE_START;
+
+
+        case MAIN_STATE_SPEEED_CONTROL:
+                speedVehicleControlStart();
+                speedSetVehiclePIDReferenceValue(speed_ref);
             break;
-        case 5:
-            main_state = MAIN_STATE_STOP;
+        case MAIN_STATE_BACKWARD:
+            speedVehicleControlStop();
+            statrt_fun_state = 0;
+            main_state = MAIN_STATE_BACKWARD_CON;
             break;
-        case 6:
-            if( (main_state == MAIN_STATE_BACKWARD) || (main_state == MAIN_STATE_BACKWARD_CON))
-                main_state = MAIN_STATE_BACKWARD_CON;
-            else
-                main_state  = MAIN_STATE_BACKWARD;
-            break;
-        case 7:
-            main_state = MAIN_STATE_STOP;
-            break;
-        case 8:
-            main_state = MAIN_STATE_STOP;
-            break;
-        case 9:
-            main_state = MAIN_STATE_SPEEED_CONTROL;
+        case MAIN_STATE_BACKWARD_CON:
+            if(start(BACKWARD)){
+                speed_sign = 2;
+                main_state = MAIN_STATE_NOP;
+            }
             break;
         default:
             break;
+        }
+
+        chprintf( (BaseSequentialStream *)&SD3, "Main State: %d\t gear_num: %d\t gear_g_pos: %d\t gear_v_pos: %d\t Clutch_pos: %d\t Break_pos: %d\t speed %.02f\t eng_speed %.02f\t \n\r",main_state, mtControlGetCurrentGearNum(), getGorisontalPosition (), getVerticalPosition(), pedalsClutchGetPosition(),pedalsBrakeGetPosition(), gazelGetSpeed(), gazelGetEngineSpeed());
+
+        chThdSleepMilliseconds(100);
     }
 
-    switch(main_state){
-    case MAIN_STATE_START:
-        speedVehicleControlStop();
-        statrt_fun_state = 0;
-        break;
-    case MAIN_STATE_START_CON:
-        if(start(FORWARD)){
-            speed_sign = 0;
-            main_state = MAIN_STATE_NOP;
-        }
-        break;
 
-    case MAIN_STATE_STOP:
-        speedVehicleControlStop();
-        if(emergencyFullStop()){
-            main_state = MAIN_STATE_NOP;
-            speed_sign = 1;
-        }
-        break;
-
-
-    case MAIN_STATE_SPEEED_CONTROL:
-            speedVehicleControlStart();
-            speedSetVehiclePIDReferenceValue(speed_ref);
-        break;
-    case MAIN_STATE_BACKWARD:
-        speedVehicleControlStop();
-        statrt_fun_state = 0;
-        main_state = MAIN_STATE_BACKWARD_CON;
-        break;
-    case MAIN_STATE_BACKWARD_CON:
-        if(start(BACKWARD)){
-            speed_sign = 2;
-            main_state = MAIN_STATE_NOP;
-         }
-        break;
-    default:
-        break;
-    }
-
-    chprintf( (BaseSequentialStream *)&SD3, "Main State: %d\t gear_num: %d\t gear_g_pos: %d\t gear_v_pos: %d\t Clutch_pos: %d\t Break_pos: %d\t speed %.02f\t eng_speed %.02f\t \n\r",main_state, mtControlGetCurrentGearNum(), getGorisontalPosition (), getVerticalPosition(), pedalsClutchGetPosition(),pedalsBrakeGetPosition(), gazelGetSpeed(), gazelGetEngineSpeed());
-
-    chThdSleepMilliseconds(100);
-}
-
-
-    #endif
+#endif
 
 }

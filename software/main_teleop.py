@@ -5,6 +5,7 @@ import time
 import pygame
 # MAIN for gamepad+computer
 BROCKER_IP = '127.0.0.1'
+
 pygame.init()
 joystick_disabled = False
 hrz_value_delay = 0
@@ -69,9 +70,11 @@ try:
 								vrt = -15
 						else:
 							vrt = 0
-					last_values = (vrt, hrz)
-					pub.send_set(vrt, hrz)
-					print('send_enable: vrt = {}, hrz = {}'.format(vrt, hrz))
+
+					if (vrt, hrz) != last_values:
+						last_values = (vrt, hrz)				
+						pub.send_set(vrt, hrz)
+						print('send_enable: vrt = {}, hrz = {}'.format(vrt, hrz))
 
 				if event.type == pygame.JOYBUTTONDOWN:
 					if event.button == 4:

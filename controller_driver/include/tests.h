@@ -20,7 +20,7 @@ void TestSpeed ( void );
 void TestHSC1 ( void );
 void testSteer ( void );
 void testEmergencyStop ( void );
-
+void testCommunication(void);
 
 
 

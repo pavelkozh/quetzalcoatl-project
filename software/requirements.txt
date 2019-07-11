@@ -1,1 +1,4 @@
 paho-mqtt
+pygame
+pyserial
+numpy

@@ -13,7 +13,7 @@ typedef int8_t comm_steer_t;
 
 typedef struct {
 
-    void (*on_set)(uint8_t speed, uint8_t angle);
+    void (*on_set)(comm_speed_t speed, comm_steer_t angle);
     void (*on_start)(void);
     void (*on_stop)(void);
     

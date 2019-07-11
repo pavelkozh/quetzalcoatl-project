@@ -1,5 +1,6 @@
 #include <hal.h>
 #include <ch.h>
+#include <stdio.h>
 #include <chprintf.h>
 #include <errno.h>
 #include <communication.h>
@@ -11,10 +12,6 @@ extern const USBConfig usbcfg;
 extern SerialUSBConfig serusbcfg;
 extern SerialUSBDriver SDU1;
 
-/* Global variables for speed and angle. */
-static comm_speed_t speed_value = 0;
-static comm_steer_t angle_value = 0;
-
 /* Flag to enable\disable debugging. */
 static bool flag_debug = 0;
 
@@ -24,7 +21,6 @@ static BaseChannel *comm_chn = NULL; // The value send.
 static int retrieve_input_data(void);
 
 #define INPUT_SYMB_CMD  '&' // Starting byte for command.
-
 #define INPUT_SYMB_CTL  '#' // Starting byte to get new values.
 
 /* Structure of velocity, angle and checksum values */
@@ -90,7 +86,6 @@ static int retrieve_input_data(void)
     char start_byte = msg;
     if (start_byte == INPUT_SYMB_CTL)
     {
-        
         input_cmd_t inp;
 
         msg = chnRead(comm_chn, (uint8_t *)&inp, sizeof(inp));
@@ -145,17 +140,11 @@ static int retrieve_input_data(void)
         /* Deactivate_connection. */
         if (rcv_buffer[0] == 67 && rcv_buffer[1] == 89 && rcv_buffer[2] == 23)
         {
-            speed_value = 0;
-            angle_value = 0;
-
             return EOK;
         }
         /* Stop_connection. */
         if (rcv_buffer[0] == 34 && rcv_buffer[1] == 63 && rcv_buffer[2] == 129)
         {
-            speed_value = 0;
-            angle_value = 0;
-
             return EOK;
         }
         /* On_start */
@@ -179,14 +168,10 @@ static int retrieve_input_data(void)
 
 /* Initialization with a choice of USB or Serial. */
 void comm_init(communicationEventFun_t structWithFunc)
-{
-    
+{    
     cpStructWithFunc.on_start = structWithFunc.on_start;
     cpStructWithFunc.on_stop = structWithFunc.on_stop;
     cpStructWithFunc.on_set = structWithFunc.on_set;
-
-    
-
 
 #if (COMM_MODE == COMM_MODE_SERIAL_USB)
     sduObjectInit(&SDU1);
@@ -225,10 +210,10 @@ void comm_dbgprintf_info(const char *format, ...)
     if (!debug_stream)
         return;
 
-    if (!flag_debug)
-        return;
+    // if (!flag_debug)
+        // return;
 
-    char buffer[256];
+    char buffer[64];
     sprintf(buffer, "INF: %s", format);
 
     va_list ap;
@@ -246,7 +231,7 @@ void comm_dbgprintf_warning(const char *format, ...)
     if (!flag_debug)
         return;
 
-    char buffer[256];
+    char buffer[64];
     sprintf(buffer, "WARN: %s", format);
 
     va_list ap;
@@ -264,7 +249,7 @@ void comm_dbgprintf_error(const char *format, ...)
     if (!flag_debug)
         return;
 
-    char buffer[256];
+    char buffer[64];
     sprintf(buffer, "ERR: %s", format);
 
     va_list ap;
