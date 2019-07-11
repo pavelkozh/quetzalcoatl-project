@@ -11,10 +11,7 @@
 
 
 /* encoder ticks units 4000 ticks = 1 rev ( or 5mm translational movement) */
-#define CLUTCH_MAX_POS                      100000
-#define BRAKE_MAX_POS                       40000
-#define ACCELERATOR_DAC_MIN_VAL             57.0
-#define ACCELERATOR_DAC_MAX_VAL             240.0
+
 
 
 /* Service callback functions declaration*/
@@ -319,3 +316,26 @@ void pedalsAcceleratorControl ( float accelerator_pedal_pos )
     extDacSetValue( ( uint8_t)( val*0.55 ) , val );
 }
 
+
+
+
+
+/****************************************************************************/
+/**********************  CALIBRATION PEDALS  ********************************/
+/****************************************************************************/
+static bool is_clutch_switch_changed = false;
+void pedalsCalibrate ( void )
+{
+    if ( gazelGetClutchSwitch() ){
+        pedalsClutchRelease(10000);
+    }
+    else{
+        pedalsClutchPress(10000);
+    }
+    if ( gazelGetBrakeSwitch() ){
+        pedalsBrakeRelease(10000);
+    }
+    else{
+        pedalsBrakePress(10000);
+    }
+}

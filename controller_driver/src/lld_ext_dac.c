@@ -49,11 +49,11 @@ void  extDacSetValue( uint8_t valueA, uint8_t valueB){
 	txbuf[0] =(0x01<<8) | valueA;
 	txbuf[1] =(0x24<<8) | valueB;
 
-		spiSelect(EXTERNAL_DAC_SPI_DRIVER);
-		spiSend(EXTERNAL_DAC_SPI_DRIVER, 1, txbuf);
-		spiUnselect(EXTERNAL_DAC_SPI_DRIVER);
-		spiSelect(EXTERNAL_DAC_SPI_DRIVER);
-		spiSend(EXTERNAL_DAC_SPI_DRIVER, 1, txbuf+1);
-		spiUnselect(EXTERNAL_DAC_SPI_DRIVER);
+    spiSelect(EXTERNAL_DAC_SPI_DRIVER);
+    spiSend(EXTERNAL_DAC_SPI_DRIVER, 1, txbuf);
+    spiUnselect(EXTERNAL_DAC_SPI_DRIVER);
+    spiSelect(EXTERNAL_DAC_SPI_DRIVER);
+    spiSend(EXTERNAL_DAC_SPI_DRIVER, 1, txbuf+1);
+    spiUnselect(EXTERNAL_DAC_SPI_DRIVER);
 
 }

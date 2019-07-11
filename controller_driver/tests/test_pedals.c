@@ -2,6 +2,7 @@
 #include <chprintf.h>
 
 #include <pedals.h>
+#include <feedback.h>
 
 
 static const SerialConfig sdcfg = {
@@ -23,6 +24,7 @@ void TestPedals ( void )
 
 
     pedalsInit();
+    feedbackInit();
 
     uint8_t sd_buff[10];
 
@@ -51,7 +53,7 @@ void TestPedals ( void )
         if(sd_buff[5]=='w') pedalsBrakeCalibrate (1, 3000, atoi(sd_buff));
         if(sd_buff[6]=='g') pedalsBrakeChangeSpeed ( atoi(sd_buff) );
 
-        chprintf( (BaseSequentialStream *)&SD3, "ClState %d\t ClMode %d\t ClStatePos %d\t ClSpeed %d\t BrState %d\t BrMode %d\t BrStatePos %d\t BrSpeed %d\t \n\r",pedalsClutchGetState(), pedalsClutchGetMode(), pedalsClutchGetPosition(), pedalsClutchGetSpeed(),pedalsBrakeGetState(), pedalsBrakeGetMode(), pedalsBrakeGetPosition(), pedalsBrakeGetSpeed());
+        chprintf( (BaseSequentialStream *)&SD3, "ClState %d\t ClMode %d\t ClStatePos %d\t ClSpeed %d\t BrState %d\t BrMode %d\t BrStatePos %d\t BrSpeed %d\t \n\r",gazelGetClutchSwitch(), pedalsClutchGetMode(), pedalsClutchGetPosition(), pedalsClutchGetSpeed(),gazelGetBrakeSwitch(), pedalsBrakeGetMode(), pedalsBrakeGetPosition(), pedalsBrakeGetSpeed());
 //        chprintf( (BaseSequentialStream *)&SD3, "BrState %d\t BrMode %d\t BrStatePos %d\t BrSpeed %d\t \n\r",pedalsBrakeGetState(), pedalsBrakeGetMode(), pedalsBrakeGetPosition(), pedalsBrakeGetSpeed());
 
         /* Accelerator pedal test */

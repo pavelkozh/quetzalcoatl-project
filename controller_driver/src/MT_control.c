@@ -144,8 +144,8 @@ void mtControlInit ( void )
 
 
     mtMotorsControlInit ();
-    chThdCreateStatic(gearshift_wa, sizeof(gearshift_wa), NORMALPRIO + 7, gearshift, NULL);
-    chThdCreateStatic(mt_control_wa, sizeof(mt_control_wa), NORMALPRIO + 7, mt_control, NULL);
+    chThdCreateStatic(gearshift_wa, sizeof(gearshift_wa), NORMALPRIO, gearshift, NULL);
+    chThdCreateStatic(mt_control_wa, sizeof(mt_control_wa), NORMALPRIO, mt_control, NULL);
     if_mtControl_module_initialized = 1;
 }
 

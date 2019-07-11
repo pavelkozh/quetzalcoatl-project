@@ -125,6 +125,6 @@ double lowSpeedGetdErr(void){
 void lowSpeedControlIntit(void){
     //Fuzzy logic controller
      fuzzylogicInit();
-     chThdCreateStatic(fl_wa, sizeof(fl_wa), NORMALPRIO + 6, fl, NULL);
+     chThdCreateStatic(fl_wa, sizeof(fl_wa), NORMALPRIO, fl, NULL);
        
 };

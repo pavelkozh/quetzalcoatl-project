@@ -185,14 +185,11 @@ void speedInit(void) {
         return;
     }
 
-
-
     PIDControlInit( &pidCtxV );
     PIDControlInit( &pidCtx );
     chThdCreateStatic(pid_wa, sizeof(pid_wa), NORMALPRIO, pid, NULL);
     pedalsInit();
     if_speed_control_module_initialized = true;
-
 
 }
 

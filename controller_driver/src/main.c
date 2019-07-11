@@ -11,16 +11,14 @@
 #define MAIN_STATE_SPEEED_CONTROL   3
 #define MAIN_STATE_BACKWARD         4
 
-#define MAIN_STATE_START_CON       101
+#define MAIN_STATE_START_CON        101
 #define MAIN_STATE_BACKWARD_CON     104
 
 
 //Start funtcion parameters
-#define FORWARD 1
+#define FORWARD  1
 #define BACKWARD 6 // так как в функцию mtControlMannualyShiftGear удобнее передавать 6 для включения задней передачи=))
 
-
-uint8_t main_state = 0;
 
 bool start( uint8_t dir );
 
@@ -29,9 +27,11 @@ static const SerialConfig sdcfg = {
   .cr1 = 0, .cr2 = 0, .cr3 = 0
 };
 
+static uint8_t main_state = 0;
 static float speed_ref = 0;
 static uint8_t speed_sign = 1;
 static uint8_t speed_ref_sign = 1;
+
 /*
  * Speed direction. Stands for initial state
  * 1 - speed~(-5:5) km/h
@@ -86,18 +86,19 @@ bool start( uint8_t dir ){
             pedalsClutchPress(650);
         else{
             mtControlMannualyShiftGear(dir);
-            pedalsBrakeRelease(1000);
+
         }
     }else{
         switch(statrt_fun_state){
             case 0: 
+                pedalsBrakeRelease(1000);
                 if(pedalsClutchGetPosition()>75000)
                     pedalsClutchRelease(1000);
                 else{
                     pedalsClutchRelease(15000);
 
                 }
-                if(_speed>1.5)//gazelGetSpeed()>1.5)
+                if(gazelGetSpeed()>1.5)
                     statrt_fun_state = -1;
                 break;
 
@@ -108,7 +109,7 @@ bool start( uint8_t dir ){
 
             case -1:
                     pedalsClutchRelease(20000);
-                    if(_speed>4.5)//gazelGetSpeed()>4.5)
+                    if(gazelGetSpeed()>4.5)
                         statrt_fun_state = 1;
                 break;
             default: break;
@@ -236,7 +237,7 @@ while(1){
         break;
     }
 
-    chprintf( (BaseSequentialStream *)&SD3, "Main State: %d gear_num: %d gear_g_pos: %d gear_v_pos: %d Clutch_pos: %d Break_pos: %d \n\r",main_state, mtControlGetCurrentGearNum(), getGorisontalPosition (), getVerticalPosition(), pedalsClutchGetPosition(),pedalsBrakeGetPosition());
+    chprintf( (BaseSequentialStream *)&SD3, "Main State: %d\t gear_num: %d\t gear_g_pos: %d\t gear_v_pos: %d\t Clutch_pos: %d\t Break_pos: %d\t speed %.02f\t eng_speed %.02f\t \n\r",main_state, mtControlGetCurrentGearNum(), getGorisontalPosition (), getVerticalPosition(), pedalsClutchGetPosition(),pedalsBrakeGetPosition(), gazelGetSpeed(), gazelGetEngineSpeed());
 
     chThdSleepMilliseconds(100);
 }

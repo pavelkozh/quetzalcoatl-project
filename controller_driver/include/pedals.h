@@ -5,6 +5,11 @@
 #include <common.h>
 
 
+#define CLUTCH_MAX_POS                      100000
+#define BRAKE_MAX_POS                       40000
+#define ACCELERATOR_DAC_MIN_VAL             57.0
+#define ACCELERATOR_DAC_MAX_VAL             240.0
+
 
 /************COMMON FOR BRAKE AND CLUTCH PEDALS MOTOR CONTROL SETUP *********/
 

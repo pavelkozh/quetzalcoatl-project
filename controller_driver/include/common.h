@@ -28,7 +28,7 @@
 #define     PROGRAM_ROUTNE_TEST_COMMUNICATION           10
 
 
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTNE_TEST_COMMUNICATION
+#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_MASTER
 
 
 

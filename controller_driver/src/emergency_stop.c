@@ -53,7 +53,10 @@ static THD_FUNCTION(emergency_button_stop, arg) {
 //              if ( pedalsBrakeGetState() == false )
 //              {
                   // gear = neutral!
-//                  mtControlMannualyShiftGear(0);
+            while ( mtControlMannualyShiftGear(0) !=0 ){
+                chThdSleepMilliseconds( 50 );
+            }
+
 //                  pedalsClutchRelease(1000);
                   
 
@@ -61,11 +64,11 @@ static THD_FUNCTION(emergency_button_stop, arg) {
 ////                  chprintf( (BaseSequentialStream *)&SD3, "Switch off\n\r");
 //                  // zagiganie off!!!
 //                }
-                  is_breaking_thread_work = false;
-                  is_emergency_stop_btn_pressed = false;
-                  chSysLock();
-                  chThdSuspendS(&trp_emergency_button_stop);
-                  chSysUnlock();
+             is_breaking_thread_work = false;
+             is_emergency_stop_btn_pressed = false;
+             chSysLock();
+             chThdSuspendS(&trp_emergency_button_stop);
+             chSysUnlock();
 //              }
 //            }
         }
@@ -85,7 +88,7 @@ bool emergencyFullStop (void) {
       chThdResume(&trp_emergency_button_stop, MSG_OK);
       chSysUnlock();
   }
-  return is_breaking_thread_work;
+  return (is_breaking_thread_work && (pedalsClutchGetPosition() == CLUTCH_MAX_POS) && (pedalsBrakeGetPosition() == BRAKE_MAX_POS) && (mtControlGetCurrentGearNum()==0));
 }
 
 /*

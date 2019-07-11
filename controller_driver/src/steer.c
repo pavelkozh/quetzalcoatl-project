@@ -26,7 +26,15 @@ static const SPIConfig spicfg = {
     .cr2 = SPI_CR2_DS //16-bit size mode
 };
 
+static bool if_steer_module_initialized = false;
+
 void steerEncInit( void ) {
+    if ( if_steer_module_initialized )
+    {
+        return;
+    }
+
+    /* Absolute encoder SPI init*/
     palSetLineMode( ABS_ENC_CLK_LINE , ABS_ENC_CLK_MODE );        // SPI SCK.
     palSetLineMode( ABS_ENC_MISO_LINE , ABS_ENC_MISO_MODE );    // MISO.
     palSetLineMode( ABS_ENC_MOSI_LINE , ABS_ENC_MOSI_MODE );    // MOSI.
@@ -34,8 +42,13 @@ void steerEncInit( void ) {
     palSetLineMode( ABS_ENC_CS_LINE , ABS_ENC_CS_MODE);        // CS0.
     palSetLine( ABS_ENC_CS_LINE );
 
-    //SPI init
     spiStart(ABS_ENC_SPI_DRIVER, &spicfg);
+
+    /* Steer driver init */
+    //
+    //
+
+    if_steer_module_initialized = true;
 }
 
 
