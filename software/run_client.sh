@@ -1,8 +1,7 @@
 #!/bin/bash
-# echo "GStreamer Logitech C920 Pro HD client"
 
-# echo -n "Provide port to listen (e. g. 6667): "
-# read user_port
+clear
+
 user_port=5000
 
 # echo "Starting stream..."
