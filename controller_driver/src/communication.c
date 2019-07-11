@@ -50,7 +50,7 @@ communicationEventFun_t getDefaultCfg(void)
 
 
 /* Thread for read data */
-static THD_WORKING_AREA(waConnection_action_n, 256);
+static THD_WORKING_AREA(waConnection_action_n, 1024);
 static THD_FUNCTION(Connection_action_n, arg)
 {
     arg = arg;

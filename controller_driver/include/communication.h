@@ -22,6 +22,10 @@ typedef struct {
 
 void comm_init(communicationEventFun_t structWithFunc);
 void comm_dbgprintf( const char* format, ... );
+void comm_dbgprintf_error(const char *format, ...);
+void comm_dbgprintf_warning(const char *format, ...);
+void comm_dbgprintf_info(const char *format, ...);
+
 communicationEventFun_t getDefaultCfg(void);
 comm_speed_t comm_get_speed( void );
 comm_steer_t comm_get_steer( void );

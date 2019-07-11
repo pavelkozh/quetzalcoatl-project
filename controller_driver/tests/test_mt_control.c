@@ -27,7 +27,7 @@ void TestMTControl ( void )
 
 
     mtControlInit ();
-    feedbackInit();
+    //feedbackInit();
     speedInit();
 
     uint8_t sd_buff[10];
@@ -35,6 +35,8 @@ void TestMTControl ( void )
     int8_t current_gear = -1;
 
     while(1) {
+
+        palToggleLine(LINE_LED1);
 
         sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
 
@@ -48,6 +50,10 @@ void TestMTControl ( void )
 
         if(sd_buff[0]=='d') speedVehicleControlStop();
         if(sd_buff[0]=='z') speedEngineControlStop();
+
+
+
+        chprintf( (BaseSequentialStream *)&SD3, " gear_num: %d gear_g_pos: %d gear_v_pos: %d v__target_pos: %d g__target_pos %d \n\r",mtControlGetCurrentGearNum(), getGorisontalPosition (), getVerticalPosition(), getVerticalTargetPosition (), getGorisontalTargetPosition());
 
 
 

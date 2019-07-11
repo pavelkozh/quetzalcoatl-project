@@ -13,7 +13,7 @@ void risingEdgeMTGorisontalCallback(PWMDriver *pwmd);
 void fallingEdgeMTGorisontalCallback(PWMDriver *pwmd);
 
 
-MotorDriver m_vertical = {
+static MotorDriver m_vertical = {
                           .pwmd              = &PWMD14,
                           .dir_line          = PAL_LINE (GPIOE, 3 ),
                           .rising_edge_cb    = risingEdgeMTGorisontalCallback,
@@ -34,7 +34,7 @@ void fallingEdgeMTVerticalCallback(PWMDriver *pwmd)
 }
 
 
-MotorDriver m_gorisontal = {
+static MotorDriver m_gorisontal = {
                               .pwmd              = &PWMD11,
                               .dir_line          = PAL_LINE (GPIOG, 1 ),
                               .rising_edge_cb    = risingEdgeMTVerticalCallback,
@@ -67,7 +67,9 @@ static bool if_mt_motors_control_module_initialized = 0;
 void mtMotorsControlInit ( void )
 {
     if ( if_mt_motors_control_module_initialized )
+    {
         return;
+    }
 
     /*Motor driver Setting */
     palSetLineMode( PAL_LINE( GPIOF, 7),  PAL_MODE_ALTERNATE(3) );
