@@ -30,7 +30,8 @@ void TestEngIgnition ( void )
         sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
 
 
-        //if(sd_buff[0]=='c') { pedalsClutchStop(); pedalsBrakeStop(); }
+        if(sd_buff[0]=='a') engIgnitionSwitchOn ();
+        if(sd_buff[0]=='s') engIgnitionSwitchOff();
 
 
 

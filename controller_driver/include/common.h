@@ -30,7 +30,7 @@
 
 
 
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_MASTER
+#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_ENGINE_IGNITION
 
 
 

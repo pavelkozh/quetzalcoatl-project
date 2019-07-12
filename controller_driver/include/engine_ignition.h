@@ -4,7 +4,7 @@
 #include <common.h>
 
 void engIgnitionInit ( void );
-void engIgnitionSwitchOn ( void );
+bool engIgnitionSwitchOn ( void );
 void engIgnitionSwitchOff ( void );
 
 

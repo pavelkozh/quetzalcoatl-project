@@ -78,7 +78,7 @@ void onStop( void ) {
 
 
 static int8_t statrt_fun_state = 0 ;
-static int16_t _speed = 0;
+//static int16_t _speed = 0;
 bool start( uint8_t dir ){
     if(mtControlGetCurrentGearNum() != dir){
         statrt_fun_state = 0;
