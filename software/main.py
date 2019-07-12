@@ -23,7 +23,7 @@ json_str = command.CommandCreate.create(type_, value)
 # Parse command from gamepad
 comun = communication.CommunicationOnSerial('/dev/ttyACM0')
 dictionary = command.CommandParse.parse(json_str)
-
+print(dictionary)
 if dictionary['type'] == command.CommandTypes.COMM_ENABLE:
 	comun.activate_connection()
 	print("COMM_ENABLE")

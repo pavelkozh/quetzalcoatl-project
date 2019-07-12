@@ -32,7 +32,7 @@ class Listener(object):
     def __init__(self, ip):
         self.l_client = mqtt.Client()
 
-        self.l_client.connect(host=ip, port=1355)
+        self.l_client.connect(host=ip, port=1883)
 
         topic = 'teleops'
         self.l_client.on_message = on_message

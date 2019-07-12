@@ -47,7 +47,7 @@ class Talker(object):
 
     def __init__(self, ip):
         self.t_client = mqtt.Client()
-        self.t_client.connect(host=ip, port=1355)
+        self.t_client.connect(host=ip, port=1883)
         self.vel = 0
         self.turn = 0
         self.stop = 0
