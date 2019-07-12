@@ -1,7 +1,7 @@
 import communication
-import mqtt_comm as mc
 import time
 import command
+
 # MAIN for gazel computer
 
 BROCKER_IP = '127.0.0.1'

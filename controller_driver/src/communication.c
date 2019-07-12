@@ -30,12 +30,6 @@ typedef struct {
     uint8_t ck;
 } input_cmd_t;
 
-// typedef struct {
-//     void (*on_set)(uint8_t speed, uint8_t angle);
-//     void (*on_start)(void);
-//     void (*on_stop)(void);
-// } structEventFun_t;
-
 communicationEventFun_t cpStructWithFunc;
 
 communicationEventFun_t getDefaultCfg(void)
@@ -77,7 +71,9 @@ static int retrieve_input_data(void)
 #if (COMM_MODE == COMM_MODE_SERIAL_USB)
         /* Q_RESET is returned in case of USB, when it is suddenly plugged out */
         if ( msg == Q_RESET )
-            palToggleLine(LINE_LED2);
+        {
+            
+        }
 #endif
 
         return ENODATA;
@@ -99,12 +95,8 @@ static int retrieve_input_data(void)
         uint8_t calc_ck = inp.speed + inp.steer * 2;
         if (calc_ck == inp.ck)
         {   
-            
-            cpStructWithFunc.on_set(inp.speed, inp.steer);
-            
-            /* Assigning global variables to a value from a received data packet. */
-            // speed_value = inp.speed;
-            // angle_value = inp.steer;
+            if (cpStructWithFunc.on_set)
+                cpStructWithFunc.on_set(inp.speed, inp.steer);
 
             return EOK;
         }
@@ -150,14 +142,17 @@ static int retrieve_input_data(void)
         /* On_start */
         if (rcv_buffer[0] == 25 && rcv_buffer[1] == 45 && rcv_buffer[2] == 65)
         {
-            cpStructWithFunc.on_start();
+            if (cpStructWithFunc.on_start) 
+                cpStructWithFunc.on_start();
+            
             return EOK;
         }
         
         /* On_stop */
         if (rcv_buffer[0] == 13 && rcv_buffer[1] == 26 && rcv_buffer[2] == 39)
         {
-            cpStructWithFunc.on_stop();
+            if (cpStructWithFunc.on_stop)
+                cpStructWithFunc.on_stop();
 
             return EOK;
         }
@@ -169,9 +164,7 @@ static int retrieve_input_data(void)
 /* Initialization with a choice of USB or Serial. */
 void comm_init(communicationEventFun_t structWithFunc)
 {    
-    cpStructWithFunc.on_start = structWithFunc.on_start;
-    cpStructWithFunc.on_stop = structWithFunc.on_stop;
-    cpStructWithFunc.on_set = structWithFunc.on_set;
+    cpStructWithFunc = structWithFunc;
 
 #if (COMM_MODE == COMM_MODE_SERIAL_USB)
     sduObjectInit(&SDU1);

@@ -23,9 +23,6 @@ void testEmergencyStop ( void );
 void testCommunication(void);
 
 
-
-
-
 static inline void testsRoutines( void )
 {
 	
@@ -47,14 +44,11 @@ static inline void testsRoutines( void )
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_EMERGENCY_STOP)
     testEmergencyStop();
 
-
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_FUZZY_LOGIC)
-TestFLRouting();
+    TestFLRouting();
 
-#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTNE_TEST_COMMUNICATION)
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_COMMUNICATION)
     testCommunication();
-
-
 
 #endif
 
