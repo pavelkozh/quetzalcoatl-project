@@ -104,7 +104,7 @@ class CommunicationOnSerial(object):
         # print('Send package: {} / hex: {}'.format(list(pkg), pkg))
         self.ser.write(pkg)
 
-    def get_debug_line(self):
+    def get_state_msg(self):
         """Получения отладочной информации."""
 
         data_2_read = self.ser.inWaiting()
@@ -115,7 +115,7 @@ class CommunicationOnSerial(object):
         result = None
 
         if nl_idx >= 0:
-            result = self.ser_buffer[:nl_idx]
+            result = StateMessage(self.ser_buffer[:nl_idx])
             self.ser_buffer = self.ser_buffer[nl_idx+1:]
 
         return result
@@ -133,31 +133,32 @@ class StateMessage(object):
     "Error" - сообщение об ошибки.
     """
 
-    UNKNOWN_LVL = ('0', "UNKNOWN ERROR")
+    UNKNOWN_LVL = 0
+    INFO_LVL = 1
+    WARNING_LVL = 2
+    ERROR_LVL = 3
 
-    INFO_LVL = ("Information", "INF: ")
-    WARNING_LVL = ("Warning", "WARN: ")
-    ERROR_LVL = ("Error", "ERR: ")
+    _INFO_LVL_STR = "INF: "
+    _WARNING_LVL_STR = "WARN: "
+    _ERROR_LVL_STR = "ERR: "
 
-    NOT_FOUND = -1
+    def __init__(self, raw_msg):
+        NOT_FOUND = -1
+        print(raw_msg)
+        if self._INFO_LVL_STR in raw_msg:
+            self.lvl, self.msg = self.INFO_LVL, raw_msg[len(
+                self._INFO_LVL_STR):]
 
-    def __init__(self):
-        pass
+        elif self._WARNING_LVL_STR in raw_msg:
+            self.lvl, self.msg = self.WARNING_LVL, raw_msg[len(
+                self._WARNING_LVL_STR):]
 
-    def parsing_(self, msg):
-        """Принимает сообщение приоритет которого необходимо узнать."""
-
-        if msg.find(self.INFO_LVL[1]) != self.NOT_FOUND:
-            return self.INFO_LVL
-
-        elif msg.find(self.WARNING_LVL[1]) != self.NOT_FOUND:
-            return self.WARNING_LVL[0], msg[len(self.WARNING_LVL[1]):]
-
-        elif msg.find(self.ERROR_LVL[1]) != self.NOT_FOUND:
-            return self.ERROR_LVL
+        elif self._ERROR_LVL_STR in raw_msg:
+            self.lvl, self.msg = self.ERROR_LVL, raw_msg[len(
+                self._ERROR_LVL_STR):]
 
         else:
-            return self.UNKNOWN_LVL
+            self.lvl, self.msg = self.UNKNOWN_LVL, raw_msg
 
 
 # Для теста предлагается в скрипте выделить часть "main" и в ней
@@ -181,9 +182,6 @@ if __name__ == "__main__":
 
     # Создание объекта и передача полученного аргумента из консоли.
     Connection = CommunicationOnSerial(args.device)
-
-    # Создание объекта для определения типа сообщения.
-    String_pars = StateMessage()
 
     print('Set connection activated')
     Connection.activate_connection()
@@ -214,12 +212,13 @@ if __name__ == "__main__":
 
         # speed, angle = input('Print speed and angle: ').split()
         # Connection.set_control(int(speed), int(angle))
-        inp = Connection.get_debug_line()
+        inp = Connection.get_state_msg()
         if inp:
-            print('I get: {}'.format(inp))
+            print('I get: {} ({})'.format(inp.msg, inp.lvl))
 
-            if String_pars.parsing_(inp) != String_pars.UNKNOWN_LVL:
+            if inp.lvl != StateMessage.UNKNOWN_LVL:
                 print("Logger")
 
-            if String_pars.parsing_(inp) != String_pars.INFO_LVL and String_pars.parsing_(inp) != String_pars.NOT_FOUND:
+            if inp.lvl != StateMessage.INFO_LVL and \
+                    inp.lvl != StateMessage.UNKNOWN_LVL:
                 print("State Pub")
