@@ -26,7 +26,7 @@ MotorDriver ClutchM = {
     .dir_line        =   PAL_LINE(GPIOB, 8),
     .rising_edge_cb  =   risingEdgeClutchMCallback,
     .falling_edge_cb =   fallingEdgeClutchMCallback,
-    .max_position    =   CLUTCH_MAX_POS,
+    .max_position    =   100000,
     .min_position     =  0
 };
 void risingEdgeClutchMCallback(PWMDriver *pwmd){
@@ -47,7 +47,7 @@ MotorDriver BreakM = {
     .dir_line        =   PAL_LINE(GPIOD, 11),
     .rising_edge_cb  =   risingEdgeBreakMCallback,
     .falling_edge_cb =   fallingEdgeBreakMCallback,
-    .max_position    =   BRAKE_MAX_POS,
+    .max_position    =   40000,
     .min_position     =  0
 };
 
@@ -191,6 +191,16 @@ uint8_t pedalsClutchGetMode ( void ){
 uint16_t pedalsClutchGetSpeed ( void ){
     return  ClutchM.pwmd->period;
 }
+
+int32_t pedalsClutchGetMaxPosition ( void )
+{
+    return ClutchM.max_position;
+}
+
+int32_t pedalsClutchGetMinPosition ( void )
+{
+    return ClutchM.min_position;
+}
 /*******************************/
 
 
@@ -298,7 +308,15 @@ uint16_t pedalsBrakeGetSpeed ( void ){
     return  BreakM.pwmd->period;
 }
 
+int32_t pedalsBrakeGetMaxPosition ( void )
+{
+    return BreakM.max_position;
+}
 
+int32_t pedalsBrakeGetMinPosition ( void )
+{
+    return BreakM.min_position;
+}
 
 /****************************************************************************/
 /****************  ACCELERATOR PEDAL MOTOR CONTROL **************************/

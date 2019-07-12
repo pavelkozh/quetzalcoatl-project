@@ -5,8 +5,7 @@
 #include <common.h>
 
 
-#define CLUTCH_MAX_POS                      100000
-#define BRAKE_MAX_POS                       40000
+
 #define ACCELERATOR_DAC_MIN_VAL             57.0
 #define ACCELERATOR_DAC_MAX_VAL             240.0
 
@@ -100,6 +99,25 @@ uint8_t pedalsClutchGetMode ( void );
  */
 uint16_t pedalsClutchGetSpeed ( void );
 
+/*
+ * @brief        This function return brake maximum possible position (encoder ticks)
+ *               It's a saturation value, which directly sets in clutch structure parameters
+ *
+ * @return       value, which corresponds to fully pressed pedal
+ *               (encoder ticks units: 1 rev = 4000 ticks)
+ *               ( 0.0 corresponds to fully released pedal)
+ */
+int32_t pedalsClutchGetMaxPosition ( void );
+
+/*
+ * @brief        This function return brake minimum possible position (encoder ticks)
+ *               It's a saturation value, which directly sets in clutch structure parameters
+ *
+ * @return       value, which corresponds to fully released pedal
+ *               (encoder ticks units: 1 rev = 4000 ticks)
+ */
+int32_t pedalsClutchGetMinPosition ( void );
+
 
 /*********************** BRAKE PEDAL MOTOR CONTROL **************************/
 
@@ -187,7 +205,24 @@ uint8_t pedalsBrakeGetMode ( void );
  */
 uint16_t pedalsBrakeGetSpeed ( void );
 
+/*
+ * @brief        This function return brake maximum possible position (encoder ticks)
+ *               It's a saturation value, which directly sets in brake structure parameters
+ *
+ * @return       value, which corresponds to fully pressed pedal
+ *               (encoder ticks units: 1 rev = 4000 ticks)
+ *               ( 0.0 corresponds to fully released pedal)
+ */
+int32_t pedalsBrakeGetMaxPosition ( void );
 
+/*
+ * @brief        This function return brake minimum possible position (encoder ticks)
+ *               It's a saturation value, which directly sets in brake structure parameters
+ *
+ * @return       value, which corresponds to fully released pedal
+ *               (encoder ticks units: 1 rev = 4000 ticks)
+ */
+int32_t pedalsBrakeGetMinPosition ( void );
 
 /****************  ACCELERATOR PEDAL MOTOR CONTROL **************************/
 

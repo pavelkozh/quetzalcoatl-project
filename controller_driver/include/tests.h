@@ -4,14 +4,13 @@
 #include <common.h>
 
 
-/* @brief test fuzzy_logic
-* 
+/*
+* @brief test fuzzy_logic
 */
 void TestFLRouting(void);
 
-
 /* 
-* @brief test px3flow sensore
+* @brief test px3flow sensor
 */
 void PX4FLOWTest(void);
 void TestPedals ( void );
@@ -20,6 +19,7 @@ void TestSpeed ( void );
 void TestHSC1 ( void );
 void testSteer ( void );
 void testEmergencyStop ( void );
+void TestEngIgnition ( void );
 void testCommunication(void);
 
 
@@ -47,8 +47,12 @@ static inline void testsRoutines( void )
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_FUZZY_LOGIC)
     TestFLRouting();
 
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ENGINE_IGNITION)
+    TestEngIgnition();
+
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_COMMUNICATION)
     testCommunication();
+
 
 #endif
 

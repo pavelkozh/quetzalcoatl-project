@@ -32,7 +32,7 @@ void TestMTControl ( void )
 
     uint8_t sd_buff[10];
     /* no gear */
-    int8_t current_gear = -1;
+    //int8_t current_gear = -1;
 
     while(1) {
 
@@ -41,7 +41,7 @@ void TestMTControl ( void )
         sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
 
 
-        if(sd_buff[1]=='g') current_gear = mtControlMannualyShiftGear( (uint8_t)atoi(sd_buff) );
+        if(sd_buff[1]=='g') mtControlMannualyShiftGear( (uint8_t)atoi(sd_buff) );
 //        if(sd_buff[0]=='y') mtControlStart();
 //        if(sd_buff[0]=='h') mtControlStop();
 //

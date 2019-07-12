@@ -17,7 +17,7 @@
 
 //Start funtcion parameters
 #define FORWARD  1
-#define BACKWARD 6 // ��� ��� � ������� mtControlMannualyShiftGear ������� ���������� 6 ��� ��������� ������ ��������=))
+#define BACKWARD 6 // 6 gear means backward
 
 
 bool start( uint8_t dir );
@@ -78,7 +78,7 @@ void onStop( void ) {
 
 
 static int8_t statrt_fun_state = 0 ;
-static int16_t _speed = 0;
+//static int16_t _speed = 0;
 bool start( uint8_t dir ){
     if(mtControlGetCurrentGearNum() != dir){
         statrt_fun_state = 0;

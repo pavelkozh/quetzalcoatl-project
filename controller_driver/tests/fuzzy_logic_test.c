@@ -30,7 +30,7 @@ void TestFLRouting ( void )
     lowSpeedControlIntit();
     feedbackInit();
     pedalsInit();
-    speedPIDInit();
+    speedInit();
 
 
     uint32_t CPSpeed = 5000;

@@ -195,6 +195,15 @@ int32_t getGorisontalMaxPosition ( void )
     return m_gorisontal.max_position;
 }
 
+int32_t getVerticalMinPosition ( void )
+{
+    return m_vertical.min_position;
+}
+
+int32_t getGorisontalMinPosition ( void )
+{
+    return m_gorisontal.min_position;
+}
 
 int32_t getVerticalTargetPosition ( void )
 {
