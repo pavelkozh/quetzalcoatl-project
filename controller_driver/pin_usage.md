@@ -64,3 +64,11 @@ SPI    | PB12 |                | CS
 Driver | Pins | Input / Output | Description
 -------|------|----------------|----------
 EXT1   | PA0  |                | interrupt
+
+## Engine Ignition control
+Driver | Pins | Input / Output | Description
+-------|------|----------------|----------
+PAL    | PF12 |   Output       | Ignition
+PAL    | PF13 |   Output       | Starter
+
+

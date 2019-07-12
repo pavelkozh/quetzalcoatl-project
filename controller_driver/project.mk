@@ -1,29 +1,31 @@
 
 
 PROJECT_MODULES =	src/lld_can.c             \
-			     src/lld_ext_dac.c         \
-				src/lld_control.c         \
-				src/lld_px4flow.c         \
+			        src/lld_ext_dac.c         \
+				    src/lld_control.c         \
+				    src/lld_px4flow.c         \
                     src/feedback.c            \
                     src/pedals.c              \
-				src/fuzzy_logic.c         \
-				src/low_speed_control.c   \
+				    src/fuzzy_logic.c         \
+				    src/low_speed_control.c   \
                     src/pid.c                 \
                     src/speed.c               \
                     src/steer.c               \
                     src/emergency_stop.c      \
                     src/MT.c                  \
                     src/MT_control.c          \
+                    src/engine_ignition.c     \
                     src/high_speed_control.c  \
                     src/communication.c       \
                     src/usbcfg.c              \
 
 
-PROJECT_TESTS   =	tests/test_pedals.c            \
-                    tests/test_speed.c             \
-                    tests/test_mt_control.c        \
-                    tests/fuzzy_logic_test.c       \
-                    test/test_high_speed_control.c \
+PROJECT_TESTS   =	tests/test_pedals.c              \
+                    tests/test_speed.c               \
+                    tests/test_mt_control.c          \
+                    tests/fuzzy_logic_test.c         \
+                    tests/test_engine_ignition.c     \
+                    tests/test_high_speed_control.c  \
                     tests/test_communication.c       \
 
 

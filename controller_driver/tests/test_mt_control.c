@@ -32,7 +32,7 @@ void TestMTControl ( void )
 
     uint8_t sd_buff[10];
     /* no gear */
-    int8_t current_gear = -1;
+    //int8_t current_gear = -1;
 
     while(1) {
 

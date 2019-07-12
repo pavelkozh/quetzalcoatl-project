@@ -1,9 +1,9 @@
 #include <emergency_stop.h>
 #include <MT_control.h>
 #include <pedals.h>
-#include <chprintf.h>
 
-#define EMERGENCY_STOP_LINE PAL_LINE( GPIOA, 0 )
+
+#define EMERGENCY_STOP_LINE       PAL_LINE( GPIOA, 0 )
 
 
 static thread_reference_t trp_emergency_button_stop = NULL;
@@ -88,7 +88,7 @@ bool emergencyFullStop (void) {
       chThdResume(&trp_emergency_button_stop, MSG_OK);
       chSysUnlock();
   }
-  return (is_breaking_thread_work && (pedalsClutchGetPosition() == CLUTCH_MAX_POS) && (pedalsBrakeGetPosition() == BRAKE_MAX_POS) && (mtControlGetCurrentGearNum()==0));
+  return (is_breaking_thread_work && (pedalsClutchGetPosition() == pedalsClutchGetMaxPosition()) && (pedalsBrakeGetPosition() == pedalsBrakeGetMaxPosition()) && (mtControlGetCurrentGearNum()==0));
 }
 
 /*
@@ -123,9 +123,9 @@ void emergencyStopInit( void ) {
 
 	if ( isInitialized )
 		return;
-    palSetPadMode( GPIOB, 7, PAL_MODE_OUTPUT_PUSHPULL );    //Led
-    palSetPadMode( GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL );    //Led
-    palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
+//    palSetPadMode( GPIOB, 7, PAL_MODE_OUTPUT_PUSHPULL );    //Led
+//    palSetPadMode( GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL );    //Led
+//    palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
 
     pedalsInit();
     mtControlInit();

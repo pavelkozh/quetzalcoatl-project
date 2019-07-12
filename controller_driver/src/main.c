@@ -17,7 +17,7 @@
 
 //Start funtcion parameters
 #define FORWARD  1
-#define BACKWARD 6 // ��� ��� � ������� mtControlMannualyShiftGear ������� ���������� 6 ��� ��������� ������ ��������=))
+#define BACKWARD 6 // 6 gear means backward
 
 
 bool start( uint8_t dir );
