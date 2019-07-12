@@ -6,52 +6,33 @@
 Obtaining speed and angle values and sending them is processed.
 */
 
-// typedef struct {
-//     void (*on_set)(uint8_t speed, uint8_t angle);
-//     void (*on_start)(void);
-//     void (*on_stop)(void);
-// } structEventFun_t;
-
 void funct_on_stop(void)
 {
     palToggleLine(LINE_LED1);
-
     comm_dbgprintf_warning("Warning! I'm stop \n ");
-    chThdSleepMilliseconds(200);
 }
 
 void funct_on_start(void)
 {
     palToggleLine(LINE_LED2);
-
     comm_dbgprintf_error("Oops... Error I'm start\n");
-    chThdSleepMilliseconds(200);
 }
 
 void fucnt_on_set(comm_speed_t speed, comm_steer_t street)
 {
     palToggleLine(LINE_LED3);
-    // chThdSleepMilliseconds(20);
     comm_dbgprintf_info("I'm get value speed dbg %d, value angle dbg %d\n", speed, street);
-    chThdSleepMilliseconds(200);
 }
 
 void testCommunication(void)
 {
-    // chSysInit();
-    // halInit();
-
-    // funcEvent_t structForFunc = getDefaultCfg();
-    communicationEventFun_t structForFunc = {NULL, NULL, NULL};
+    communicationEventFun_t structForFunc = getDefaultCfg();
  
-    structForFunc.on_set = &fucnt_on_set;
-    structForFunc.on_start =&funct_on_start;
-    structForFunc.on_stop =&funct_on_stop;
+    structForFunc.on_set    = fucnt_on_set;
+    structForFunc.on_start  = funct_on_start;
+    structForFunc.on_stop   = funct_on_stop;
     
     comm_init(structForFunc);
-
-    comm_speed_t value_speed_dbg = 0;
-    comm_steer_t value_angle_dbg = 0;
 
     while ( true )
     {   
