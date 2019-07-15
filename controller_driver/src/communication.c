@@ -7,7 +7,7 @@
 
 #define EOK 0
 
-static int16_t vt_usb_check_period_MS = 10000;
+static uint32_t vt_usb_check_period_MS = 10000;
 /* USB configuration values ​​from usbcfg.c file */
 extern const USBConfig usbcfg;
 extern SerialUSBConfig serusbcfg;
@@ -190,14 +190,14 @@ void usb_is_alive(void)
     }
 
 /* Initialization with a choice of USB or Serial. */
-void comm_init(communicationEventFun_t structWithFunc, int16_t time_for_virtual_timer_MS)
+void comm_init(communicationEventFun_t structWithFunc, uint32_t timeout_MS)
 {    
     cpStructWithFunc = structWithFunc;
 
-    vt_usb_check_period_MS = time_for_virtual_timer_MS;
+    vt_usb_check_period_MS = timeout_MS;
 
     chVTObjectInit(&usb_check_vt);
-    usb_is_alive();
+
 
 #if (COMM_MODE == COMM_MODE_SERIAL_USB)
     sduObjectInit(&SDU1);

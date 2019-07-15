@@ -20,7 +20,7 @@ typedef struct {
     
 } communicationEventFun_t;
 
-void comm_init(communicationEventFun_t structWithFunc, int16_t time_for_virtual_timer_MS);
+void comm_init(communicationEventFun_t structWithFunc, uint32_t timeout_MS);
 void comm_dbgprintf( const char* format, ... );
 void comm_dbgprintf_error(const char *format, ...);
 void comm_dbgprintf_warning(const char *format, ...);
