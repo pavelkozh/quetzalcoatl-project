@@ -7,13 +7,14 @@
 
 #define EOK 0
 
+static int16_t vt_usb_check_period_MS = 10000;
 /* USB configuration values ​​from usbcfg.c file */
 extern const USBConfig usbcfg;
 extern SerialUSBConfig serusbcfg;
 extern SerialUSBDriver SDU1;
 
 /* Flag to enable\disable debugging. */
-static bool flag_debug = 0;
+static bool flag_debug = 1;
 
 static BaseSequentialStream *debug_stream = NULL; // The value read.
 static BaseChannel *comm_chn = NULL; // The value send.
@@ -30,11 +31,13 @@ typedef struct {
     uint8_t ck;
 } input_cmd_t;
 
+virtual_timer_t usb_check_vt;
+
 communicationEventFun_t cpStructWithFunc;
 
 communicationEventFun_t getDefaultCfg(void)
 {
-    communicationEventFun_t structFuncNull = {NULL, NULL, NULL};
+    communicationEventFun_t structFuncNull = {NULL, NULL, NULL, NULL};
     return  structFuncNull;
 }
 
@@ -161,10 +164,30 @@ static int retrieve_input_data(void)
     return ENODATA;
 }
 
+void usb_is_dead(void)
+{
+
+
+    if(cpStructWithFunc.on_interrupt_timer)
+        cpStructWithFunc.on_interrupt_timer();
+
+    chVTSetI( &usb_check_vt, MS2ST( vt_usb_check_period_MS ), usb_is_dead, NULL );
+}
+
+void usb_is_alive(void)
+    {
+        chVTSet( &usb_check_vt, MS2ST( vt_usb_check_period_MS ), usb_is_dead, NULL );
+    }
+
 /* Initialization with a choice of USB or Serial. */
-void comm_init(communicationEventFun_t structWithFunc)
+void comm_init(communicationEventFun_t structWithFunc, int16_t time_for_virtual_timer_MS)
 {    
     cpStructWithFunc = structWithFunc;
+
+    vt_usb_check_period_MS = time_for_virtual_timer_MS;
+
+    chVTObjectInit(&usb_check_vt);
+    usb_is_alive();
 
 #if (COMM_MODE == COMM_MODE_SERIAL_USB)
     sduObjectInit(&SDU1);

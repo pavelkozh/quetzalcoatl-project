@@ -16,11 +16,11 @@ typedef struct {
     void (*on_set)(comm_speed_t speed, comm_steer_t angle);
     void (*on_start)(void);
     void (*on_stop)(void);
+    void (*on_interrupt_timer)(void);
     
-
 } communicationEventFun_t;
 
-void comm_init(communicationEventFun_t structWithFunc);
+void comm_init(communicationEventFun_t structWithFunc, int16_t time_for_virtual_timer_MS);
 void comm_dbgprintf( const char* format, ... );
 void comm_dbgprintf_error(const char *format, ...);
 void comm_dbgprintf_warning(const char *format, ...);
