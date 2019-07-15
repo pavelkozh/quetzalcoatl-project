@@ -42,7 +42,7 @@ void testCommunication(void)
     structForFunc.on_stop   = funct_on_stop;
     structForFunc.on_interrupt_timer = funct_on_interrupt_timer;
     
-    int16_t time_for_vt_MS = 2000;
+    uint32_t time_for_vt_MS = 2000;
 
     comm_init(structForFunc, time_for_vt_MS);
 
