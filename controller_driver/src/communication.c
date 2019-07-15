@@ -91,6 +91,7 @@ static int retrieve_input_data(void)
 
         if (msg != sizeof(inp))
         {
+            
             return EIO;
         }
         
@@ -98,6 +99,7 @@ static int retrieve_input_data(void)
         uint8_t calc_ck = inp.speed + inp.steer * 2;
         if (calc_ck == inp.ck)
         {   
+            usb_is_alive();
             if (cpStructWithFunc.on_set)
                 cpStructWithFunc.on_set(inp.speed, inp.steer);
 
@@ -119,6 +121,7 @@ static int retrieve_input_data(void)
         /* Enable_debugging. */ 
         if (rcv_buffer[0] == 38 && rcv_buffer[1] == 79 && rcv_buffer[2] == 123)
         {
+            usb_is_alive();
             flag_debug = 1;
 
             return EOK;
@@ -127,6 +130,7 @@ static int retrieve_input_data(void)
         /* Disable_debugging. */
         if (rcv_buffer[0] == 31 && rcv_buffer[1] == 39 && rcv_buffer[2] == 115)
         {
+            usb_is_alive();
             flag_debug = 0;
 
             return EOK;
@@ -135,16 +139,20 @@ static int retrieve_input_data(void)
         /* Deactivate_connection. */
         if (rcv_buffer[0] == 67 && rcv_buffer[1] == 89 && rcv_buffer[2] == 23)
         {
+            usb_is_alive();
             return EOK;
         }
         /* Stop_connection. */
         if (rcv_buffer[0] == 34 && rcv_buffer[1] == 63 && rcv_buffer[2] == 129)
         {
+            usb_is_alive();
             return EOK;
         }
         /* On_start */
         if (rcv_buffer[0] == 25 && rcv_buffer[1] == 45 && rcv_buffer[2] == 65)
         {
+            usb_is_alive();
+
             if (cpStructWithFunc.on_start) 
                 cpStructWithFunc.on_start();
             
@@ -154,6 +162,8 @@ static int retrieve_input_data(void)
         /* On_stop */
         if (rcv_buffer[0] == 13 && rcv_buffer[1] == 26 && rcv_buffer[2] == 39)
         {
+            usb_is_alive();
+
             if (cpStructWithFunc.on_stop)
                 cpStructWithFunc.on_stop();
 
@@ -171,7 +181,7 @@ void usb_is_dead(void)
     if(cpStructWithFunc.on_interrupt_timer)
         cpStructWithFunc.on_interrupt_timer();
 
-    chVTSetI( &usb_check_vt, MS2ST( vt_usb_check_period_MS ), usb_is_dead, NULL );
+    
 }
 
 void usb_is_alive(void)
@@ -226,8 +236,8 @@ void comm_dbgprintf_info(const char *format, ...)
     if (!debug_stream)
         return;
 
-    // if (!flag_debug)
-        // return;
+    if (!flag_debug)
+        return;
 
     char buffer[64];
     sprintf(buffer, "INF: %s", format);
@@ -274,17 +284,7 @@ void comm_dbgprintf_error(const char *format, ...)
     va_end(ap);
 }
 
-// /* Return global variable speed from module. */
-// comm_speed_t comm_get_speed(void)
-// {
-//     return speed_value;
-// }
 
-// /* Return global variable angle from module. */
-// comm_steer_t comm_get_steer(void)
-// {
-//     return angle_value;
-// }
 
 
 
