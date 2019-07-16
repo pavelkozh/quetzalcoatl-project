@@ -13,7 +13,7 @@ void testSteer ( void ) {
     palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
 
     steerEncInit();
-    steerMotorInit();
+    //steerMotorInit();
 
     uint8_t sd_buff[10];
 
@@ -21,9 +21,9 @@ void testSteer ( void ) {
 
 	    sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
 
-	    if(sd_buff[4]=='m') steerMotorSetSpeed( atoi(sd_buff) );
-	    if(sd_buff[0]=='s') steerMotorStartStopControl();
-	    if(sd_buff[0]=='d') steerMotorDirChange();
+//	    if(sd_buff[4]=='m') steerMotorSetSpeed( atoi(sd_buff) );
+//	    if(sd_buff[0]=='s') steerMotorStartStopControl();
+//	    if(sd_buff[0]=='d') steerMotorDirChange();
 		chprintf( (BaseSequentialStream *)&SD3, "Result %d\t \n\r",(uint16_t)(steerGetPosition()*100));
 
 		for (int i = 0; i < 9; i++)

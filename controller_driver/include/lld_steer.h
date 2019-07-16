@@ -28,7 +28,7 @@ void steerMotorInit( void );
  * @note    Steer motor driver needs analog input for speed control,
  *          so external DAC with SPI is used
  */
-void steerMotorSetSpeed( uint8_t speed );
+void steerMotorSetSpeed( float speed );
 
 /*
  * @brief   start/stop button (without fixation) simulation
@@ -43,6 +43,14 @@ void steerMotorStartStopControl ( void );
  *          I.e. first call - dir right, second - dir left, third - dir right...
  */
 void steerMotorDirChange ( void );
+
+/*
+ * @brief    Check motor state (start or stop)
+ * @note     Motor state depends on previous changes on driver's "Start" input
+ * @return   1 - if motor is enable (start)
+ *           0 - if motor is disable (stop)
+ */
+bool steerIsMotorEnable ( void );
 
 
 #endif  /*INCLUDE_LLD_STEER_H */

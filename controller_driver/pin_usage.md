@@ -57,16 +57,17 @@ EXT1   |PC12  | Input          | vertical   axis lower sensor
 Driver | Pins | Input / Output | Description
 -------|------|----------------|----------
 SPI2   | PB13 |                | clock
-SPI2   | PA2  |                | MISO
+SPI2   | PC2  |                | MISO
 SPI2   | PB15 |                | MOSI
 PAL    | PB12 |                | CS
+
 
 ## Steer motor driver
 Driver | Pins | Input / Output | Description
 -------|------|----------------|----------
 SPI4   | PE2  |                | clock
 SPI4   | PE5  |                | MISO
-SPI4   | PE6  |                | MOSI
+SPI4   | PE6  |                | MOSI //??????
 PAL    | PD3  |                | CS
 PAL    | PD4  |                | Start/Stop
 PAL    | PD5  |                | Dir left/Dir right

@@ -18,6 +18,7 @@ void TestMTControl ( void );
 void TestSpeed ( void );
 void TestHSC1 ( void );
 void testSteer ( void );
+void testSteerPositionControl ( void );
 void testEmergencyStop ( void );
 void TestEngIgnition ( void );
 void testCommunication(void);
@@ -41,6 +42,9 @@ static inline void testsRoutines( void )
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_STEER)
     testSteer();
     
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_STEER_POS_LOOP)
+    testSteerPositionControl();
+
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_EMERGENCY_STOP)
     testEmergencyStop();
 

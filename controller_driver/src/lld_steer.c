@@ -108,7 +108,7 @@ static const SPIConfig m_spicfg = {
     .cr2 = SPI_CR2_DS //16-bit size mode
 };
 
-
+static bool is_steer_motor_start = false; // 0-stop, 1-start
 static thread_reference_t trp_steer_start_stop = NULL;
 static bool is_steer_start_stop_change = false;
 static THD_WORKING_AREA(steer_start_stop_wa, 256);
@@ -125,6 +125,7 @@ static THD_FUNCTION(steer_start_stop, arg) {
         palClearLine(MOTOR_START_STOP_LINE);
         chThdSleepMilliseconds(50);
         palSetLine(MOTOR_START_STOP_LINE);
+        is_steer_motor_start = !is_steer_motor_start;
 
         is_steer_start_stop_change = false;
         chSysLock();
@@ -187,10 +188,11 @@ void steerMotorInit( void ){
 }
 
 
-void  steerMotorSetSpeed( uint8_t value ){
+void  steerMotorSetSpeed( float value ){
+    if ( value < 0   ) value = 0;
     if ( value > 100 ) value = 100;
-    value = uint32_map(value, 0, 100, 0, 4095);
-    m_txbuf[0] = ( 0b0111 << 12 ) | value;
+    uint16_t speed = (uint16_t) ( double_map(value, 0.0, 100.0, 0.0, 4095.0));
+    m_txbuf[0] = ( 0b0111 << 12 ) | speed;
 
     spiSelect(MOTOR_SPI_DRIVER);
     spiSend(MOTOR_SPI_DRIVER, 1, m_txbuf);
@@ -219,6 +221,8 @@ void steerMotorStartStopControl ( void ){
       }
 }
 
-
+bool steerIsMotorEnable ( void ){
+    return is_steer_motor_start;
+}
 
 
