@@ -11,7 +11,13 @@ class MQTTControl(object):
 class MQTTControlPub(object):
     def __init__(self, ip='127.0.0.1'):
         self.client = mqtt.Client(client_id='control_pub')
-        self.client.connect(host=ip, port=1883)
+        self.client.connect(host=ip, port=1883, keepalive=5)
+
+        self.client.on_disconnect = self._disc_hdlr
+
+    # Couldn`t call this, need to check if it is called after disconnect
+    def _disc_hdlr(self):
+        print('>>> Disconnect!')
 
     def send(self, json_str):
         self.client.publish(

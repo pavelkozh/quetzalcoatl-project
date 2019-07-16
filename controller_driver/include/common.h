@@ -29,8 +29,7 @@
 #define     PROGRAM_ROUTINE_TEST_ENGINE_IGNITION        11
 
 
-
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_STEER
+#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_COMMUNICATION
 
 
 
