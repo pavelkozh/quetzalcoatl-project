@@ -8,7 +8,7 @@
 #include <feedback.h> 
 #include <pedals.h>
 #include <speed.h>
-#include <steer.h>
+#include <lld_steer.h>
 #include <emergency_stop.h>
 
 #include <stdint.h>
@@ -30,7 +30,7 @@
 
 
 
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_ENGINE_IGNITION
+#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_STEER
 
 
 
