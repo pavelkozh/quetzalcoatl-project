@@ -10,7 +10,7 @@ PROJECT_MODULES =	src/lld_can.c             \
 				    src/low_speed_control.c   \
                     src/pid.c                 \
                     src/speed.c               \
-                    src/steer.c               \
+                    src/lld_steer.c           \
                     src/emergency_stop.c      \
                     src/MT.c                  \
                     src/MT_control.c          \
@@ -18,6 +18,7 @@ PROJECT_MODULES =	src/lld_can.c             \
                     src/high_speed_control.c  \
                     src/communication.c       \
                     src/usbcfg.c              \
+                    src/steer_control.c       \
 
 
 PROJECT_TESTS   =	tests/test_pedals.c              \
@@ -27,6 +28,8 @@ PROJECT_TESTS   =	tests/test_pedals.c              \
                     tests/test_engine_ignition.c     \
                     tests/test_high_speed_control.c  \
                     tests/test_communication.c       \
+                    tests/test_lld_steer.c           \
+                    tests/test_steer_control.c       \
 
 
 

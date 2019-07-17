@@ -8,7 +8,7 @@
 #include <feedback.h> 
 #include <pedals.h>
 #include <speed.h>
-#include <steer.h>
+#include <lld_steer.h>
 #include <emergency_stop.h>
 
 #include <stdint.h>
@@ -27,10 +27,10 @@
 #define     PROGRAM_ROUTINE_TEST_STEER                  9
 #define     PROGRAM_ROUTINE_TEST_COMMUNICATION          10
 #define     PROGRAM_ROUTINE_TEST_ENGINE_IGNITION        11
+#define     PROGRAM_ROUTINE_TEST_STEER_POS_LOOP         12
 
 
-
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_ENGINE_IGNITION
+#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_STEER
 
 
 
@@ -56,6 +56,7 @@ void commonExtDriverInit ( void );
 uint8_t uint8_map(uint8_t x, uint8_t in_min, uint8_t in_max, uint8_t out_min, uint8_t out_max);
 uint32_t uint32_map(uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_min, uint32_t out_max);
 double double_map(double x, double in_min, double in_max, double out_min, double out_max);
+int8_t sign ( float var );
 
 
 #endif /* INCLUDE_COMMON_H_ */

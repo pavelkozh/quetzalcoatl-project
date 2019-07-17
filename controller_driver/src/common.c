@@ -11,13 +11,19 @@ uint32_t uint32_map(uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_m
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-
-
 double double_map(double x, double in_min, double in_max, double out_min, double out_max)
 {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
+int8_t sign ( float var )
+{
+    bool result = 0;
+    if ( var > 0 ) result = 1;
+    if ( var < 0 ) result = -1;
+    if ( var == 0 ) result = 0;
+
+}
 
 
 /***********************/

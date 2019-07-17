@@ -8,10 +8,10 @@
 ## Throttle position (DAC)
 Driver | Pins | Input / Output | Description
 -------|------|----------------|----------
-SPI    | PA5  |                | clock
-SPI    | PA6  |                | MISO
-SPI    | PA7  |                | MOSI
-SPI    | PD14 |                | CS
+SPI1   | PA5  |                | clock
+SPI1   | PA6  |                | MISO
+SPI1   | PA7  |                | MOSI
+PAL    | PD14 |                | CS
 
 
 ## CAN 
@@ -52,13 +52,27 @@ EXT1   |PG3   | Input          | horizontal axis left sensor
 EXT1   |PC11  | Input          | vertical   axis upper sensor
 EXT1   |PC12  | Input          | vertical   axis lower sensor   
 
-## Absolute encoder
+
+## Absolute encoder (steer unit)
 Driver | Pins | Input / Output | Description
 -------|------|----------------|----------
-SPI    | PB13 |                | clock
-SPI    | PA2  |                | MISO
-SPI    | PB15 |                | MOSI
-SPI    | PB12 |                | CS
+SPI2   | PB13 |                | clock
+SPI2   | PC2  |                | MISO
+SPI2   | PB15 |                | MOSI
+PAL    | PB12 |                | CS
+
+
+## Steer motor driver
+Driver | Pins | Input / Output | Description
+-------|------|----------------|----------
+SPI4   | PE2  |                | clock
+SPI4   | PE5  |                | MISO
+SPI4   | PE6  |                | MOSI //??????
+PAL    | PD3  |                | CS
+PAL    | PD4  |                | Start/Stop
+PAL    | PD5  |                | Dir left/Dir right
+
+
 
 ## Emergency stop button
 Driver | Pins | Input / Output | Description

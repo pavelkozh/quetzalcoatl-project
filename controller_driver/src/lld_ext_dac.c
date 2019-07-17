@@ -26,7 +26,7 @@ static const SPIConfig spicfg = {
 	.end_cb = NULL,
 	.ssport = EXTERNAL_DAC_CS_PORT,
 	.sspad = EXTERNAL_DAC_CS_PIN,
-	.cr1 = SPI_CR1_BR_2,//SPI_CR1_BR_0 | SPI_CR1_BR_1,// fPCLK/16
+	.cr1 = SPI_CR1_BR | SPI_CR1_BR_0, // fPCLK/64
 	.cr2 = SPI_CR2_DS //16-bit size mode
 };
 
@@ -40,7 +40,6 @@ void extDacInit( ){
 
 	//SPI init
 	spiStart(EXTERNAL_DAC_SPI_DRIVER, &spicfg);
-	palSetLine(LINE_LED1);
 }
 
 
