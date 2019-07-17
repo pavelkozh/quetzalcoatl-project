@@ -24,10 +24,10 @@ void testSteerPositionControl ( void ) {
 
         sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
 
-        if(sd_buff[4]=='m') steerSetPosition ( (float) atoi(sd_buff)/10 );
+        if(sd_buff[4]=='m') steerSetPosition ( ((float) atoi(sd_buff))/10 );
         if(sd_buff[0]=='s') steerControlStart();
         if(sd_buff[0]=='d') steerControlStop();
-        chprintf( (BaseSequentialStream *)&SD3, "Result %d\t \n\r",(uint16_t)(steerGetPosition()*100));
+        chprintf( (BaseSequentialStream *)&SD3, "PosRef %.02f\t Encoder %d\t PosErr %.02f\t PidOut %.02f\t MotorEn%d\t \n\r",steerDbgGetMotorPosRef(),(uint16_t)(steerGetPosition()), steerDbgGetMotorCalcPosErr(),steerDbgGetMotorCalcSpeedRef(), steerDbgGetEnableFlag());
 
         for (int i = 0; i < 9; i++)
         {

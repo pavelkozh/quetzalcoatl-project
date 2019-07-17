@@ -22,6 +22,9 @@ static uint8_t CSErrorDeadzoneHalfwidth = 1;
 float steerPosControl( float steer_angle_ref ){
 
     float error = steer_angle_ref - steerGetPosition();
+    if ( error > 180.0 ){
+        error = 360.0 - error;
+    }
 
     /* Dead zone for (p) error */
     if ( abs(error) < CSErrorDeadzoneHalfwidth ){
@@ -40,12 +43,13 @@ float steerPosControl( float steer_angle_ref ){
 }
 
 
-static THD_WORKING_AREA(steer_pos_control_wa, 256);
+static THD_WORKING_AREA(steer_pos_control_wa, 1024);
 static THD_FUNCTION(steer_pos_control, arg) {
 
     (void)arg;
 
     while(1){
+        palToggleLine(LINE_LED2);
 
         if ( steer_control_start ){
             speed_ref = steerPosControl( steer_angle_ref );
@@ -58,11 +62,18 @@ static THD_FUNCTION(steer_pos_control, arg) {
         }
         if ( sign(speed_ref) != sign(prev_speed_ref)){
             steerMotorDirChange();
+            palToggleLine(LINE_LED3);
         }
-        steerMotorSetSpeed(speed_ref);
+        if ( speed_ref < 0 ){
+            steerMotorSetSpeed(-speed_ref);
+        }
+        else{
+            steerMotorSetSpeed(speed_ref);
+        }
+
 
         prev_speed_ref = speed_ref;
-        chThdSleepMilliseconds( 100 );
+        chThdSleepMilliseconds( 35 );
     }
 }
 
@@ -77,7 +88,7 @@ void steerInit(void) {
 
     PIDControlInit( &steer_pidCtx );
     chThdCreateStatic(steer_pos_control_wa, sizeof(steer_pos_control_wa), NORMALPRIO, steer_pos_control, NULL);
-    steerEncInit();
+    //steerEncInit();
     steerMotorInit();
     if_steer_control_module_initialized = true;
 
@@ -98,8 +109,40 @@ void steerControlStop(void) {
     if ( steerIsMotorEnable () == true ){
         steerMotorStartStopControl();
     }
+//    else{
+//        steer_pidCtx.err        = 0;
+//        steer_pidCtx.prevErr    = 0;
+//        steer_pidCtx.integrSum  = 0;
+//        speed_ref = steerGetPosition();
+//    }
 }
 
 void steerSetPosition ( float val ){
+    if ( val > 360.0 ) val = 360.0;
+    if ( val < 0.0 ) val = 0.0;
     steer_angle_ref = val;
+}
+
+
+
+/**DBG functions**/
+
+float steerDbgGetMotorCalcSpeedRef ( void )
+{
+    return speed_ref;
+}
+
+float steerDbgGetMotorCalcPosErr ( void )
+{
+    return steer_pidCtx.err;
+}
+
+float steerDbgGetMotorPosRef ( void )
+{
+    return steer_angle_ref;
+}
+
+bool steerDbgGetEnableFlag ( void )
+{
+    return steerIsMotorEnable ();
 }

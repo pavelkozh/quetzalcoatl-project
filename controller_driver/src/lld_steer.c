@@ -104,14 +104,14 @@ static const SPIConfig m_spicfg = {
     .end_cb = NULL,
     .ssport = MOTOR_SPI_CS_PORT,
     .sspad = MOTOR_SPI_CS_PIN,
-    .cr1 = SPI_CR1_BR | SPI_CR1_BR_0, // fPCLK/64
+    .cr1 = SPI_CR1_BR_2 |SPI_CR1_BR_1 | SPI_CR1_BR_0, // fPCLK/64
     .cr2 = SPI_CR2_DS //16-bit size mode
 };
 
 static bool is_steer_motor_start = false; // 0-stop, 1-start
 static thread_reference_t trp_steer_start_stop = NULL;
 static bool is_steer_start_stop_change = false;
-static THD_WORKING_AREA(steer_start_stop_wa, 256);
+static THD_WORKING_AREA(steer_start_stop_wa, 512);
 static THD_FUNCTION(steer_start_stop, arg) {
     (void)arg;
     while(1){
@@ -123,7 +123,7 @@ static THD_FUNCTION(steer_start_stop, arg) {
         }
 
         palClearLine(MOTOR_START_STOP_LINE);
-        chThdSleepMilliseconds(50);
+        chThdSleepMilliseconds(200);
         palSetLine(MOTOR_START_STOP_LINE);
         is_steer_motor_start = !is_steer_motor_start;
 
@@ -139,7 +139,7 @@ static THD_FUNCTION(steer_start_stop, arg) {
 
 static thread_reference_t trp_steer_dir_change = NULL;
 static bool is_steer_dir_change = false;
-static THD_WORKING_AREA(steer_dir_wa, 256);
+static THD_WORKING_AREA(steer_dir_wa, 512);
 static THD_FUNCTION(steer_dir, arg) {
     (void)arg;
     while(1){
@@ -151,7 +151,7 @@ static THD_FUNCTION(steer_dir, arg) {
         }
 
         palClearLine(MOTOR_DIR_LINE);
-        chThdSleepMilliseconds(50);
+        chThdSleepMilliseconds(200);
         palSetLine(MOTOR_DIR_LINE);
 
         is_steer_dir_change = false;
@@ -208,6 +208,7 @@ void steerMotorDirChange ( void ){
         chThdResume(&trp_steer_dir_change, MSG_OK);
         chSysUnlock();
       }
+
 }
 
 
@@ -219,6 +220,7 @@ void steerMotorStartStopControl ( void ){
         chThdResume(&trp_steer_start_stop, MSG_OK);
         chSysUnlock();
       }
+
 }
 
 bool steerIsMotorEnable ( void ){
