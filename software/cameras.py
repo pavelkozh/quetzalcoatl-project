@@ -4,7 +4,8 @@ import cv2
 class GstH264UDPClient(object):
 
     def __init__(self, port=5000):
-        gst_string = 'udpsrc port={} ! h264parse ! avdec_h264 ! videoconvert ! appsink'\
+        gst_string = 'udpsrc port={} ! application/x-rtp, encoding-name=H264 ! '\
+            'rtph264depay ! avdec_h264 ! videoconvert ! appsink'\
             .format(port)
 
         self.cap = cv2.VideoCapture(
@@ -15,8 +16,7 @@ class GstH264UDPClient(object):
         self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
         if not self.cap.isOpened():
-            raise('VideoCapture not opened, check server')
-            exit(0)
+            raise Exception('VideoCapture not opened, check server')
 
     def __del__(self):
         self.cap.release()
@@ -38,6 +38,8 @@ if __name__ == "__main__":
     cam2 = GstH264UDPClient(port=4000)
 
     current_cam = cam1
+
+    print('Start!')
 
     while True:
         frame = current_cam.read_frame()
