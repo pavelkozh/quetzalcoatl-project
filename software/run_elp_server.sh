@@ -15,9 +15,10 @@ bitrate=2048
 
 echo "Starting stream..."
 gst-launch-1.0 -v -e v4l2src device=$dev_name ! \
-    "video/x-h264,width=$cam_width,height=$cam_height,framerate=30/1,bitrate=$bitrate" ! tee name=h \
+    video/x-h264,width=$cam_width,height=$cam_height,framerate=30/1,bitrate=$bitrate ! tee name=h \
     h. ! queue ! rtph264pay ! udpsink host=$client1_IP port=$client_port \
     h. ! queue ! rtph264pay ! udpsink host=$client2_IP port=$client_port \
     h. ! queue ! rtph264pay ! udpsink host=127.0.0.1 port=$client_port \
-    h. ! queue ! h264parse ! tcpserversink host=0.0.0.0 port=$client_port recover-policy=keyframe sync-method=latest-keyframe \
-    h. ! queue ! avdec_h264 ! fpsdisplaysink sync=false
+    h. ! queue ! avdec_h264 ! fpsdisplaysink sync=false \
+    h. ! queue ! h264parse ! video/x-h264,stream-format=avc ! tcpserversink host=0.0.0.0 port=$client_port recover-policy=keyframe sync-method=latest-keyframe
+
