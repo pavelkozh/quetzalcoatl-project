@@ -12,19 +12,25 @@ void testSteer ( void ) {
     palSetPadMode( GPIOD, 8, PAL_MODE_ALTERNATE(7) );   // TX
     palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
 
-    //steerEncInit();
+    steerEncInit();
     steerMotorInit();
 
     uint8_t sd_buff[10];
 
-	while (1) {
 
+
+	while (1) {
+        palToggleLine(LINE_LED1);
 	    sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
 
 	    if(sd_buff[4]=='m') steerMotorSetSpeed( (float) (atoi(sd_buff)) );
 	    if(sd_buff[0]=='s') steerMotorStartStopControl();
 	    if(sd_buff[0]=='d') steerMotorDirChange();
-		//chprintf( (BaseSequentialStream *)&SD3, "Result %d\t \n\r",(uint16_t)(steerGetPosition()*100));
+        // palToggleLine(LINE_LED2);
+        steerMotorStartStopControl();
+
+		chprintf( (BaseSequentialStream *)&SD3, "Result %d\t \n\r",(uint16_t)(steerGetPosition()*100));
+        // palToggleLine(LINE_LED3);
 
 		for (int i = 0; i < 9; i++)
         {

@@ -60,16 +60,20 @@ void steerEncInit( void ) {
 
 
 void  steerEncReadValue( void ){
-	spiSelect(ABS_ENC_SPI_DRIVER);
+
+	spiSelect(ABS_ENC_SPI_DRIVER); 
     spiReceive(ABS_ENC_SPI_DRIVER, 1, rxbuf);
     spiUnselect(ABS_ENC_SPI_DRIVER);
 }      
 
-double steerGetPosition( void ) {
+float steerGetPosition( void ) {
+    // palToggleLine(LINE_LED1);
 	steerEncReadValue();
-	uint16_t ang = 0;
+    // palToggleLine(LINE_LED3);
+	int16_t ang = 0;
     ang = ( rxbuf[0] & 0b0111111111111000 ) >> 3; // main variable 
-    return double_map(ang, 0, 4095, 0, 360);
+    if(ang > 2049) ang = ang - 4095;
+    return (float)double_map(ang, -2048, 2049, -180, 180);
 }
 
 /****************************************************************************/

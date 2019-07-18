@@ -8,7 +8,7 @@ void steerInit(void);
 void steerControlStart(void);
 void steerControlStop(void);
 void steerSetPosition ( float val );
-
+float steerGetPos( void );
 
 /***Debug**/
 float steerDbgGetMotorCalcSpeedRef ( void );
