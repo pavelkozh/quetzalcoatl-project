@@ -23,36 +23,27 @@ static THD_WORKING_AREA(emergency_button_stop_wa, 256);
 
 static THD_FUNCTION(emergency_button_stop, arg) {
     (void)arg;
-    // do {
-    //   chThdSleepMilliseconds( 10 );
-    // } while (palReadLine(EMERGENCY_STOP_LINE) == 0);
-    // if (palReadLine(EMERGENCY_STOP_LINE) != 1) {
-    //   chThdSleepMilliseconds( 10 );
-    // }
+
     while(1){
-      //if (palReadLine(EMERGENCY_STOP_LINE) == 1) {
-        if ( is_breaking_thread_work == false )
-        {
+
+        if ( is_breaking_thread_work == false ){
             chSysLock();
             chThdSuspendS(&trp_emergency_button_stop);
             chSysUnlock();
         }
-        else
-        {
-//            chprintf( (BaseSequentialStream *)&SD3, "Start breaking \n\r");
+        else{
+            palSetLine(LINE_LED2);
             pedalsClutchPress ( 1000 );
-//            if ( pedalsClutchGetState () == false )
-//            {
+
             while(pedalsClutchGetState()){
                 chThdSleepMilliseconds( 50 );
             }
+
             pedalsBrakePress( 5000 );
             while(pedalsBrakeGetState()){
                 chThdSleepMilliseconds( 50 );
             }
-//              if ( pedalsBrakeGetState() == false )
-//              {
-                  // gear = neutral!
+
             while ( mtControlMannualyShiftGear(0) !=0 ){
                 chThdSleepMilliseconds( 50 );
             }
@@ -66,6 +57,7 @@ static THD_FUNCTION(emergency_button_stop, arg) {
 //                }
              is_breaking_thread_work = false;
              is_emergency_stop_btn_pressed = false;
+             palClearLine(LINE_LED2);
              chSysLock();
              chThdSuspendS(&trp_emergency_button_stop);
              chSysUnlock();
@@ -133,7 +125,7 @@ void emergencyStopInit( void ) {
   	palSetLineMode( PAL_LINE(GPIOA,0), PAL_MODE_INPUT_PULLDOWN);
   	commonExtDriverInit();
   	EXTChannelConfig base_conf = {
-  	    .mode = EXT_CH_MODE_FALLING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, 
+  	    .mode = EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA,
   	    .cb = extcb_base
   	};
 

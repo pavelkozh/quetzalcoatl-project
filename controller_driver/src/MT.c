@@ -18,7 +18,7 @@ static MotorDriver m_vertical = {
                           .dir_line          = PAL_LINE (GPIOE, 3 ),
                           .rising_edge_cb    = risingEdgeMTGorisontalCallback,
                           .falling_edge_cb   = fallingEdgeMTGorisontalCallback,
-                          .max_position      = 35000,//15000,
+                          .max_position      = 30000,//15000,
                           .min_position      = -30000//-25000
 };
 
@@ -40,7 +40,7 @@ static MotorDriver m_gorisontal = {
                               .rising_edge_cb    = risingEdgeMTVerticalCallback,
                               .falling_edge_cb   = fallingEdgeMTVerticalCallback,
                               .max_position      = 30000,//14000,
-                              .min_position      = -40000//-14000
+                              .min_position      = -30000//-14000
 };
 
 void risingEdgeMTGorisontalCallback(PWMDriver *pwmd)
@@ -93,7 +93,7 @@ void mtMotorsControlInit ( void )
     points_array[0].x = 0; //neutral gear horizontal coordinate
     points_array[0].y = 0; //neutral gear vertical coordinate
     /*first gear coordinates*/
-    points_array[1].x = -20000;//-30000; //first gear horizontal coordinate
+    points_array[1].x = -21000;//-30000; //first gear horizontal coordinate
     points_array[1].y = 27000; //first gear vertical coordinate
     /*second gear coordinates*/
     points_array[2].x = -15000; //second gear horizontal coordinate
@@ -108,8 +108,8 @@ void mtMotorsControlInit ( void )
     points_array[5].x = 12500; //fifth gear horizontal coordinate
     points_array[5].y = 13000; //fifth gear vertical coordinate
     /*reverse gear coordinates*/
-    points_array[6].x = 22000; //reverse gear horizontal coordinate
-    points_array[6].y = -15000;//-24000; //reverse gear vertical coordinate
+    points_array[6].x = 20000; //reverse gear horizontal coordinate
+    points_array[6].y = -21000;//-24000; //reverse gear vertical coordinate
 
     if_mt_motors_control_module_initialized = 1;
 }

@@ -4,35 +4,40 @@
 #define IGNITION_PAL_LINE  PAL_LINE(GPIOF,12)
 #define STARTER_PAL_LINE   PAL_LINE(GPIOF,13)
 
-static thread_reference_t trp_eng_ignition = NULL;
-static bool is_engine_start_thd_working = false;
+static uint16_t dbgVal = 0;
 
-static THD_WORKING_AREA(eng_ignition_wa, 256);
+static thread_reference_t trp_eng_ignition = NULL;
+static uint8_t is_engine_start_thd_working = 0;
+
+static THD_WORKING_AREA(eng_ignition_wa, 512);
 static THD_FUNCTION(eng_ignition, arg) {
     (void)arg;
 
     while(1){
-        if ( is_engine_start_thd_working == false ){
+        if ( is_engine_start_thd_working == 0 ){
             chSysLock();
             chThdSuspendS(&trp_eng_ignition);
             chSysUnlock();
         }
         else{
-            palSetLine(LINE_LED1);
-            palSetLine(IGNITION_PAL_LINE);
-            palSetLine(STARTER_PAL_LINE);
-            while ( gazelGetEngineSpeed() < 730 ){
+
+            palClearLine(IGNITION_PAL_LINE);
+            palClearLine(STARTER_PAL_LINE);
+            while ( dbgVal < 730 ){ //( gazelGetEngineSpeed() < 730 ){
                 palSetLine(LINE_LED2);
                 chThdSleepMilliseconds( 50 );
             }
-            palClearLine(STARTER_PAL_LINE);
-            palSetLine(LINE_LED3);
+            palSetLine(STARTER_PAL_LINE);
+            palClearLine(LINE_LED2);
+
 
             /* starting is finish -> thread goes to sleep*/
-            is_engine_start_thd_working == false;
+            is_engine_start_thd_working = 0;
+            palSetLine(LINE_LED3);
             chSysLock();
             chThdSuspendS(&trp_eng_ignition);
             chSysUnlock();
+
 
         }
         chThdSleepMilliseconds( 50 );
@@ -59,6 +64,9 @@ void engIgnitionInit ( void )
     palSetLineMode( IGNITION_PAL_LINE, PAL_MODE_OUTPUT_PUSHPULL );
     palSetLineMode( STARTER_PAL_LINE,  PAL_MODE_OUTPUT_PUSHPULL );
 
+    palSetLine(IGNITION_PAL_LINE);
+    palSetLine(STARTER_PAL_LINE);
+
     feedbackInit();
     chThdCreateStatic(eng_ignition_wa, sizeof(eng_ignition_wa), NORMALPRIO + 1, eng_ignition, NULL);
 
@@ -67,8 +75,9 @@ void engIgnitionInit ( void )
 
 bool engIgnitionSwitchOn ( void )
 {
-    if (is_engine_start_thd_working == false) {
-        is_engine_start_thd_working = true;
+    if (is_engine_start_thd_working == 0) {
+        is_engine_start_thd_working = 1;
+        palSetLine(LINE_LED1);
         /* Wake up engine start thread */
         chSysLock();
         chThdResume(&trp_eng_ignition, MSG_OK);
@@ -80,7 +89,26 @@ bool engIgnitionSwitchOn ( void )
 
 void engIgnitionSwitchOff ( void )
 {
-    palClearLine(IGNITION_PAL_LINE);
+    palSetLine(IGNITION_PAL_LINE);
+
+    palClearLine(LINE_LED1);
+    palClearLine(LINE_LED2);
+    palClearLine(LINE_LED3);
+}
+
+void engIgnitionDbgSetEngSpeed ( uint16_t val )
+{
+    dbgVal = val;
+}
+
+uint8_t engIgnitionDbgGetThreadEnFlag ( void )
+{
+    return is_engine_start_thd_working;
+}
 
 
+uint8_t engIgnitionDbgGetFlaf ( void )
+{
+
+    return 12;
 }

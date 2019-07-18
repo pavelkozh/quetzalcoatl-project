@@ -30,7 +30,7 @@
 #define     PROGRAM_ROUTINE_TEST_STEER_POS_LOOP         12
 
 
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_STEER
+#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_TEST_ENGINE_IGNITION
 
 
 
