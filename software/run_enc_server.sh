@@ -9,7 +9,7 @@ client_port=4000
 cam_width=640
 cam_height=480
 
-bitrate=2048
+bitrate=1024
 
 echo "Starting stream..."
 gst-launch-1.0 -v v4l2src device=$dev_name ! \

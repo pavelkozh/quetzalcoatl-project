@@ -58,9 +58,6 @@ if __name__ == "__main__":
 
     print('Start!')
 
-    time.sleep(10)
-    exit(1)
-
     while True:
         frame = current_cam.read_frame()
         if frame is None:
