@@ -4,6 +4,7 @@ from threading import Thread
 import time
 import pygame
 import os
+import mqtt_state as ms
 
 # Setup for logging
 import gzl.logger as gzlog
@@ -24,6 +25,13 @@ if args.debug:
 # MAIN for gamepad+computer
 BROCKER_IP = '127.0.0.1'
 # BROCKER_IP = '10.139.1.134'
+
+
+def state_on_msg(data):
+	print(data.decode('UTF-8'))
+
+state_sub = ms.MQTTStateSub(ip = BROCKER_IP, on_msg=state_on_msg)
+
 
 pygame.init()
 joystick_disabled = False
