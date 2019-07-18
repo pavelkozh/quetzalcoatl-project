@@ -28,7 +28,7 @@ check_time = time.time()
 #  Для запуска в консоли  " python push_msg.py /dev/ttyACM1 " 
 # в зависимости от операционной системы проверить к какому порту подключена STM
 # для linux  это /dev/ttyACM1
-
+# pip install -r requirements.txt
 while(1):
 
     if time.time() - check_time > 1:
