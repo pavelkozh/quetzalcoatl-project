@@ -2,6 +2,7 @@ import communication
 import time
 import command
 import os
+import mqtt_state as ms
 
 # Setup for logging
 import gzl.logger as gzlog
@@ -22,8 +23,11 @@ if args.debug:
 
 BROCKER_IP = '127.0.0.1'
 STM_COMMUNICATION_DEVICE='/dev/serial/by-id/usb-STMicroelectronics_ChibiOS_RT_Virtual_COM_Port_404-if00'
+STM_COMMUNICATION_DEVICE='/dev/ttyACM1'
 
 rootLogger.debug('start')
+
+state_pub = ms.MQTTStatePub(ip = BROCKER_IP)
 
 try:
     comun = communication.CommunicationOnSerial(STM_COMMUNICATION_DEVICE)
@@ -64,17 +68,21 @@ sub.on_disable = disable_handler
 while True:	
     if comun:
         inp = comun.get_state_msg()
+        # print("inp = {}".format(inp))
         if inp:
             rootLogger.debug('Debug output: {} (lvl: {})'.format(inp.msg, inp.lvl))
             
             if inp.lvl == communication.StateMessage.INFO_LVL or \
                 inp.lvl == communication.StateMessage.UNKNOWN_LVL:
                 rootLogger.info('From uC: {}'.format(inp.msg))
+                state_pub.send(inp.msg)
 
             if inp.lvl == communication.StateMessage.WARNING_LVL:
                 rootLogger.warning('From uC: {}'.format(inp.msg))
+                state_pub.send(inp.msg)
 
             if inp.lvl == communication.StateMessage.ERROR_LVL:
                 rootLogger.error('From uC: {}'.format(inp.msg))
+                state_pub.send(inp.msg)
 
     time.sleep(0.001)
