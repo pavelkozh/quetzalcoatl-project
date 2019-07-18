@@ -21,7 +21,7 @@ class GstH264UDPClient(object):
     def __del__(self):
         self.cap.release()
 
-    def read_frame():
+    def read_frame(self):
         ret, frame = cap_rcv.read()
 
         if not ret:
