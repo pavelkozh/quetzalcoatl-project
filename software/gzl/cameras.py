@@ -59,11 +59,12 @@ class GstH264TCPClient(GstClient):
 
 
 class GstCamerasController(object):
-    def __init__(self, cameras_list):
+    def __init__(self, cameras_list, logger=None):
         self.cameras_list = cameras_list
         self.cameras = []
         self.active_idx = 0
         self.active_cam = None
+        self.logger = logger
 
         for camera_info in cameras_list:
             class_name = camera_info[0]
@@ -81,7 +82,10 @@ class GstCamerasController(object):
         try:
             self.active_cam.connect()
         except:
-            print('Failed to connect to camera')
+            if self.logger:
+                self.logger.error('Failed to connect to camera')
+            else:
+                print('Failed to connect to camera')
             self.active_cam = None
             return False
 
@@ -91,11 +95,11 @@ class GstCamerasController(object):
         if self.active_cam is not None:
             self.active_cam.disconnect()
 
-    def _is_connected(self):
+    def is_connected(self):
         return self.active_cam is not None
 
     def read_frame(self):
-        if not self._is_connected():
+        if not self.is_connected():
             if not self._connect_active():
                 return None
 
@@ -116,11 +120,11 @@ if __name__ == "__main__":
     import time
     import numpy as np
 
-    SERVER_IP = '127.0.0.1'
+    CAMERAS_SERVER_IP = '127.0.0.1'
 
     cam_params = [
-        [GstH264TCPClient, {'ip': SERVER_IP, 'port': 4000}],
-        [GstH264TCPClient, {'ip': SERVER_IP, 'port': 5000}],
+        [GstH264TCPClient, {'ip': CAMERAS_SERVER_IP, 'port': 4000}],
+        [GstH264TCPClient, {'ip': CAMERAS_SERVER_IP, 'port': 5000}],
     ]
 
     cams_controller = GstCamerasController(cam_params)

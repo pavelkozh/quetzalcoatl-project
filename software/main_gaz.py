@@ -4,11 +4,21 @@ import command
 import os
 import mqtt_state as ms
 
-# Setup for logging
 import gzl.logger as gzlog
-basename = os.path.basename(__file__).split('.')[0]
-gzlog.setup_logger(basename + '.log')
-rootLogger = gzlog.get_logger()
+
+def setup_logger():
+    """ Setup logger with filename same as module name 
+	return logger from logging module 
+	(https://docs.python.org/3/library/logging.html)
+
+        Returns:
+            Logger -- Python object of module logging
+    """
+    basename = os.path.basename(__file__).split('.')[0]
+    gzlog.setup_logger(basename + '.log')
+    logger = gzlog.get_logger()
+
+    return logger
 
 # Setup for options
 import argparse
@@ -25,6 +35,7 @@ BROCKER_IP = '127.0.0.1'
 STM_COMMUNICATION_DEVICE='/dev/serial/by-id/usb-STMicroelectronics_ChibiOS_RT_Virtual_COM_Port_404-if00'
 STM_COMMUNICATION_DEVICE='/dev/ttyACM1'
 
+rootLogger = setup_logger()
 rootLogger.debug('start')
 
 state_pub = ms.MQTTStatePub(ip = BROCKER_IP)
