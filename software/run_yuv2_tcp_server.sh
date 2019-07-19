@@ -16,8 +16,8 @@ gst-launch-1.0 -v v4l2src device=$dev_name ! \
     video/x-raw,width=$cam_width, height=$cam_height, framerate=30/1 ! \
     videoconvert ! tee name=h \
     h. ! queue ! \
-    x264enc tune=zerolatency bitrate=$bitrate speed-preset=superfast ! \
+    x264enc tune=zerolatency bitrate=$bitrate speed-preset=superfast key-int-max=30 ! \
     tcpserversink host=0.0.0.0 port=$client_port \
-    recover-policy=keyframe sync=false sync-method=latest-keyframe \
+    recover-policy=keyframe sync=false sync-method=next-keyframe \
     h. ! queue ! fpsdisplaysink sync=false \
 

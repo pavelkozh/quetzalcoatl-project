@@ -20,7 +20,7 @@ args = parser.parse_args()
 # MAIN for gamepad+computer
 SERVER_IP = '127.0.0.1'
 # SERVER_IP = '10.139.1.134'
-
+TARGET_FRAME_SIZE_CV = (800, 600)
 
 def setup_cameras_controller(logger=None):
     """ Setup camera controller with routes
@@ -104,6 +104,7 @@ try:
         if cams_controller.is_connected():
             frame = cams_controller.read_frame()
             if frame is not None:
+                frame = cv2.resize(frame, TARGET_FRAME_SIZE_CV)
                 cv2.imshow('view', frame)
                 cv2.waitKey(1)
 

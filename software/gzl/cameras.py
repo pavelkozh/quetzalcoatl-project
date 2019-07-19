@@ -120,6 +120,7 @@ if __name__ == "__main__":
     import numpy as np
 
     CAMERAS_SERVER_IP = '127.0.0.1'
+    TARGET_FRAME_SIZE_CV = (800, 600)
 
     cam_params = [
         [GstH264TCPClient, {'ip': CAMERAS_SERVER_IP, 'port': 5000}],
@@ -130,19 +131,22 @@ if __name__ == "__main__":
 
     print('Start!')
 
-    prev_frame = np.zeros((600, 800, 3), np.uint8)
+    prev_frame = np.zeros((TARGET_FRAME_SIZE_CV[1], TARGET_FRAME_SIZE_CV[0], 3), \
+        np.uint8)
 
     while True:
         frame = cams_controller.read_frame()
         if frame is None:
             print('No frame from camera')
 
+            prev_frame = cv2.resize(prev_frame, TARGET_FRAME_SIZE_CV)
             cv2.imshow('result', prev_frame)
             inp = cv2.waitKey(300)
 
         else:
             prev_frame = frame
 
+            frame = cv2.resize(frame, TARGET_FRAME_SIZE_CV)
             cv2.imshow('result', frame)
             inp = cv2.waitKey(1)
 
