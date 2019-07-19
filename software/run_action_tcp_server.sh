@@ -22,7 +22,7 @@ gst-launch-1.0 -v v4l2src device=$dev_name ! \
     tee name=h \
     h. ! queue ! \
         x264enc tune=zerolatency bitrate=$bitrate_kbps speed-preset=superfast \
-            key-int-max=$keyframe_period_frames ! \ ! \
+            key-int-max=$keyframe_period_frames ! \
         tcpserversink host=0.0.0.0 port=$client_port \
             recover-policy=keyframe sync=false sync-method=next-keyframe \
     h. ! queue ! xvimagesink sync=false \

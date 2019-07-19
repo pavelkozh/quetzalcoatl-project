@@ -6,7 +6,7 @@ clear
 dev_name=/dev/v4l/by-id/usb-046d_HD_Pro_Webcam_C920_91D1FE4F-video-index0
 
 client_IP=127.0.0.1
-client_port=5000
+client_port=4000
 
 cam_width=640
 cam_height=480
