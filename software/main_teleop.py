@@ -6,7 +6,7 @@ import time
 import pygame
 import os
 import mqtt_state as ms
-
+import cv2
 import gzl.logger as gzlog
 import gzl.cameras as gzcams
 
@@ -121,7 +121,7 @@ try:
                     elif event.axis == joy_vrt_axis:
                         if abs(event.value) > 0.02:
                             # 3.99 selected to disable possible value 20/-20
-                            vrt = int(event.value * -3.99) * 5
+                            vrt = int(event.value * -10)
                         else:
                             vrt = 0
 
