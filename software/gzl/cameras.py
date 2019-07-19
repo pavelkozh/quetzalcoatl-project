@@ -39,8 +39,7 @@ class GstClient(object):
 
 
 class GstH264UDPClient(GstClient):
-    def __init__(self, port=5000):
-
+    def __init__(self, port=5000, ip=None):
         gst_string = 'udpsrc port={} ! application/x-rtp, encoding-name=H264 ! '\
             'rtph264depay ! avdec_h264 ! videoconvert ! appsink'\
             .format(port)
@@ -121,32 +120,36 @@ if __name__ == "__main__":
     import numpy as np
 
     CAMERAS_SERVER_IP = '127.0.0.1'
+    TARGET_FRAME_SIZE_CV = (800, 600)
 
     cam_params = [
-        [GstH264TCPClient, {'ip': CAMERAS_SERVER_IP, 'port': 4000}],
         [GstH264TCPClient, {'ip': CAMERAS_SERVER_IP, 'port': 5000}],
+        [GstH264TCPClient, {'ip': CAMERAS_SERVER_IP, 'port': 4000}],
     ]
 
     cams_controller = GstCamerasController(cam_params)
 
     print('Start!')
 
-    prev_frame = np.zeros((600, 800, 3), np.uint8)
+    prev_frame = np.zeros((TARGET_FRAME_SIZE_CV[1], TARGET_FRAME_SIZE_CV[0], 3), \
+        np.uint8)
 
     while True:
         frame = cams_controller.read_frame()
         if frame is None:
             print('No frame from camera')
 
+            prev_frame = cv2.resize(prev_frame, TARGET_FRAME_SIZE_CV)
             cv2.imshow('result', prev_frame)
             inp = cv2.waitKey(300)
 
         else:
             prev_frame = frame
 
+            frame = cv2.resize(frame, TARGET_FRAME_SIZE_CV)
             cv2.imshow('result', frame)
             inp = cv2.waitKey(1)
-        
+
         if inp & 0xFF == ord('q'):
             break
         elif inp & 0xFF == ord('w'):
