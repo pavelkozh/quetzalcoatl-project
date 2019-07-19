@@ -123,7 +123,7 @@ if __name__ == "__main__":
     TARGET_FRAME_SIZE_CV = (800, 600)
 
     cam_params = [
-        [GstH264TCPClient, {'ip': CAMERAS_SERVER_IP, 'port': 5000}],
+        [GstH264UDPClient, {'ip': CAMERAS_SERVER_IP, 'port': 5000}],
         [GstH264TCPClient, {'ip': CAMERAS_SERVER_IP, 'port': 4000}],
     ]
 
