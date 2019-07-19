@@ -29,8 +29,8 @@ def setup_cameras_controller(logger=None):
                     GstCamerasController -- cameras controller
     """
     cam_params = [
-        [gzcams.GstH264TCPClient, {'ip': SERVER_IP, 'port': 4000}],
         [gzcams.GstH264TCPClient, {'ip': SERVER_IP, 'port': 5000}],
+        [gzcams.GstH264TCPClient, {'ip': SERVER_IP, 'port': 4000}],
     ]
 
     cams_controller = gzcams.GstCamerasController(cam_params, logger)

@@ -39,8 +39,7 @@ class GstClient(object):
 
 
 class GstH264UDPClient(GstClient):
-    def __init__(self, port=5000):
-
+    def __init__(self, port=5000, ip=None):
         gst_string = 'udpsrc port={} ! application/x-rtp, encoding-name=H264 ! '\
             'rtph264depay ! avdec_h264 ! videoconvert ! appsink'\
             .format(port)
@@ -123,8 +122,8 @@ if __name__ == "__main__":
     CAMERAS_SERVER_IP = '127.0.0.1'
 
     cam_params = [
-        [GstH264TCPClient, {'ip': CAMERAS_SERVER_IP, 'port': 4000}],
         [GstH264TCPClient, {'ip': CAMERAS_SERVER_IP, 'port': 5000}],
+        [GstH264TCPClient, {'ip': CAMERAS_SERVER_IP, 'port': 4000}],
     ]
 
     cams_controller = GstCamerasController(cam_params)
@@ -146,7 +145,7 @@ if __name__ == "__main__":
 
             cv2.imshow('result', frame)
             inp = cv2.waitKey(1)
-        
+
         if inp & 0xFF == ord('q'):
             break
         elif inp & 0xFF == ord('w'):
