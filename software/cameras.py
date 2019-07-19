@@ -52,7 +52,7 @@ class GstH264TCPClient(GstClient):
     def __init__(self, ip='127.0.0.1', port=5000):
         gst_string = 'tcpclientsrc host={} port={} ! '\
             'h264parse ! avdec_h264 ! videoconvert ! '\
-            'appsink drop=true sync=false max-buffers=1'\
+            'appsink drop=true sync=false'\
             .format(ip, port)
 
         super().__init__(gst_string)
