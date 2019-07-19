@@ -6,6 +6,7 @@ import time
 import pygame
 import os
 import mqtt_state as ms
+import cv2
 
 import gzl.logger as gzlog
 import gzl.cameras as gzcams
