@@ -59,10 +59,11 @@ void steerEncInit(void)
 
 void steerEncReadValue(void)
 {
-
+    spiAcquireBus(ABS_ENC_SPI_DRIVER);
     spiSelect(ABS_ENC_SPI_DRIVER);
     spiReceive(ABS_ENC_SPI_DRIVER, 1, rxbuf);
     spiUnselect(ABS_ENC_SPI_DRIVER);
+    spiReleaseBus(ABS_ENC_SPI_DRIVER);
 }
 
 float steerGetPosition(void)
