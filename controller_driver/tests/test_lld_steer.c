@@ -56,7 +56,7 @@ void testSteer(void)
                 break;
 
             case '0':
-                comm_dbgprintf("Power: %s / Direction: %s / Position: %d\n",
+                comm_dbgprintf("Pwr: %s / Dir: %s / Pos: %d\n",
                                steerIsMotorEnable() ? "enabled" : "disabled",
                                steerMotorGetDirection() ? "clockwise" : "counterclockwise",
                                (int)steerGetPosition());

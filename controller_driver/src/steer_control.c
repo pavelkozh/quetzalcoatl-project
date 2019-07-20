@@ -12,8 +12,8 @@ static float speed_ref = 0.0,
 static bool steer_control_start = false;
 
 static PIDControllerContext_t steer_pidCtx = {
-    .kp = 0.01,
-    .ki = 0.0,
+    .kp = 0.2,
+    .ki = 0.01,
     .kd = 0.0,
     .integrLimit = 100,
     .integZone = 0.5};
@@ -44,102 +44,73 @@ float steerPosControl(float steer_angle_ref)
     return steer_control_val;
 }
 
-void steerPositionCalculate(void)
+static void steerPositionCalculate(void)
 {
-    position = steerGetPosition();
+    float c_position = steerGetPosition();
     if (position_cnt == 0)
     {
-        if (position > 180)
-            position -= 360;
+        if (c_position > 180)
+            c_position -= 360;
     }
     else
     {
-        position += position_cnt * 360.0;
+        c_position += position_cnt * 360.0;
     }
-    if (position - prev_position < -220)
+
+    if (c_position - prev_position < -220)
     {
         position_cnt++;
-        position += 360.0;
+        c_position += 360.0;
     }
-    if (position - prev_position > 220)
+
+    if (c_position - prev_position > 220)
     {
         position_cnt--;
-        position -= 360.0;
+        c_position -= 360.0;
     }
-    prev_position = position;
-    //return position;
-}
-
-static uint8_t calibration_state_flag = 0;
-// -1 - error
-// 0 - while calibration
-// 1 - calibration finished OK
-int8_t steerMotroDirCalibration(void)
-{
-
-    switch (calibration_state_flag)
-    {
-    case 0:
-        steerMotorStartStopControl();
-        // calibration_state_flag;
-        break;
-    case 1:
-        break;
-    }
-
-    return 1;
+    /* Update global variable */
+    position = prev_position = c_position;
 }
 
 static THD_WORKING_AREA(steer_pos_control_wa, 512);
 static THD_FUNCTION(steer_pos_control, arg)
 {
-
     (void)arg;
-    bool calibration_flag = 1;
     while (1)
     {
         // palToggleLine(LINE_LED2);
         steerPositionCalculate();
 
-        switch (calibration_flag)
+        if (steer_control_start)
         {
-        case 0:
-            if (gazelGetEngineSpeed() > 700)
-                calibration_flag = steerMotroDirCalibration();
-            break;
-        case 1:
-            if (steer_control_start)
+
+            speed_ref = steerPosControl(steer_angle_ref);
+            
+
+            if (((speed_ref < 0) && (!steerMotorGetDirection() /* CCW */)) ||
+                ((speed_ref > 0) && (steerMotorGetDirection() /* CW */)))
             {
-                speed_ref = steerPosControl(steer_angle_ref);
-            }
-            else
-            {
-                steer_pidCtx.err = 0;
-                steer_pidCtx.prevErr = 0;
-                steer_pidCtx.integrSum = 0;
-                speed_ref = 0;
-                // //Motor stop if he run
-                // if(prev_position != position){
-                //     steerMotorStartStopControl();
-                //     steerMotorEnableInvert();
-                // }
-            }
-            if (((speed_ref < 0) && (steerMotorGetDirection() != 0)) || ((speed_ref >= 0) && (steerMotorGetDirection() != 1)))
                 steerMotorDirChange();
-            if (speed_ref < 0)
-            {
-                steerMotorSetSpeed(-speed_ref);
             }
-            else
-            {
-                steerMotorSetSpeed(speed_ref);
-            }
+
+            steerMotorSetSpeed(abs(speed_ref));
+
             prev_speed_ref = speed_ref;
-            break;
-        default:
-            break;
         }
-        chThdSleepMilliseconds(35);
+        else
+        {
+            steer_pidCtx.err = 0;
+            steer_pidCtx.prevErr = 0;
+            steer_pidCtx.integrSum = 0;
+            speed_ref = 0;
+            // //Motor stop if he run
+            // if(prev_position != position){
+            //     steerMotorStartStopControl();
+            //     steerMotorEnableInvert();
+            // }
+        }
+
+        chThdSleepMilliseconds(20);
     }
 }
 
@@ -171,7 +142,7 @@ void steerInit(void)
 void steerControlStart(void)
 {
     steer_control_start = true;
-    if (steerIsMotorEnable() == false)
+    if (!steerIsMotorEnable())
     {
         steerMotorStartStopControl();
     }
@@ -180,7 +151,7 @@ void steerControlStart(void)
 void steerControlStop(void)
 {
     steer_control_start = false;
-    if (steerIsMotorEnable() == true)
+    if (steerIsMotorEnable())
     {
         steerMotorStartStopControl();
     }

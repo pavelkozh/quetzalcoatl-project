@@ -108,13 +108,14 @@ static const SPIConfig m_spicfg = {
     .cr2 = SPI_CR2_DS                                  //16-bit size mode
 };
 
-#define DRIVER_SEND_PULSE_WIDTH_MS 50
+#define DRIVER_SEND_PULSE_WIDTH_MS 25
 
 static bool is_steer_motor_start = false; // 0-stop, 1-start
 static bool is_steer_motor_dir = false;   // 0-stop, 1-start
 static thread_reference_t trp_steer_start_stop = NULL;
-// static bool is_steer_start_stop_change = false;
-static THD_WORKING_AREA(steer_start_stop_wa, 64);
+static bool is_steer_start_stop_changed = true;
+
+static THD_WORKING_AREA(steer_start_stop_wa, 512);
 static THD_FUNCTION(steer_start_stop, arg)
 {
     (void)arg;
@@ -126,12 +127,14 @@ static THD_FUNCTION(steer_start_stop, arg)
 
         chThdSleepMilliseconds(DRIVER_SEND_PULSE_WIDTH_MS);
         palSetLine(MOTOR_START_STOP_LINE);
+        is_steer_start_stop_changed = true;
     }
 }
 
 static thread_reference_t trp_steer_dir_change = NULL;
-// static bool is_steer_dir_change = false;
-static THD_WORKING_AREA(steer_dir_wa, 64);
+static bool is_steer_dir_changed = true;
+
+static THD_WORKING_AREA(steer_dir_wa, 512);
 static THD_FUNCTION(steer_dir, arg)
 {
     (void)arg;
@@ -143,6 +146,7 @@ static THD_FUNCTION(steer_dir, arg)
 
         chThdSleepMilliseconds(DRIVER_SEND_PULSE_WIDTH_MS);
         palSetLine(MOTOR_DIR_LINE);
+        is_steer_dir_changed = true;
     }
 }
 
@@ -185,16 +189,24 @@ void steerMotorSetSpeed(float value)
 
 void steerMotorDirChange(void)
 {
+    if (!is_steer_dir_changed)
+        return;
+
     /* Wake up thread which starts or stops steer motor driver */
     palClearLine(MOTOR_DIR_LINE);
+    is_steer_dir_changed = false;
     chThdResume(&trp_steer_dir_change, MSG_OK);
     is_steer_motor_dir = !is_steer_motor_dir;
 }
 
 void steerMotorStartStopControl(void)
 {
+    if (!is_steer_start_stop_changed)
+        return;
+
     /* Wake up thread which starts or stops steer motor driver */
     palClearLine(MOTOR_START_STOP_LINE);
+    is_steer_start_stop_changed = false;
     chThdResume(&trp_steer_start_stop, MSG_OK);
     is_steer_motor_start = !is_steer_motor_start;
 }
@@ -222,7 +234,7 @@ bool steerMotorDirectionInvert(void)
 /* Synchronization/Testing environment */
 
 /* Percentage of speed to set for motor */
-#define TEST_SPEED_PERC 5
+#define TEST_SPEED_PERC 20
 /* Time for rotation wait */
 #define TEST_WAIT_TIME_MS 300
 /* Minimal delta for movement recognition */
@@ -332,7 +344,7 @@ int steerSyncTestDriver()
     pos_diff = result_pos - initial_pos;
 
     UPDATE_DIFF_NO_LIMITS(pos_diff);
-    
+
     if (abs(pos_diff) < TEST_CHECK_ANGLE_DIFF)
     {
 #ifdef TEST_DEBUG_ENABLED

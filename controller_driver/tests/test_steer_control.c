@@ -27,6 +27,7 @@ void testSteerPositionControl(void)
 #define REF_LOWER_LIMIT -180
     float ref_input = 0;
     float ref_delta = 10;
+    int sync_result = 0;
 
     steerInit();
 
@@ -56,15 +57,19 @@ void testSteerPositionControl(void)
                 break;
 
             case '3':
-                steerSyncTestDriver();
-                comm_dbgprintf("Sync done\n");
+                sync_result = steerSyncTestDriver();
+                comm_dbgprintf("Sync done, result: %d\n", sync_result);
                 break;
 
             case '0':
-                comm_dbgprintf("Power: %s / Direction: %s / Position: %d\n",
+                comm_dbgprintf("Pwr: %s / Dir: %s\n",
                                steerIsMotorEnable() ? "enabled" : "disabled",
-                               steerMotorGetDirection() ? "clockwise" : "counterclockwise",
-                               (int)steerGetPosition());
+                               steerMotorGetDirection() ? "clockwise" : "counterclockwise");
+                comm_dbgprintf("StRef: %d / PsRef: %d / CPos: %d / PErr: %d\n",
+                               (int)steerDbgGetMotorCalcSpeedRef(),
+                               (int)steerDbgGetMotorPosRef(),
+                               (int)steerGetPos(),
+                               (int)steerDbgGetMotorCalcPosErr());
                 break;
 
             case 'q':
