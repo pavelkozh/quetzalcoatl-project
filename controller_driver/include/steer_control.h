@@ -11,8 +11,6 @@ void steerSetPosition ( float val );
 float steerGetPos( void );
 int8_t steerMotroDirCalibration( void );
 
-int steerSyncTestDriver();
-
 /***Debug**/
 float steerDbgGetMotorCalcSpeedRef ( void );
 float steerDbgGetMotorCalcPosErr ( void );

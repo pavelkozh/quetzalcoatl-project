@@ -4,35 +4,109 @@
 #include <steer_control.h>
 #include <lld_steer.h>
 
+static void showHelp(void)
+{
+    comm_dbgprintf("Test LLD steer control module\n");
+    comm_dbgprintf("Commands:\n");
+    comm_dbgprintf("  1 - Start/stop\n");
+    comm_dbgprintf("  2 - Change dir\n");
+    comm_dbgprintf("  3 - Perform driver sync\n");
+    comm_dbgprintf("  0 - Get motor expected state\n");
+    comm_dbgprintf("  q - Increase reference\n");
+    comm_dbgprintf("  a - Decrease reference\n");
+    comm_dbgprintf("  h - show help\n");
+    comm_dbgprintf("  space - Reset reference\n");
+}
 
-static const SerialConfig sdcfg = {
-    .speed  = 115200,
-    .cr1    = 0, .cr2    = 0, .cr3    = 0
-};
+void testSteerPositionControl(void)
+{
+    comm_init(NULL, 0, false);
+    BaseChannel *dbg_chn = comm_get_channel();
 
-void testSteerPositionControl ( void ) {
-    sdStart( &SD3, &sdcfg );
-    palSetPadMode( GPIOD, 8, PAL_MODE_ALTERNATE(7) );   // TX
-    palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
+#define REF_UPPER_LIMIT 180
+#define REF_LOWER_LIMIT -180
+    float ref_input = 0;
+    float ref_delta = 10;
 
     steerInit();
 
-    uint8_t sd_buff[10];
+    showHelp();
 
-    while (1) {
+    while (1)
+    {
+        msg_t msg = chnGetTimeout(dbg_chn, MS2ST(100));
+        if (msg != MSG_TIMEOUT)
+        {
+            char input = (char)msg;
+
+            switch (input)
+            {
+            case 'h':
+                showHelp();
+                break;
+
+            case '1':
+                steerControlStart();
+                comm_dbgprintf("Control start\n");
+                break;
+
+            case '2':
+                steerControlStop();
+                comm_dbgprintf("Control stop\n");
+                break;
+
+            case '3':
+                steerSyncTestDriver();
+                comm_dbgprintf("Sync done\n");
+                break;
+
+            case '0':
+                comm_dbgprintf("Power: %s / Direction: %s / Position: %d\n",
+                               steerIsMotorEnable() ? "enabled" : "disabled",
+                               steerMotorGetDirection() ? "clockwise" : "counterclockwise",
+                               (int)steerGetPosition());
+                break;
+
+            case 'q':
+                ref_input += ref_delta;
+                ref_input = ref_input > REF_UPPER_LIMIT ? REF_UPPER_LIMIT : ref_input;
+                steerSetPosition(ref_input);
+                comm_dbgprintf("Ref increase to %d\n", (int)ref_input);
+                break;
+
+            case 'a':
+                ref_input -= ref_delta;
+                ref_input = ref_input < REF_LOWER_LIMIT ? REF_LOWER_LIMIT : ref_input;
+                steerSetPosition(ref_input);
+                comm_dbgprintf("Ref decrease to %d\n", (int)ref_input);
+                break;
+
+            case ' ':
+                ref_input = 0;
+                steerSetPosition(ref_input);
+                comm_dbgprintf("Reset reference\n");
+                break;
+            }
+        }
+
+#ifdef OLD_TEST
         palToggleLine(LINE_LED1);
 
-        sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
+        sdReadTimeout(&SD3, sd_buff, 9, TIME_IMMEDIATE);
 
-        if(sd_buff[4]=='m') steerSetPosition ( ((float) atoi(sd_buff))/10 );
-        if(sd_buff[0]=='s') steerControlStart();
-        if(sd_buff[0]=='d') steerControlStop();
-        chprintf( (BaseSequentialStream *)&SD3, "PosRef %.02f\t Encoder %d\t PosErr %.02f\t PidOut %.02f\t MotorEn%d\t \n\r",steerDbgGetMotorPosRef(),(uint16_t)(steerGetPosition()), steerDbgGetMotorCalcPosErr(),steerDbgGetMotorCalcSpeedRef(), steerDbgGetEnableFlag());
+        if (sd_buff[4] == 'm')
+            steerSetPosition(((float)atoi(sd_buff)) / 10);
+        if (sd_buff[0] == 's')
+            steerControlStart();
+        if (sd_buff[0] == 'd')
+            steerControlStop();
+        chprintf((BaseSequentialStream *)&SD3, "PosRef %.02f\t Encoder %d\t PosErr %.02f\t PidOut %.02f\t MotorEn%d\t \n\r", steerDbgGetMotorPosRef(), (uint16_t)(steerGetPosition()), steerDbgGetMotorCalcPosErr(), steerDbgGetMotorCalcSpeedRef(), steerDbgGetEnableFlag());
 
         for (int i = 0; i < 9; i++)
         {
-          sd_buff[i]='?';
+            sd_buff[i] = '?';
         }
-        chThdSleepMilliseconds( 1000 );
+#endif
+        chThdSleepMilliseconds(100);
     }
 }
