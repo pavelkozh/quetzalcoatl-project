@@ -71,9 +71,8 @@ float steerGetPosition( void ) {
 	steerEncReadValue();
     // palToggleLine(LINE_LED3);
 	int16_t ang = 0;
-    ang = ( rxbuf[0] & 0b0111111111111000 ) >> 3; // main variable 
-    if(ang > 2049) ang = ang - 4095;
-    return (float)double_map(ang, -2048, 2049, -180, 180);
+    ang = ( rxbuf[0] & 0b0111111111111000 ) >> 3; // main variable     
+    return (float)double_map(ang, 0, 4095, 0, 360);
 }
 
 /****************************************************************************/
@@ -113,6 +112,7 @@ static const SPIConfig m_spicfg = {
 };
 
 static bool is_steer_motor_start = false; // 0-stop, 1-start
+static bool is_steer_motor_dir = false; // 0-stop, 1-start
 static thread_reference_t trp_steer_start_stop = NULL;
 static bool is_steer_start_stop_change = false;
 static THD_WORKING_AREA(steer_start_stop_wa, 512);
@@ -157,6 +157,7 @@ static THD_FUNCTION(steer_dir, arg) {
         palClearLine(MOTOR_DIR_LINE);
         chThdSleepMilliseconds(200);
         palSetLine(MOTOR_DIR_LINE);
+        is_steer_motor_dir = !is_steer_motor_dir;
 
         is_steer_dir_change = false;
         chSysLock();
@@ -229,6 +230,18 @@ void steerMotorStartStopControl ( void ){
 
 bool steerIsMotorEnable ( void ){
     return is_steer_motor_start;
+}
+
+bool steerMotorEnableInvert ( void ){
+    is_steer_motor_start !=is_steer_motor_start ;
+}
+
+bool steerMotorDirection( void ){
+    return is_steer_motor_dir;
+}
+
+bool steerMotorDirectionInvert( void ){
+    is_steer_motor_dir !=is_steer_motor_dir ;
 }
 
 
