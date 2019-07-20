@@ -59,8 +59,8 @@ void engIgnitionInit ( void )
     palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
 
 
-    palSetLineMode( IGNITION_PAL_LINE, PAL_MODE_OUTPUT_PUSHPULL );
-    palSetLineMode( STARTER_PAL_LINE,  PAL_MODE_OUTPUT_PUSHPULL );
+    palSetLineMode( IGNITION_PAL_LINE, PAL_MODE_OUTPUT_OPENDRAIN );
+    palSetLineMode( STARTER_PAL_LINE,  PAL_MODE_OUTPUT_OPENDRAIN );
 
     palSetLine(IGNITION_PAL_LINE);
     palSetLine(STARTER_PAL_LINE);
