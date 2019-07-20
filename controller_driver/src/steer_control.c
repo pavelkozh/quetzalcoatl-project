@@ -67,18 +67,11 @@ static uint8_t calibration_state_flag = 0;
 // 0 - while calibration
 // 1 - calibration finished OK
 int8_t steerMotroDirCalibration( void ){
-    
-        switch(calibration_state_flag){
-            case 0: steerMotorStartStopControl();
-                    calibration_state_flag();
-                break;
-            case 1:
-                break;    
-        }
-    
 
 return 1;
 }
+
+// TODO: Engine speed enable
 
 static THD_WORKING_AREA(steer_pos_control_wa, 512);
 static THD_FUNCTION(steer_pos_control, arg) {
