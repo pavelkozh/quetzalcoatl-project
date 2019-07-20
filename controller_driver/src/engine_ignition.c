@@ -20,10 +20,8 @@ static THD_FUNCTION(eng_ignition, arg) {
             chSysUnlock();
         }
         else{
-
-            palClearLine(IGNITION_PAL_LINE);
             palClearLine(STARTER_PAL_LINE);
-            while ( dbgVal < 730 ){ //( gazelGetEngineSpeed() < 730 ){
+            while (  gazelGetEngineSpeed() < 710 ){
                 palSetLine(LINE_LED2);
                 chThdSleepMilliseconds( 50 );
             }
@@ -61,40 +59,57 @@ void engIgnitionInit ( void )
     palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
 
 
-    palSetLineMode( IGNITION_PAL_LINE, PAL_MODE_OUTPUT_PUSHPULL );
-    palSetLineMode( STARTER_PAL_LINE,  PAL_MODE_OUTPUT_PUSHPULL );
+    palSetLineMode( IGNITION_PAL_LINE, PAL_MODE_OUTPUT_OPENDRAIN );
+    palSetLineMode( STARTER_PAL_LINE,  PAL_MODE_OUTPUT_OPENDRAIN );
 
     palSetLine(IGNITION_PAL_LINE);
     palSetLine(STARTER_PAL_LINE);
 
     feedbackInit();
-    chThdCreateStatic(eng_ignition_wa, sizeof(eng_ignition_wa), NORMALPRIO + 1, eng_ignition, NULL);
+    //chThdCreateStatic(eng_ignition_wa, sizeof(eng_ignition_wa), NORMALPRIO + 1, eng_ignition, NULL);
 
     if_eng_ignition_tnitialized = true;
 }
 
-bool engIgnitionSwitchOn ( void )
+
+
+bool engStarterSwitchOn ( void )
 {
-    if (is_engine_start_thd_working == 0) {
-        is_engine_start_thd_working = 1;
-        palSetLine(LINE_LED1);
-        /* Wake up engine start thread */
-        chSysLock();
-        chThdResume(&trp_eng_ignition, MSG_OK);
-        chSysUnlock();
-    }
+//    if (is_engine_start_thd_working == 0) {
+//        is_engine_start_thd_working = 1;
+//        palSetLine(LINE_LED1);
+//        /* Wake up engine start thread */
+//        chSysLock();
+//        chThdResumeS(&trp_eng_ignition, MSG_OK);
+//        chSysUnlock();
+//    }
+    palClearLine(STARTER_PAL_LINE);
     return  ( is_engine_start_thd_working && ( gazelGetEngineSpeed() > 750 ) );
 
 }
 
+void engStarterSwitchOff ( void )
+{
+    palSetLine(STARTER_PAL_LINE);
+}
+
+
+
 void engIgnitionSwitchOff ( void )
 {
     palSetLine(IGNITION_PAL_LINE);
-
-    palClearLine(LINE_LED1);
-    palClearLine(LINE_LED2);
-    palClearLine(LINE_LED3);
 }
+
+void engIgnitionSwitchOn ( void )
+{
+    palClearLine(IGNITION_PAL_LINE);
+}
+
+
+
+
+
+
 
 void engIgnitionDbgSetEngSpeed ( uint16_t val )
 {

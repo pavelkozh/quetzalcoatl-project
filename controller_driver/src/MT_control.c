@@ -74,7 +74,7 @@ static THD_FUNCTION(mt_control, arg) {
                     {
                         /* Shifting is start and thread wake up! */
                         chSysLock();
-                        chThdResume(&trp_gearshift, MSG_OK);
+                        chThdResumeS(&trp_gearshift, MSG_OK);
                         chSysUnlock();
 
                         gear = 2;
@@ -119,12 +119,7 @@ int8_t mtControlMannualyShiftGear ( uint8_t command_gear )
 {
 
     /* Shifting is start and thread wake up! */
-    chSysLock();
     chThdResume(&trp_gearshift, MSG_OK);
-    chSysUnlock();
-
-   // palSetLine(LINE_LED2);
-
 
     gear = command_gear;
     return gear_num;

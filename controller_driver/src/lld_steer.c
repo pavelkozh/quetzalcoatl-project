@@ -210,7 +210,7 @@ void steerMotorDirChange ( void ){
         is_steer_dir_change = true;
         /* Wake up thread which starts or stops steer motor driver */
         chSysLock();
-        chThdResume(&trp_steer_dir_change, MSG_OK);
+        chThdResumeS(&trp_steer_dir_change, MSG_OK);
         chSysUnlock();
       }
 
@@ -222,7 +222,7 @@ void steerMotorStartStopControl ( void ){
         is_steer_start_stop_change = true;
         /* Wake up thread which starts or stops steer motor driver */
         chSysLock();
-        chThdResume(&trp_steer_start_stop, MSG_OK);
+        chThdResumeS(&trp_steer_start_stop, MSG_OK);
         chSysUnlock();
       }
 

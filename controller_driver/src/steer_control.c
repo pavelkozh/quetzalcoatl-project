@@ -61,16 +61,21 @@ void  steerPositionCalculate( void ){
         prev_position = position;
         //return position;
 }
+
+static uint8_t calibration_state_flag = 0;
 // -1 - error
 // 0 - while calibration
 // 1 - calibration finished OK
 int8_t steerMotroDirCalibration( void ){
-    uint8_t state_flag = 0;
-        switch(){
-            case 0:
+    
+        switch(calibration_state_flag){
+            case 0: steerMotorStartStopControl();
+                    calibration_state_flag();
                 break;
+            case 1:
+                break;    
         }
-    steerMotorStartStopControl();
+    
 
 return 1;
 }

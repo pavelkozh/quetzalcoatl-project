@@ -24,7 +24,7 @@ void TestEngIgnition ( void )
 
     engIgnitionInit();
     feedbackInit();
-    emergencyStopInit();
+   // emergencyStopInit();
 
     uint8_t sd_buff[10];
     uint8_t var = 15;
@@ -36,6 +36,9 @@ void TestEngIgnition ( void )
 
         if(sd_buff[0]=='a') engIgnitionSwitchOn ();
         if(sd_buff[0]=='s') engIgnitionSwitchOff();
+        if(sd_buff[0]=='b') engStarterSwitchOn();
+        if(sd_buff[0]=='d') engStarterSwitchOff();
+
         if(sd_buff[4]=='e') engIgnitionDbgSetEngSpeed (atoi(sd_buff));
 
         for (int i = 0; i < 9; i++)
