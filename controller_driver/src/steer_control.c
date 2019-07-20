@@ -72,6 +72,8 @@ static void steerPositionCalculate(void)
     position = prev_position = c_position;
 }
 
+// TODO: Engine speed enable
+
 static THD_WORKING_AREA(steer_pos_control_wa, 512);
 static THD_FUNCTION(steer_pos_control, arg)
 {
@@ -85,7 +87,6 @@ static THD_FUNCTION(steer_pos_control, arg)
         {
 
             speed_ref = steerPosControl(steer_angle_ref);
-            
 
             if (((speed_ref < 0) && (!steerMotorGetDirection() /* CCW */)) ||
                 ((speed_ref > 0) && (steerMotorGetDirection() /* CW */)))
@@ -134,7 +135,11 @@ void steerInit(void)
     position_cnt = 0;
     prev_position = position;
 
-    chThdCreateStatic(steer_pos_control_wa, sizeof(steer_pos_control_wa), NORMALPRIO, steer_pos_control, NULL);
+    chThdCreateStatic(steer_pos_control_wa,
+                      sizeof(steer_pos_control_wa),
+                      NORMALPRIO,
+                      steer_pos_control,
+                      NULL);
 
     is_initialized = true;
 }

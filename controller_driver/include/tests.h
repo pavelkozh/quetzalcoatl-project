@@ -22,7 +22,7 @@ void testSteerPositionControl ( void );
 void testEmergencyStop ( void );
 void TestEngIgnition ( void );
 void testCommunication(void);
-
+void testMain( void );
 
 static inline void testsRoutines( void )
 {
@@ -59,6 +59,9 @@ static inline void testsRoutines( void )
 
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_STEER_WITH_COMMUNICATION)
     testCommunicationWithSteer();
+
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_MAIN)
+    testMain();
 
 
 #endif

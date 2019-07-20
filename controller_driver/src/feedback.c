@@ -127,5 +127,6 @@ double gazelGetBatteryPotential(void){
 
 double gazelGetBrakePedalPosition(void){
   return gaz->BrakePedalPosition;
-
 };
+
+
