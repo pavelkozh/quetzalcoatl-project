@@ -51,6 +51,21 @@ void steerMotorDirChange ( void );
  *           0 - if motor is disable (stop)
  */
 bool steerIsMotorEnable ( void );
+/*
+ * @brief    Check motor direction 	
+ * @note     Motor state depends on previous changes on driver's "Start" input
+ * @return   1 - if motor is rotates clockwise
+ *           0 - if motor is rotates counterсlockwise
+ */
+bool steerMotorGetDirection( void );
+/*
+*@brief Inverte flag of steer motor speed
+*/
 
+bool steerMotorEnableInvert ( void );
+/*
+*@brief Inverte flag of steer motor direction
+*/
 
+bool steerMotorDirectionInvert( void );
 #endif  /*INCLUDE_LLD_STEER_H */

@@ -1,5 +1,6 @@
 #include <steer_control.h>
 #include <lld_steer.h>
+#include <feedback.h>
 #include <pid.h>
 
 static double steer_control_val = 0.0;
@@ -19,12 +20,11 @@ static uint8_t CSErrorDeadzoneHalfwidth = 1;
 
 
 static float position;
+static float prev_position;
+static int8_t position_cnt;
 float steerPosControl( float steer_angle_ref ){
 
     float error = steer_angle_ref - position;
-    if ( error > 180.0 ){
-        error = 360.0 - error;
-    }
 
     /* Dead zone for (p) error */
     if ( abs(error) < CSErrorDeadzoneHalfwidth ){
@@ -43,38 +43,79 @@ float steerPosControl( float steer_angle_ref ){
 
 }
 
+void  steerPositionCalculate( void ){
+        position = steerGetPosition();
+        if(position_cnt == 0){
+            if(position > 180) position -= 360;
+        }else{
+            position += position_cnt*360.0;
+        }
+        if(position - prev_position < -220) {
+            position_cnt++;
+            position+=360.0;
+        }
+        if(position - prev_position >  220) {
+            position_cnt--;
+            position-=360.0;
+        }
+        prev_position = position;
+        //return position;
+}
+// -1 - error
+// 0 - while calibration
+// 1 - calibration finished OK
+int8_t steerMotroDirCalibration( void ){
+    uint8_t state_flag = 0;
+        switch(){
+            case 0:
+                break;
+        }
+    steerMotorStartStopControl();
 
-static THD_WORKING_AREA(steer_pos_control_wa, 2048);
+return 1;
+}
+
+static THD_WORKING_AREA(steer_pos_control_wa, 512);
 static THD_FUNCTION(steer_pos_control, arg) {
 
     (void)arg;
-
+    bool calibration_flag = 1;
     while(1){
-        palToggleLine(LINE_LED2);
-        position = steerGetPosition();
+        // palToggleLine(LINE_LED2);
+        steerPositionCalculate();
 
-        if ( steer_control_start ){
-             speed_ref = steerPosControl( steer_angle_ref );
-         }
-        else{
-            steer_pidCtx.err        = 0;
-            steer_pidCtx.prevErr    = 0;
-            steer_pidCtx.integrSum  = 0;
-            speed_ref = 0;
+        switch(calibration_flag){
+            case 0:
+                if(gazelGetEngineSpeed() > 700)
+                    calibration_flag = steerMotroDirCalibration();
+                break;
+            case 1:
+                if ( steer_control_start ){
+                         speed_ref = steerPosControl( steer_angle_ref );
+                     }
+                else{
+                    steer_pidCtx.err        = 0;
+                    steer_pidCtx.prevErr    = 0;
+                    steer_pidCtx.integrSum  = 0;
+                    speed_ref = 0;
+                    // //Motor stop if he run
+                    // if(prev_position != position){
+                    //     steerMotorStartStopControl();
+                    //     steerMotorEnableInvert();
+                    // }
+                }
+                if( ( (speed_ref<0) && (steerMotorGetDirection()!=0) ) || ((speed_ref>=0) && ( steerMotorGetDirection()!=1 )) ) steerMotorDirChange();
+                if ( speed_ref < 0 ){
+                    steerMotorSetSpeed(-speed_ref);
+                }
+                else{
+                    steerMotorSetSpeed(speed_ref);
+                }
+                prev_speed_ref = speed_ref;
+                break;
+            default:
+                break;
         }
-        if ( sign(speed_ref) != sign(prev_speed_ref)){
-            steerMotorDirChange();
-            palToggleLine(LINE_LED3);
-        }
-        if ( speed_ref < 0 ){
-            steerMotorSetSpeed(-speed_ref);
-        }
-        else{
-            steerMotorSetSpeed(speed_ref);
-        }
-
-
-        prev_speed_ref = speed_ref;
         chThdSleepMilliseconds( 35 );
     }
 }
@@ -96,6 +137,9 @@ void steerInit(void) {
     
     steerMotorInit();
     position = steerGetPosition();
+    if(position > 180) position -= 360;
+    position_cnt = 0;
+    prev_position = position;
 
     chThdCreateStatic(steer_pos_control_wa, sizeof(steer_pos_control_wa), NORMALPRIO, steer_pos_control, NULL);
 
@@ -160,4 +204,14 @@ float steerDbgGetMotorPosRef ( void )
 bool steerDbgGetEnableFlag ( void )
 {
     return steerIsMotorEnable ();
+}
+
+bool steerDbgGetDir( void )
+{
+    return steerMotorGetDirection();
+}
+
+
+int pos_cnt( void ){
+    return position_cnt;
 }
