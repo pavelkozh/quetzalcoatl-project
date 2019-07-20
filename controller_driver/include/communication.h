@@ -20,8 +20,10 @@ typedef struct {
     
 } communicationEventFun_t;
 
+// TODO - add start receiving function
+// TODO - create communication console
+
 void comm_init(communicationEventFun_t structWithFunc, uint32_t timeout_MS);
-void comm_dbgprintf( const char* format, ... );
 void comm_dbgprintf_error(const char *format, ...);
 void comm_dbgprintf_warning(const char *format, ...);
 void comm_dbgprintf_info(const char *format, ...);

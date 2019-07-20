@@ -10,6 +10,8 @@ void steerControlStop(void);
 void steerSetPosition ( float val );
 float steerGetPos( void );
 
+int steerSyncTestDriver();
+
 /***Debug**/
 float steerDbgGetMotorCalcSpeedRef ( void );
 float steerDbgGetMotorCalcPosErr ( void );

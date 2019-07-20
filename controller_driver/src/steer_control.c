@@ -1,6 +1,7 @@
 #include <steer_control.h>
 #include <lld_steer.h>
 #include <pid.h>
+#include <errno.h>
 
 static double steer_control_val = 0.0;
 static float speed_ref = 0.0,
@@ -79,11 +80,34 @@ static THD_FUNCTION(steer_pos_control, arg) {
     }
 }
 
-static bool if_steer_control_module_initialized = false;
+static bool is_initialized = false;
+
+#define TEST_SPEED_PERC     20
+#define TEST_WAIT_TIME_MS   500
+
+int steerSyncTestDriver() {
+    if ( !is_initialized )
+    {
+        return EINVAL;
+    }   
+
+    /* Step 1 - first check */
+    float initial_pos = steerGetPosition();
+    
+    
+    steerMotorSetSpeed( TEST_SPEED_PERC );
+
+    chThdSleepMilliseconds( TEST_WAIT_TIME_MS );
+
+
+    /* Step 2 - check direction */
+
+    return EOK;
+}
 
 void steerInit(void) {
 
-    if ( if_steer_control_module_initialized )
+    if ( is_initialized )
     {
         return;
     }
@@ -100,7 +124,7 @@ void steerInit(void) {
     chThdCreateStatic(steer_pos_control_wa, sizeof(steer_pos_control_wa), NORMALPRIO, steer_pos_control, NULL);
 
     
-    if_steer_control_module_initialized = true;
+    is_initialized = true;
     
 
 }
