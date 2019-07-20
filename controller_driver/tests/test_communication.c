@@ -37,7 +37,7 @@ void testCommunication(void)
 {
     communicationEventFun_t structForFunc = getDefaultCfg();
  
-    structForFunc.on_set    = fucnt_on_set;
+    structForFunc.on_set    = fucnt_on_set; //
     structForFunc.on_start  = funct_on_start;
     structForFunc.on_stop   = funct_on_stop;
     structForFunc.on_interrupt_timer = funct_on_interrupt_timer;

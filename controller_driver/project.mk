@@ -31,6 +31,7 @@ PROJECT_TESTS   =	tests/test_pedals.c              \
                     tests/test_lld_steer.c           \
                     tests/test_steer_control.c       \
                     tests/test_emergency_stop.c      \
+                    tests/test_steer_with_communication.c \
 
 
 

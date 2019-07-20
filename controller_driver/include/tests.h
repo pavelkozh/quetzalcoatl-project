@@ -57,6 +57,9 @@ static inline void testsRoutines( void )
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_COMMUNICATION)
     testCommunication();
 
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_STEER_WITH_COMMUNICATION)
+    testCommunicationWithSteer();
+
 
 #endif
 

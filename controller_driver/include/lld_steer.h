@@ -12,7 +12,7 @@ void steerEncInit( void );
  * @brief   Read data from absolute encoder 
  * @return  Position from 0 to 360 degrees
  */
-double steerGetPosition( void );
+float steerGetPosition( void );
 
 /**
  * @brief   Initialize steer motor driver. US talk with driver via SPI
