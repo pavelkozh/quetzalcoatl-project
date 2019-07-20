@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #define     PROGRAM_ROUTINE_MASTER                      1
 
@@ -32,7 +33,7 @@
 #define		PROGRAM_ROUTINE_TEST_MAIN			14
 
 
-#define     MAIN_PROGRAM_ROUTINE                     PROGRAM_ROUTINE_MASTER  
+#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_STEER 
 
 
 
@@ -43,6 +44,9 @@
 #define CLIP_VALUE(x, min, max) ((x) < (min) ? (min) : \
 (x) > (max) ? (max) : (x))
 
+#ifndef EOK
+    #define EOK 0
+#endif
 
 /**
  * @brief   Initialize EXT driver with empty config
