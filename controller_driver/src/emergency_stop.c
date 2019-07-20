@@ -99,9 +99,9 @@ void extcb_base(EXTDriver *extp, expchannel_t channel)
         is_breaking_thread_work = true;
 //        chprintf( (BaseSequentialStream *)&SD3, "In Interrupt\n\r");
         /* Wake up braking thread */
-        chSysLock();
+        chSysLockFromISR();
         chThdResumeI(&trp_emergency_button_stop, MSG_OK);
-        chSysUnlock();
+        chSysUnlockFromISR();
     }
 
 }

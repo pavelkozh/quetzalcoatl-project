@@ -119,12 +119,7 @@ int8_t mtControlMannualyShiftGear ( uint8_t command_gear )
 {
 
     /* Shifting is start and thread wake up! */
-    chSysLock();
     chThdResume(&trp_gearshift, MSG_OK);
-    chSysUnlock();
-
-   // palSetLine(LINE_LED2);
-
 
     gear = command_gear;
     return gear_num;
