@@ -74,7 +74,7 @@ static THD_FUNCTION(mt_control, arg) {
                     {
                         /* Shifting is start and thread wake up! */
                         chSysLock();
-                        chThdResume(&trp_gearshift, MSG_OK);
+                        chThdResumeS(&trp_gearshift, MSG_OK);
                         chSysUnlock();
 
                         gear = 2;
