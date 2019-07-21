@@ -1,6 +1,9 @@
 #include <steer_control.h>
 #include <lld_steer.h>
+#include <feedback.h>
 #include <pid.h>
+#include <errno.h>
+#include <math.h>
 
 static double steer_control_val = 0.0;
 static float speed_ref = 0.0,
@@ -8,156 +11,206 @@ static float speed_ref = 0.0,
              steer_angle_ref = 0.0;
 static bool steer_control_start = false;
 
- static PIDControllerContext_t  steer_pidCtx = {
-    .kp   = 0.01,
-    .ki   = 0.0,
-    .kd   = 0.0,
-    .integrLimit  = 100,
-    .integZone = 0.5
-};
+static PIDControllerContext_t steer_pidCtx = {
+    .kp = 0.2,
+    .ki = 0.01,
+    .kd = 0.0,
+    .integrLimit = 100,
+    .integZone = 0.5};
 static uint8_t CSErrorDeadzoneHalfwidth = 1;
 
-
 static float position;
-float steerPosControl( float steer_angle_ref ){
-
+static float prev_position;
+static int8_t position_cnt;
+float steerPosControl(float steer_angle_ref)
+{
     float error = steer_angle_ref - position;
-    if ( error > 180.0 ){
-        error = 360.0 - error;
-    }
 
     /* Dead zone for (p) error */
-    if ( abs(error) < CSErrorDeadzoneHalfwidth ){
+    if (abs(error) < CSErrorDeadzoneHalfwidth)
+    {
         steer_pidCtx.err = 0;
     }
-    else{
+    else
+    {
         steer_pidCtx.err = error;
     }
     steer_pidCtx.integZone_abs = steer_angle_ref * steer_pidCtx.integZone;
-    steer_control_val    = PIDControlResponse( &steer_pidCtx );
+    steer_control_val = PIDControlResponse(&steer_pidCtx);
 
     /*  roughly reset integral */
-    steer_control_val = CLIP_VALUE(steer_control_val,-100.0,100.0);
+    steer_control_val = CLIP_VALUE(steer_control_val, -100.0, 100.0);
 
     return steer_control_val;
-
 }
 
+static void steerPositionCalculate(void)
+{
+    float c_position = steerGetPosition();
+    if (position_cnt == 0)
+    {
+        if (c_position > 180)
+            c_position -= 360;
+    }
+    else
+    {
+        c_position += position_cnt * 360.0;
+    }
 
-static THD_WORKING_AREA(steer_pos_control_wa, 2048);
-static THD_FUNCTION(steer_pos_control, arg) {
+    if (c_position - prev_position < -220)
+    {
+        position_cnt++;
+        c_position += 360.0;
+    }
 
+    if (c_position - prev_position > 220)
+    {
+        position_cnt--;
+        c_position -= 360.0;
+    }
+    /* Update global variable */
+    position = prev_position = c_position;
+}
+
+// TODO: Engine speed enable
+
+static THD_WORKING_AREA(steer_pos_control_wa, 512);
+static THD_FUNCTION(steer_pos_control, arg)
+{
     (void)arg;
+    while (1)
+    {
+        // palToggleLine(LINE_LED2);
+        steerPositionCalculate();
 
-    while(1){
-        palToggleLine(LINE_LED2);
-        position = steerGetPosition();
+        if (steer_control_start)
+        {
 
-        if ( steer_control_start ){
-             speed_ref = steerPosControl( steer_angle_ref );
-         }
-        else{
-            steer_pidCtx.err        = 0;
-            steer_pidCtx.prevErr    = 0;
-            steer_pidCtx.integrSum  = 0;
+            speed_ref = steerPosControl(steer_angle_ref);
+
+            if (((speed_ref < 0) && (!steerMotorGetDirection() /* CCW */)) ||
+                ((speed_ref > 0) && (steerMotorGetDirection() /* CW */)))
+            {
+                steerMotorDirChange();
+            }
+
+            steerMotorSetSpeed(abs(speed_ref));
+
+            prev_speed_ref = speed_ref;
+        }
+        else
+        {
+            steer_pidCtx.err = 0;
+            steer_pidCtx.prevErr = 0;
+            steer_pidCtx.integrSum = 0;
             speed_ref = 0;
-        }
-        if ( sign(speed_ref) != sign(prev_speed_ref)){
-            steerMotorDirChange();
-            palToggleLine(LINE_LED3);
-        }
-        if ( speed_ref < 0 ){
-            steerMotorSetSpeed(-speed_ref);
-        }
-        else{
-            steerMotorSetSpeed(speed_ref);
+            // //Motor stop if he run
+            // if(prev_position != position){
+            //     steerMotorStartStopControl();
+            //     steerMotorEnableInvert();
+            // }
         }
 
-
-        prev_speed_ref = speed_ref;
-        chThdSleepMilliseconds( 35 );
+        chThdSleepMilliseconds(20);
     }
 }
 
-static bool if_steer_control_module_initialized = false;
+static bool is_initialized = false;
 
-void steerInit(void) {
-
-    if ( if_steer_control_module_initialized )
+void steerInit(void)
+{
+    if (is_initialized)
     {
         return;
     }
-    
-    PIDControlInit( &steer_pidCtx );
-    
-    
-    
+
+    PIDControlInit(&steer_pidCtx);
+
     steerEncInit();
-    
+
     steerMotorInit();
     position = steerGetPosition();
+    if (position > 180)
+        position -= 360;
+    position_cnt = 0;
+    prev_position = position;
 
-    chThdCreateStatic(steer_pos_control_wa, sizeof(steer_pos_control_wa), NORMALPRIO, steer_pos_control, NULL);
+    chThdCreateStatic(steer_pos_control_wa,
+                      sizeof(steer_pos_control_wa),
+                      NORMALPRIO,
+                      steer_pos_control,
+                      NULL);
 
-    
-    if_steer_control_module_initialized = true;
-    
-
+    is_initialized = true;
 }
 
-
-
-void steerControlStart(void) {
+void steerControlStart(void)
+{
     steer_control_start = true;
-    if ( steerIsMotorEnable () == false ){
+    if (!steerIsMotorEnable())
+    {
         steerMotorStartStopControl();
     }
-
 }
 
-void steerControlStop(void) {
+void steerControlStop(void)
+{
     steer_control_start = false;
-    if ( steerIsMotorEnable () == true ){
+    if (steerIsMotorEnable())
+    {
         steerMotorStartStopControl();
     }
-   else{
-       steer_pidCtx.err        = 0;
-       steer_pidCtx.prevErr    = 0;
-       steer_pidCtx.integrSum  = 0;
-       speed_ref = steerGetPosition();
-   }
+    else
+    {
+        steer_pidCtx.err = 0;
+        steer_pidCtx.prevErr = 0;
+        steer_pidCtx.integrSum = 0;
+        speed_ref = steerGetPosition();
+    }
 }
 
-void steerSetPosition ( float val ){
-    if ( val > 180.0 ) val = 180.0;
-    if ( val < -180.0 ) val = -180.0;
+void steerSetPosition(float val)
+{
+    if (val > 180.0)
+        val = 180.0;
+    if (val < -180.0)
+        val = -180.0;
     steer_angle_ref = val;
 }
 
-
-float steerGetPos( void ){
+float steerGetPos(void)
+{
     return position;
 }
 
-
 /**DBG functions**/
 
-float steerDbgGetMotorCalcSpeedRef ( void )
+float steerDbgGetMotorCalcSpeedRef(void)
 {
     return speed_ref;
 }
 
-float steerDbgGetMotorCalcPosErr ( void )
+float steerDbgGetMotorCalcPosErr(void)
 {
     return steer_pidCtx.err;
 }
 
-float steerDbgGetMotorPosRef ( void )
+float steerDbgGetMotorPosRef(void)
 {
     return steer_angle_ref;
 }
 
-bool steerDbgGetEnableFlag ( void )
+bool steerDbgGetEnableFlag(void)
 {
-    return steerIsMotorEnable ();
+    return steerIsMotorEnable();
+}
+
+bool steerDbgGetDir(void)
+{
+    return steerMotorGetDirection();
+}
+
+int pos_cnt(void)
+{
+    return position_cnt;
 }

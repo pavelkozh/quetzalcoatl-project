@@ -52,7 +52,7 @@ void setDirection(void){
 
 void testCommunicationWithSteer(void)
 {
-    communicationEventFun_t structForFunc = getDefaultCfg();
+    communicationEventFun_t structForFunc = comm_get_default_cfg();
  
     structForFunc.on_set    = changeSpeedSteer;
     structForFunc.on_start  = setStartSteer;
@@ -62,7 +62,7 @@ void testCommunicationWithSteer(void)
     
     uint32_t time_for_vt_MS = 2000;
 
-    comm_init(structForFunc, time_for_vt_MS);
+    comm_init(&structForFunc, time_for_vt_MS, true);
 
     // steerEncInit();
     // steerMotorInit();
@@ -74,12 +74,12 @@ void testCommunicationWithSteer(void)
     {   
         // palToggleLine(LINE_LED3);
         // comm_dbgprintf_info("PosRef %.02f\t Encoder %d\t PosErr %.02f\t PidOut %.02f\t MotorEn %d\t \n\r",steerDbgGetMotorPosRef(),(uint16_t)(steerGetPosition()), steerDbgGetMotorCalcPosErr(),steerDbgGetMotorCalcSpeedRef(), steerDbgGetEnableFlag());
-        comm_dbgprintf_info("PosRef %.02f\t Encoder %d\t  ", steerDbgGetMotorPosRef(),(int16_t)(steerGetPos()));
-        comm_dbgprintf_info("PosErr %.02f\t PidOut %.02f\t ", steerDbgGetMotorCalcPosErr(),steerDbgGetMotorCalcSpeedRef());
-        comm_dbgprintf_info("MotorEn %d \n", steerDbgGetEnableFlag());
+        comm_dbgprintf_info("Ref %.02f\t Enc %d\t  ", steerDbgGetMotorPosRef(),(int16_t)(steerGetPos()));
+        comm_dbgprintf_info("Err %.02f\t Out %.02f\t ", steerDbgGetMotorCalcPosErr(),steerDbgGetMotorCalcSpeedRef());
+        comm_dbgprintf_info("MotorEn %d Motordir:%d\n", steerDbgGetEnableFlag(),steerMotorDirection());
         // comm_dbgprintf_info("PosRef %d  \n",steerDbgGetEnableFlag());
         // comm_dbgprintf_info("I m in setStartSteer \n");
       
-        chThdSleepMilliseconds(600);
+        chThdSleepMilliseconds(200);
     }
 }

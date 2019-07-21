@@ -3,31 +3,33 @@
 
 #include <stdint.h>
 
-#define COMM_MODE_SERIAL_PROG   1
-#define COMM_MODE_SERIAL_USB    2
-
-#define COMM_MODE   COMM_MODE_SERIAL_USB
-
 typedef int8_t comm_speed_t;
 typedef int8_t comm_steer_t;
 
-typedef struct {
+typedef struct
+{
 
     void (*on_set)(comm_speed_t speed, comm_steer_t angle);
     void (*on_start)(void);
     void (*on_stop)(void);
     void (*on_interrupt_timer)(void);
-    
+
 } communicationEventFun_t;
 
-void comm_init(communicationEventFun_t structWithFunc, uint32_t timeout_MS);
-void comm_dbgprintf( const char* format, ... );
+communicationEventFun_t comm_get_default_cfg(void);
+
+void comm_init(communicationEventFun_t *structWithFunc,
+               uint32_t timeout_MS,
+               bool usb_mode);
+void comm_start_protocol(void);
+
+void comm_dbgprintf(const char *format, ...);
 void comm_dbgprintf_error(const char *format, ...);
 void comm_dbgprintf_warning(const char *format, ...);
 void comm_dbgprintf_info(const char *format, ...);
 
-communicationEventFun_t getDefaultCfg(void);
-comm_speed_t comm_get_speed( void );
-comm_steer_t comm_get_steer( void );
+/* Use carefully, as USB can freeze controller! */
+BaseChannel *comm_get_channel(void);
+
 
 #endif //_COMMUNICATION_

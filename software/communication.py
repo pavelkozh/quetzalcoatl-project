@@ -25,7 +25,7 @@ class CommunicationOnSerial(object):
             writeTimeout=0
         )
         self.ser_buffer = ""
-        self.work_resolution = False
+        self.work_resolution = True
 
         self.start_byte_ctl = '#'
         self.start_byte_cmd = '&'
