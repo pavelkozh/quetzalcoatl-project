@@ -22,6 +22,6 @@ double gazelGetEngineInstantaneousFuelEconomy(void);
 double gazelGetEngineThrottleValve(void);
 double gazelGetBatteryPotential(void);
 double gazelGetBrakePedalPosition(void);
-
+bool gazelGetI2cErrFlag(void);
 
 #endif // INCLUDE_FEEDBACK_
