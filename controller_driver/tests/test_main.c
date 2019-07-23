@@ -63,7 +63,7 @@ array elements contain numbers from 1 to 25 and detects curent gazel state
  */
 
 static uint8_t arr_fuzzy_err[3][3] = {{1,3,5},{11,13,15},{21,23,25}};
-static uint8_t arr_fuzzy_ok[5][5] = {{1,2,3,4,5},{6,7,8,9,10},{11,12,13,14,15},{16,17,18,19,20},{21,22,23,24,25};
+static uint8_t arr_fuzzy_ok[5][5] = {{1,2,3,4,5},{6,7,8,9,10},{11,12,13,14,15},{16,17,18,19,20},{21,22,23,24,25}};
 
 
 void onSet( float speed, float angle ) {
@@ -82,11 +82,10 @@ void onSet( float speed, float angle ) {
                 speed_ref_sign = 2;
         }
     }else{
-        if(speed < 5 && speed > -5)
+        // if(speed < 5 && speed > -5)
 
     }
 
-    #endif
 
     //steerSet...
 
@@ -191,7 +190,7 @@ void testMain( void ){
         }
 
         if(main_state == MAIN_STATE_NOP){
-            switch (arr[speed_sign][speed_ref_sign]) {
+            switch (arr_fuzzy_err[speed_sign][speed_ref_sign]) {
                 case 1:
                     main_state = MAIN_STATE_HIGHT_SPEEED_CONTROL;
                     break;

@@ -6,12 +6,12 @@ static void showHelp(void)
 {
     comm_dbgprintf("Test LLD steer module\n");
     comm_dbgprintf("Commands:\n");
-    comm_dbgprintf("  0 - Get motor expected state\n");
-    comm_dbgprintf("  1 - Start/stop\n");
-    comm_dbgprintf("  2 - Change dir\n");
-    comm_dbgprintf("  3 - Perform driver sync\n");
-    comm_dbgprintf("  q - Increase speed\n");
-    comm_dbgprintf("  a - Decrease speed\n");
+    comm_dbgprintf("  0 - Get motor expected state\n"); //ссостояние движка (ожидание) + энкодер
+    comm_dbgprintf("  1 - Start/stop\n"); // старт стоп драйвера
+    comm_dbgprintf("  2 - Change dir\n"); // понятно =)
+    comm_dbgprintf("  3 - Perform driver sync\n"); //выполнить синк
+    comm_dbgprintf("  q - Increase speed\n"); // увелич скорость
+    comm_dbgprintf("  a - Decrease speed\n"); //меньшить скорость 
     comm_dbgprintf("  h - show help\n");
     comm_dbgprintf("  space - Reset speed\n");
 }

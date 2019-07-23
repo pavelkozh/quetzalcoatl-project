@@ -8,8 +8,8 @@ static void showHelp(void)
 {
     comm_dbgprintf("Test LLD steer control module\n");
     comm_dbgprintf("Commands:\n");
-    comm_dbgprintf("  1 - Start/stop\n");
-    comm_dbgprintf("  2 - Change dir\n");
+    comm_dbgprintf("  1 - Start/stop\n"); //
+    comm_dbgprintf("  2 - Change dir\n"); //
     comm_dbgprintf("  3 - Perform driver sync\n");
     comm_dbgprintf("  0 - Get motor expected state\n");
     comm_dbgprintf("  q - Increase reference\n");
