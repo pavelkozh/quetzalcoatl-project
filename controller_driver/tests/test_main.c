@@ -24,11 +24,6 @@
 
 bool start( uint8_t dir );
 
-static const SerialConfig sdcfg = {
-  .speed = 115200,
-  .cr1 = 0, .cr2 = 0, .cr3 = 0
-};
-
 static uint8_t main_state = 0;
 static float speed_ref = 0;
 static uint8_t speed_sign = 1;
@@ -66,29 +61,56 @@ static uint8_t arr_fuzzy_err[3][3] = {{1,3,5},{11,13,15},{21,23,25}};
 static uint8_t arr_fuzzy_ok[5][5] = {{1,2,3,4,5},{6,7,8,9,10},{11,12,13,14,15},{16,17,18,19,20},{21,22,23,24,25}};
 
 
-void onSet( float speed, float angle ) {
+void CommandSet( float speed, float angle ) {
     speed_ref = speed;
 
-    if(gazelGetI2cErrFlag){
-
-        if (speed < 4.0 && speed > -4.0) {
+    if(gazelGetI2cErrFlag()){
+        if (speed < 4.0 && speed > -4.0) 
             speed_ref_sign = 1;
-        }
-        else if ( gazelGetSpeed() < 1.0 ) {
-
-            if(speed > 0)
+        else 
+            if(speed > 4.0)
                 speed_ref_sign = 0;
             else
                 speed_ref_sign = 2;
-        }
-    }else{
-        // if(speed < 5 && speed > -5)
 
+        if ( gazelGetSpeed() < 1.0 ) 
+            if(mtControlGetCurrentGearNum() != 6)
+                speed_ref_sign = 0;
+            else
+                speed_ref_sign = 2;
+    }else{
+         if(speed < 5 && speed > -5)
+            if(speed == 0 ) 
+                speed_ref_sign = 0;
+            else
+                if(speed < 0)
+                    speed_ref_sign = 3;
+                else
+                    speed_ref_sign = 1;
+        if(gazelGetSpeed() < 5)
+            if(gazelGetSpeed() == 0)
+                speed_sign = 2
+            else
+                if(mtControlGetCurrentGearNum() != 6)
+                    speed_sign = 1;
+                else
+                    speed_sign = 3;
+        else 
+            if(mtControlGetCurrentGearNum() != 6)
+                    speed_sign = 0;
+                else
+                    speed_sign = 4;
     }
 
+    //TODO: ADD Steer control
+}
 
-    //steerSet...
+void CommanStop(void){
+    //TODO: Command to stop
+}
 
+void CommanStart(void){
+    //TODO: Command to start
 }
 
 static int8_t statrt_fun_state = 0 ;
@@ -144,46 +166,28 @@ bool start( uint8_t dir ){
 
 void testMain( void ){
 
-/*    communicationEventFun_t structForFunc = getDefaultCfg();
- 
-    structForFunc.on_set    = setFun;
-    structForFunc.on_start  = startFun;
-    structForFunc.on_stop   = stopFun;
-
-    structForFunc.on_interrupt_timer = NULL;
-    
-    uint32_t time_for_vt_MS = 2000;
-
-    comm_init(structForFunc, time_for_vt_MS);
-*/
-    sdStart( &SD3, &sdcfg );
-    palSetPadMode( GPIOD, 8, PAL_MODE_ALTERNATE(7) );   // TX
-    palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
+    comm_init(NULL, 0, false);
+    BaseChannel *dbg_chn = comm_get_channel();
 
     feedbackInit();
     pedalsInit();
     mtControlInit();
     speedInit();
     emergencyStopInit();
-    #ifdef FUZZY_LOGIC_ENABLE
-        lowSpeedControlIntit();
-    #endif
+    lowSpeedControlIntit();
 
     char  sd_buff[10] = {'?','?','?','?','?','?','?','?','?','?'} ;
     bool start_flag = 0;
     int8_t state = 0;
 
     while(1){
-        // comm_dbgprintf_info("Hellow, int's communication test! ");
-        // chThdSleepMilliseconds(1000);
 
-                sdReadTimeout( &SD3, sd_buff, 10, TIME_IMMEDIATE   );
 
-        if(sd_buff[0] == 's')  onSet( atoi(&sd_buff[1]), 0);
+        sdReadTimeout( &SD3, sd_buff, 10, TIME_IMMEDIATE   );
+
+        if(sd_buff[0] == 's')  CommandSet( atoi(&sd_buff[1]), 0);
         if(sd_buff[0] == 'p')  main_state = MAIN_STATE_STOP;
-        // if(sd_buff[0] == 'z')  _speed =  atoi(&sd_buff[1]);
 
-    //    chprintf( (BaseSequentialStream *)&SD3,"state:\t%d\tCl_pos:\t%d\tspeed\t%.2f\tgear: %d\n\r",state,pedalsClutchGetPosition(),gazelGetSpeed(),mtControlGetCurrentGearNum());
         for (int i = 0; i < 9; i++)
         {
         sd_buff[i]='?';
@@ -195,27 +199,85 @@ void testMain( void ){
                     main_state = MAIN_STATE_HIGHT_SPEEED_CONTROL;
                     break;
                 case 2:
-                    main_state = MAIN_STATE_STOP;
+                    main_state = MAIN_STATE_LOW_SPEED_CONTROL;
                     break;
                 case 3:
                     main_state = MAIN_STATE_STOP;
                     break;
                 case 4:
-                        main_state  = MAIN_STATE_FORWARD;
+                    main_state = MAIN_STATE_STOP;
                     break;
                 case 5:
-                        main_state = MAIN_STATE_STOP;
+                    main_state = MAIN_STATE_STOP;
                     break;
                 case 6:
-                        main_state  = MAIN_STATE_BACKWARD;
+                    MAIN_STATE_FORWARD;
                     break;
                 case 7:
-                    main_state = MAIN_STATE_STOP;
+                    main_state = MAIN_STATE_LOW_SPEED_CONTROL;
                     break;
                 case 8:
                     main_state = MAIN_STATE_STOP;
                     break;
                 case 9:
+                    main_state = MAIN_STATE_STOP;
+                    break;
+                case 10:
+                    main_state = MAIN_STATE_STOP;
+                    break;
+                case 11:
+                    MAIN_STATE_FORWARD;
+                    break;
+                case 12:
+                    if(mtControlGetCurrentGearNum() != 1){
+                        pedalsClutchPress(700);
+                        mtControlMannualyShiftGear(1);
+                    }
+                    else
+                        main_state = MAIN_STATE_LOW_SPEED_CONTROL;
+                    break;
+                case 13:
+                    main_state = MAIN_STATE_STOP;
+                    break;
+                case 14:
+                    if(mtControlGetCurrentGearNum() != 6){
+                        pedalsClutchPress(700);
+                        mtControlMannualyShiftGear(6);
+                    }
+                    else
+                        main_state = MAIN_STATE_LOW_SPEED_CONTROL;
+                    break;
+                case 15:
+                    MAIN_STATE_BACKWARD;
+                    break;
+                case 16:
+                    main_state = MAIN_STATE_STOP;
+                    break;
+                case 17:
+                    main_state = MAIN_STATE_STOP;
+                    break;
+                case 18:
+                    main_state = MAIN_STATE_STOP;
+                    break;
+                case 19:
+                    main_state = MAIN_STATE_LOW_SPEED_CONTROL;
+                    break;
+                case 20:
+                    MAIN_STATE_BACKWARD;
+                    break;
+                case 21:
+                    main_state = MAIN_STATE_STOP;
+                    break;
+                case 22:
+                    main_state = MAIN_STATE_STOP;
+                    break;
+                case 23:
+                    main_state = MAIN_STATE_STOP;
+                    break;
+                case 24:
+                    main_state = MAIN_STATE_LOW_SPEED_CONTROL;
+                    break;
+                case 25:
                     main_state = MAIN_STATE_HIGHT_SPEEED_CONTROL;
                     break;
                 default:
@@ -223,7 +285,7 @@ void testMain( void ){
             }
         }
 
-        if( speed_ref_sign == 1 )  main_state = MAIN_STATE_STOP;
+        if( speed == 0 )  main_state = MAIN_STATE_STOP;
 
         switch(main_state){
         case MAIN_STATE_FORWARD:
@@ -284,8 +346,10 @@ void testMain( void ){
             break;
         }
 
-        chprintf( (BaseSequentialStream *)&SD3, "Main State: %d\t gear_num: %d\t gear_g_pos: %d\t gear_v_pos: %d\t Clutch_pos: %d\t Break_pos: %d\t speed %.02f\t eng_speed %.02f\t \n\r",main_state, mtControlGetCurrentGearNum(), getGorisontalPosition (), getVerticalPosition(), pedalsClutchGetPosition(),pedalsBrakeGetPosition(), gazelGetSpeed(), gazelGetEngineSpeed());
-
+        comm_dbgprintf("Main State: %d\t gear_num: %d\t Clutch_pos: %d\t ",main_state, mtControlGetCurrentGearNum(), pedalsClutchGetPosition());
+        comm_dbgprintf("Break_pos: %d\t speed %.02f\t eng_speed %.02f\t \n\r",pedalsBrakeGetPosition(), gazelGetSpeed(), gazelGetEngineSpeed());
+        if(gazelGetI2cErrFlag())
+            comm_dbgprintf("I2c error!\r\n");
         chThdSleepMilliseconds(100);
     }
 }
