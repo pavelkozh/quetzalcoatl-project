@@ -109,7 +109,7 @@ static const SPIConfig m_spicfg = {
     .cr2 = SPI_CR2_DS                                  //16-bit size mode
 };
 
-#define DRIVER_SEND_PULSE_WIDTH_MS 25
+#define DRIVER_SEND_PULSE_WIDTH_MS 100
 
 static bool is_steer_motor_start = false; // 0-stop, 1-start
 static bool is_steer_motor_dir = false;   // 0-stop, 1-start
@@ -235,7 +235,7 @@ bool steerMotorDirectionInvert(void)
 /* Synchronization/Testing environment */
 
 /* Percentage of speed to set for motor */
-#define TEST_SPEED_PERC 20
+#define TEST_SPEED_PERC 5
 /* Time for rotation wait */
 #define TEST_WAIT_TIME_MS 300
 /* Minimal delta for movement recognition */

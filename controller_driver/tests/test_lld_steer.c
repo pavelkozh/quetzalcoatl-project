@@ -26,7 +26,7 @@ void testSteer(void)
 
     // uint8_t sd_buff[10];
     float perc_speed = 0;
-    float speed_delta = 5;
+    float speed_delta = 1;
     int sync_result;
 
     showHelp();

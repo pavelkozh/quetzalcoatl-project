@@ -39,7 +39,7 @@ float steerPosControl(float steer_angle_ref)
     steer_control_val = PIDControlResponse(&steer_pidCtx);
 
     /*  roughly reset integral */
-    steer_control_val = CLIP_VALUE(steer_control_val, -100.0, 100.0);
+    steer_control_val = CLIP_VALUE(steer_control_val, -13.0, 13.0);
 
     return steer_control_val;
 }

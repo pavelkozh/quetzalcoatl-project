@@ -23,8 +23,8 @@ void testSteerPositionControl(void)
     comm_init(NULL, 0, false);
     BaseChannel *dbg_chn = comm_get_channel();
 
-#define REF_UPPER_LIMIT 180
-#define REF_LOWER_LIMIT -180
+#define REF_UPPER_LIMIT 230
+#define REF_LOWER_LIMIT -230
     float ref_input = 0;
     float ref_delta = 10;
     int sync_result = 0;
