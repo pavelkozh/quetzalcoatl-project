@@ -25,4 +25,4 @@ gst-launch-1.0 -v v4l2src device=$dev_name ! \
             key-int-max=$keyframe_period_frames ! \
         tcpserversink host=0.0.0.0 port=$client_port \
             recover-policy=keyframe sync=false sync-method=next-keyframe \
-    h. ! queue ! xvimagesink sync=false \
+    h. ! queue ! xvimagesink sync=false
