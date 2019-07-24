@@ -6,16 +6,16 @@
 
 static void showHelp(void)
 {
-    comm_dbgprintf("Test LLD steer control module\n");
-    comm_dbgprintf("Commands:\n");
-    comm_dbgprintf("  1 - Start/stop\n");
-    comm_dbgprintf("  2 - Change dir\n");
-    comm_dbgprintf("  3 - Perform driver sync\n");
-    comm_dbgprintf("  0 - Get motor expected state\n");
-    comm_dbgprintf("  q - Increase reference\n");
-    comm_dbgprintf("  a - Decrease reference\n");
-    comm_dbgprintf("  h - show help\n");
-    comm_dbgprintf("  space - Reset reference\n");
+    comm_dbgprintf("Test LLD steer control module \n\r");
+    comm_dbgprintf("Commands: \n\r");
+    comm_dbgprintf("  1 - Start/stop \n\r");
+    comm_dbgprintf("  2 - Change dir \n\r");
+    comm_dbgprintf("  3 - Perform driver sync \n\r");
+    comm_dbgprintf("  0 - Get motor expected state \n\r");
+    comm_dbgprintf("  q - Increase reference \n\r");
+    comm_dbgprintf("  a - Decrease reference \n\r");
+    comm_dbgprintf("  h - show help \n\r");
+    comm_dbgprintf("  space - Reset reference \n\r");
 }
 
 void testSteerPositionControl(void)
@@ -48,24 +48,24 @@ void testSteerPositionControl(void)
 
             case '1':
                 steerControlStart();
-                comm_dbgprintf("Control start\n");
+                comm_dbgprintf("Control start \n\r");
                 break;
 
             case '2':
                 steerControlStop();
-                comm_dbgprintf("Control stop\n");
+                comm_dbgprintf("Control stop \n\r");
                 break;
 
             case '3':
                 sync_result = steerSyncTestDriver();
-                comm_dbgprintf("Sync done, result: %d\n", sync_result);
+                comm_dbgprintf("Sync done, result: %d \n\r", sync_result);
                 break;
 
             case '0':
-                comm_dbgprintf("Pwr: %s / Dir: %s\n",
+                comm_dbgprintf("Pwr: %s / Dir: %s \n\r",
                                steerIsMotorEnable() ? "enabled" : "disabled",
                                steerMotorGetDirection() ? "clockwise" : "counterclockwise");
-                comm_dbgprintf("StRef: %d / PsRef: %d / CPos: %d / PErr: %d\n",
+                comm_dbgprintf("StRef: %d / PsRef: %d / CPos: %d / PErr: %d \n\r",
                                (int)steerDbgGetMotorCalcSpeedRef(),
                                (int)steerDbgGetMotorPosRef(),
                                (int)steerGetPos(),
@@ -76,20 +76,20 @@ void testSteerPositionControl(void)
                 ref_input += ref_delta;
                 ref_input = ref_input > REF_UPPER_LIMIT ? REF_UPPER_LIMIT : ref_input;
                 steerSetPosition(ref_input);
-                comm_dbgprintf("Ref increase to %d\n", (int)ref_input);
+                comm_dbgprintf("Ref increase to %d \n\r", (int)ref_input);
                 break;
 
             case 'a':
                 ref_input -= ref_delta;
                 ref_input = ref_input < REF_LOWER_LIMIT ? REF_LOWER_LIMIT : ref_input;
                 steerSetPosition(ref_input);
-                comm_dbgprintf("Ref decrease to %d\n", (int)ref_input);
+                comm_dbgprintf("Ref decrease to %d \n\r", (int)ref_input);
                 break;
 
             case ' ':
                 ref_input = 0;
                 steerSetPosition(ref_input);
-                comm_dbgprintf("Reset reference\n");
+                comm_dbgprintf("Reset reference \n\r");
                 break;
             }
         }
