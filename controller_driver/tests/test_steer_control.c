@@ -57,6 +57,7 @@ void testSteerPositionControl(void)
                 break;
 
             case '3':
+
                 sync_result = steerSyncTestDriver();
                 comm_dbgprintf("Sync done, result: %d \n\r", sync_result);
                 break;
@@ -88,6 +89,7 @@ void testSteerPositionControl(void)
                 steerSetMoveToTheLeft();
                 break;
 
+
             case ' ':
 //                ref_input = 0;
 //                steerSetPosition(ref_input);
@@ -97,7 +99,7 @@ void testSteerPositionControl(void)
             }
         }
 
-        chprintf((BaseSequentialStream *)&SD3,"Dir: %s \t CPos: %d  \n\r",
+        chprintf((BaseSequentialStream *)&SD3,"Dir: %d \t CPos: %d  \n\r",
                        steerMotorGetDirection(), (int)steerGetPos());
 
 #ifdef OLD_TEST

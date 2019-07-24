@@ -132,22 +132,21 @@ static THD_FUNCTION(steer_control, arg)
 
         if (steer_control_start)
         {
-            if (((position >= STEER_RIGHT_POS_LIMIT) && steer_move_to_the_right)|| (( position <= STEER_LEFT_POS_LIMIT ) && steer_move_to_the_left)) // position out of the range
-            {
-                steerMotorSetSpeed(0);
-                // steerStop?
-            }
-            else{
+//            if (((position >= STEER_RIGHT_POS_LIMIT) && steer_move_to_the_right)|| (( position <= STEER_LEFT_POS_LIMIT ) && steer_move_to_the_left)) // position out of the range
+//            {
+//                steerMotorSetSpeed(0);
+//                chThdSleepMilliseconds(20);
+//                continue;
+//                // steerStop?
+//            }
+//            else{
                 if (( (!steerMotorGetDirection() /* CCW */) && steer_move_to_the_right) ||
                        ((steerMotorGetDirection() /* CW */) && steer_move_to_the_left))
                 {
                     steerMotorDirChange();
                 }
 
-                //steerMotorSetSpeed(abs(speed_ref));
-                steerMotorSetSpeed( 5 );
-
-            }
+//            }
         }
         else{
             steerMotorSetSpeed(0);
@@ -235,16 +234,19 @@ void steerSetMoveToTheRight ( void )
 {
     steer_move_to_the_right = true;
     steer_move_to_the_left = false;
+    steerMotorSetSpeed( 2.5 );
 }
 void steerSetMoveToTheLeft ( void )
 {
     steer_move_to_the_right = false;
     steer_move_to_the_left = true;
+    steerMotorSetSpeed( 2.5 );
 }
 void steerSetStop ( void )
 {
-    steer_move_to_the_right = false;
-    steer_move_to_the_left = false;
+    //steer_move_to_the_right = false;
+    //steer_move_to_the_left = false;
+    steerMotorSetSpeed( 0.1 );
 }
 
 
