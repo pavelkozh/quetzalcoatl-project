@@ -200,6 +200,7 @@ void testMain( void ){
     structForFunc.on_interrupt_timer = connectionErrorCb;
 
     comm_init(&structForFunc, CONNECTION_FAIL_OK_DELAY, true);
+    comm_start_protocol();
 
     BaseChannel *dbg_chn = comm_get_channel();
 

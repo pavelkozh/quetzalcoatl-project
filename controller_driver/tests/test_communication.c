@@ -45,6 +45,7 @@ void testCommunication(void)
     uint32_t time_for_vt_MS = 2000;
 
     comm_init(&structForFunc, time_for_vt_MS, true);
+    comm_start_protocol();
 
     while ( true )
     {   palToggleLine(LINE_LED3);

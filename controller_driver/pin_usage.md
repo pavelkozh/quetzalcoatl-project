@@ -38,7 +38,7 @@ PAL    | PD11 | Output          | Direction
 ## Steer (Step Motor) actuator control unit 
 Driver | Pins | Input / Output | Description
 -------|------|----------------|----------
-PWM13  | PF8  | Output         | 
+PWM12  | PB14 | Output         | 
 PAL    | PF2  | Output         | Direction
 
 

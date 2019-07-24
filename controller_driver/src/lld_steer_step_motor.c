@@ -10,7 +10,7 @@ void fallingEdgeSteerMCallback(PWMDriver *pwmd);
 
 /* Clutch motor structure declaration*/
 MotorDriver SteerM = {
-    .pwmd            =   &PWMD13,
+    .pwmd            =   &PWMD12,
     .dir_line        =   PAL_LINE(GPIOF, 2),
     .rising_edge_cb  =   risingEdgeSteerMCallback,
     .falling_edge_cb =   fallingEdgeSteerMCallback,
@@ -38,11 +38,15 @@ void lldSteerSMInit ( void ){
      }
 
      /* Clutch init*/
-     palSetLineMode( PAL_LINE( GPIOF, 8),  PAL_MODE_ALTERNATE(2) );
+     palSetLineMode( PAL_LINE( GPIOB, 14),  PAL_MODE_ALTERNATE(2) );
      palSetLineMode( SteerM.dir_line, PAL_MODE_OUTPUT_PUSHPULL);
      MotorlldControlInit( &SteerM );
 
      if_lld_steer_module_initialized = 1;
+}
+
+void lldSteerSMMove ( uint16_t speed ){
+    MotorRunContinuous(&SteerM, 0, speed);
 }
 
 int32_t lldSteerSMSetPosition (double position, uint16_t speed ){
