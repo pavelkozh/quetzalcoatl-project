@@ -58,6 +58,7 @@ class CommunicationOnSerial(object):
 
         pkg = bytes([ord(self.start_byte_cmd), 25, 45, 65])
         self.__push_msg(pkg)
+        print('------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------')
 
         # self.work_resolution = False
 
@@ -200,8 +201,8 @@ if __name__ == "__main__":
             # speed, angle = input("Put speed, angle ").split()
             # Connection.set_control(speed, angle)
 
-            spst_pair = (np.random.randint(-100, 100),
-                         np.random.randint(-100, 100))
+            spst_pair = (42,
+                         69)
             print('New speed/steer pair: {}'.format(spst_pair))
 
             Connection.set_control(spst_pair[0], spst_pair[1])
@@ -213,6 +214,7 @@ if __name__ == "__main__":
         # speed, angle = input('Print speed and angle: ').split()
         # Connection.set_control(int(speed), int(angle))
         inp = Connection.get_state_msg()
+        # print('inp = {}'.format(inp))
         if inp:
             print('I get: {} ({})'.format(inp.msg, inp.lvl))
 

@@ -32,9 +32,11 @@ if args.debug:
 # MAIN for gazel computer
 
 BROCKER_IP = '127.0.0.1'
-STM_COMMUNICATION_DEVICE='/dev/serial/by-id/usb-STMicroelectronics_ChibiOS_RT_Virtual_COM_Port_404-if00'
+#STM_COMMUNICATION_DEVICE='/dev/serial/by-id/usb-STMicroelectronics_ChibiOS_RT_Virtual_COM_Port_404-if00'
 STM_COMMUNICATION_DEVICE='/dev/ttyACM1'
-
+# STM_COMMUNICATION_DEVICE='/dev/serial/by-id/usb-STMicroelectronics_STM32_STLink_0671FF504955857567171741-if02'
+global SEND_DATA_ENABLE 
+SEND_DATA_ENABLE = 42
 rootLogger = setup_logger()
 rootLogger.debug('start')
 
@@ -50,23 +52,34 @@ except:
 
 sub = command.CommandSub(ip = BROCKER_IP)
 def set_handler(load):
-    if comun:
+    if comun and SEND_DATA_ENABLE == 2:
+        state_pub.send("SET VALUES sssssssssssssssssssssssssssssssssssssvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
         comun.set_control(load['speed'], load['steer'],)
     rootLogger.debug('COMM_SET: speed = {}, steer = {}'.format(load['speed'], load['steer']))
 def start_handler():
-    if comun:
+    if comun and SEND_DATA_ENABLE == 2:
+        state_pub.send("START tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt")
         comun.on_start()
     rootLogger.debug("COMM_START")
 def stop_handler():
     if comun:
-        comun.on_stop()
+        if SEND_DATA_ENABLE == 2:
+            comun.on_stop()
+            state_pub.send('STOP ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp')
     rootLogger.debug("COMM_STOP")
 def enable_handler():
+    global SEND_DATA_ENABLE
+    SEND_DATA_ENABLE = 2
     if comun:
+        state_pub.send("ENABLE EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
         comun.activate_connection()
     rootLogger.debug("COMM_ENABLE")
 def disable_handler():
+    global SEND_DATA_ENABLE
+    SEND_DATA_ENABLE = 1
     if comun:
+        state_pub.send('DISABLE ddddddddddddddddddddddddddddddddddddddddddd')
+        SEND_DATA_ENABLE = 1
         comun.deactivate_connection()
     rootLogger.debug("COMM_DISABLE")
 
