@@ -39,9 +39,14 @@ static THD_FUNCTION(SteerStepThd, arg)
         steer_task_steps_t ref = steps_msg;
         
         if (ref < 0)
+        {
             SET_NEGATIVE_DIR();
+            ref = -ref;
+        }
         else
+        {
             SET_POSITIVE_DIR();
+        }   
 
         for (int i = 0; i < ref; i++)
         {
