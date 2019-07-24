@@ -15,10 +15,10 @@ static bool steer_control_start = false,
 
 static PIDControllerContext_t steer_pidCtx = {
     .kp = 0.2,
-    .ki = 0.01,
+    .ki = 0.0,
     .kd = 0.0,
-    .integrLimit = 100,
-    .integZone = 0.5};
+    .integrLimit = 0.2,
+    .integZone = 0.3};
 static uint8_t CSErrorDeadzoneHalfwidth = 1;
 
 static float position;
@@ -41,7 +41,7 @@ float steerPosControl(float steer_angle_ref)
     steer_control_val = PIDControlResponse(&steer_pidCtx);
 
     /*  roughly reset integral */
-    steer_control_val = CLIP_VALUE(steer_control_val, -13.0, 13.0);
+    steer_control_val = CLIP_VALUE(steer_control_val, -10.0, 10.0);
 
     return steer_control_val;
 }
@@ -113,7 +113,7 @@ static THD_FUNCTION(steer_pos_control, arg)
             // }
         }
 
-        chThdSleepMilliseconds(20);
+        chThdSleepMilliseconds(100);
     }
 }
 
@@ -176,17 +176,17 @@ void steerInit(void)
     position_cnt = 0;
     prev_position = position;
 
-//    chThdCreateStatic(steer_pos_control_wa,
-//                      sizeof(steer_pos_control_wa),
-//                      NORMALPRIO,
-//                      steer_pos_control,
-//                      NULL);
+    chThdCreateStatic(steer_pos_control_wa,
+                      sizeof(steer_pos_control_wa),
+                      NORMALPRIO,
+                      steer_pos_control,
+                      NULL);
 
-    chThdCreateStatic(steer_control_wa,
-                          sizeof(steer_control_wa),
-                          NORMALPRIO,
-                          steer_control,
-                          NULL);
+//    chThdCreateStatic(steer_control_wa,
+//                          sizeof(steer_control_wa),
+//                          NORMALPRIO,
+//                          steer_control,
+//                          NULL);
 
     is_initialized = true;
 }

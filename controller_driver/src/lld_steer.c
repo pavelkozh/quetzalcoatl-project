@@ -235,9 +235,9 @@ bool steerMotorDirectionInvert(void)
 /* Synchronization/Testing environment */
 
 /* Percentage of speed to set for motor */
-#define TEST_SPEED_PERC 15
+#define TEST_SPEED_PERC 5
 /* Time for rotation wait */
-#define TEST_WAIT_TIME_MS 1000
+#define TEST_WAIT_TIME_MS 700
 /* Minimal delta for movement recognition */
 #define TEST_CHECK_ANGLE_DIFF 1.0
 /* Limit for checking switches 0->360 / 360->0 */

@@ -74,27 +74,27 @@ void testSteerPositionControl(void)
                 break;
 
             case 'q':
-//                ref_input += ref_delta;
-//                ref_input = ref_input > REF_UPPER_LIMIT ? REF_UPPER_LIMIT : ref_input;
-//                steerSetPosition(ref_input);
-//                comm_dbgprintf("Ref increase to %d \n\r", (int)ref_input);
-                steerSetMoveToTheRight();
+                ref_input += ref_delta;
+                ref_input = ref_input > REF_UPPER_LIMIT ? REF_UPPER_LIMIT : ref_input;
+                steerSetPosition(ref_input);
+                comm_dbgprintf("Ref increase to %d \n\r", (int)ref_input);
+                //steerSetMoveToTheRight();
                 break;
 
             case 'a':
-//                ref_input -= ref_delta;
-//                ref_input = ref_input < REF_LOWER_LIMIT ? REF_LOWER_LIMIT : ref_input;
-//                steerSetPosition(ref_input);
-//                comm_dbgprintf("Ref decrease to %d \n\r", (int)ref_input);
-                steerSetMoveToTheLeft();
+                ref_input -= ref_delta;
+                ref_input = ref_input < REF_LOWER_LIMIT ? REF_LOWER_LIMIT : ref_input;
+                steerSetPosition(ref_input);
+                comm_dbgprintf("Ref decrease to %d \n\r", (int)ref_input);
+                //steerSetMoveToTheLeft();
                 break;
 
 
             case ' ':
-//                ref_input = 0;
-//                steerSetPosition(ref_input);
-//                comm_dbgprintf("Reset reference \n\r");
-                steerSetStop();
+                ref_input = 0;
+                steerSetPosition(ref_input);
+                comm_dbgprintf("Reset reference \n\r");
+               // steerSetStop();
                 break;
             }
         }
