@@ -71,15 +71,15 @@ int steerStepThdMakeSteps(steer_task_steps_t steps)
 
     msg_t msg = chMBPostTimeout(&steps_mb, steps_msg, TIME_IMMEDIATE);
 
-	if (msg == MSG_OK)
-		return EOK;
-	else if (msg == MSG_TIMEOUT)
+    if (msg == MSG_OK)
+        return EOK;
+    else if (msg == MSG_TIMEOUT)
         return EOVERFLOW;
-	else
-		return EFAULT;
+    else
+        return EFAULT;
 }
 
-void steerStepThdIsCompleted(void)
+bool steerStepThdIsCompleted(void)
 {
     chSysLock();
     size_t result = chMBGetUsedCountI();

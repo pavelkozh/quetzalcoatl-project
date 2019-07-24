@@ -24,6 +24,6 @@ int steerStepThdMakeSteps(steer_task_steps_t steps);
  * @brief:  Check if all tasks are completed
  * @note:   Function uses reschedule, don`t use it too often
  */
-void steerStepThdIsCompleted(void);
+bool steerStepThdIsCompleted(void);
 
 #endif // LLD_STEER_STEP_THREADED_H
