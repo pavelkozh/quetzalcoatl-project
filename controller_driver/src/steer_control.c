@@ -118,8 +118,8 @@ static THD_FUNCTION(steer_pos_control, arg)
 }
 
 
-#define STEER_RIGHT_POS_LIMIT 230 //deg
-#define STEER_LEFT_POS_LIMIT -230
+#define STEER_RIGHT_POS_LIMIT -290 //deg
+#define STEER_LEFT_POS_LIMIT 289
 
 static THD_WORKING_AREA(steer_control_wa, 512);
 static THD_FUNCTION(steer_control, arg)
@@ -127,38 +127,33 @@ static THD_FUNCTION(steer_control, arg)
     (void)arg;
     while (1)
     {
-        // palToggleLine(LINE_LED2);
+        palToggleLine(LINE_LED2);
         steerPositionCalculate();
 
         if (steer_control_start)
         {
-            if (((position > STEER_RIGHT_POS_LIMIT) && steer_move_to_the_right)|| (( position < STEER_LEFT_POS_LIMIT )&&steer_move_to_the_left)) // position out of the range
+            if (((position >= STEER_RIGHT_POS_LIMIT) && steer_move_to_the_right)|| (( position <= STEER_LEFT_POS_LIMIT ) && steer_move_to_the_left)) // position out of the range
             {
                 steerMotorSetSpeed(0);
                 // steerStop?
             }
             else{
-                if (){  //sign of speed_ref is change // then change dir  ){
+                if (( (!steerMotorGetDirection() /* CCW */) && steer_move_to_the_right) ||
+                       ((steerMotorGetDirection() /* CW */) && steer_move_to_the_left))
+                {
                     steerMotorDirChange();
                 }
 
-                steerMotorSetSpeed(abs(speed_ref));
+                //steerMotorSetSpeed(abs(speed_ref));
+                steerMotorSetSpeed( 5 );
 
             }
         }
         else{
-            steer_pidCtx.err = 0;
-            steer_pidCtx.prevErr = 0;
-            steer_pidCtx.integrSum = 0;
-            speed_ref = 0;
-            // //Motor stop if he run
-            // if(prev_position != position){
-            //     steerMotorStartStopControl();
-            //     steerMotorEnableInvert();
-            // }
+            steerMotorSetSpeed(0);
         }
 
-        chThdSleepMilliseconds(20);
+        chThdSleepMilliseconds(200);
     }
 }
 

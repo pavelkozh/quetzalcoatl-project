@@ -33,7 +33,7 @@
 #define		PROGRAM_ROUTINE_TEST_MAIN			            14
 
 
-#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_MT_CONTROL
+#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_STEER_POS_LOOP
 
 /**************/
 /*** Macros ***/
