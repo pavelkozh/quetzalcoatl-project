@@ -32,7 +32,7 @@ static THD_FUNCTION(emergency_button_stop, arg) {
             chSysUnlock();
         }
         else{
-            palSetLine(LINE_LED2);
+            //palSetLine(LINE_LED2);
             pedalsClutchPress ( 1000 );
 
             while(pedalsClutchGetState()){
@@ -57,7 +57,7 @@ static THD_FUNCTION(emergency_button_stop, arg) {
 //                }
              is_breaking_thread_work = false;
              is_emergency_stop_btn_pressed = false;
-             palClearLine(LINE_LED2);
+           //  palClearLine(LINE_LED2);
              chSysLock();
              chThdSuspendS(&trp_emergency_button_stop);
              chSysUnlock();

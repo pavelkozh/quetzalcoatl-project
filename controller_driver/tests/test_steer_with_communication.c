@@ -76,7 +76,8 @@ void testCommunicationWithSteer(void)
         // comm_dbgprintf_info("PosRef %.02f\t Encoder %d\t PosErr %.02f\t PidOut %.02f\t MotorEn %d\t \n\r",steerDbgGetMotorPosRef(),(uint16_t)(steerGetPosition()), steerDbgGetMotorCalcPosErr(),steerDbgGetMotorCalcSpeedRef(), steerDbgGetEnableFlag());
         comm_dbgprintf_info("Ref %.02f\t Enc %d\t  ", steerDbgGetMotorPosRef(),(int16_t)(steerGetPos()));
         comm_dbgprintf_info("Err %.02f\t Out %.02f\t ", steerDbgGetMotorCalcPosErr(),steerDbgGetMotorCalcSpeedRef());
-        comm_dbgprintf_info("MotorEn %d Motordir:%d\n", steerDbgGetEnableFlag(),steerMotorDirection());
+        //comm_dbgprintf_info("MotorEn %d Motordir:%d\n", steerDbgGetEnableFlag(),steerMotorDirection());
+
         // comm_dbgprintf_info("PosRef %d  \n",steerDbgGetEnableFlag());
         // comm_dbgprintf_info("I m in setStartSteer \n");
       

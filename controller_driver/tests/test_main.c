@@ -117,7 +117,8 @@ void commandSet( float speed, float angle ) {
 void commandStop(void){
     //TODO: Command to stop
     engIgnitionSwitchOff();
-    comm_dbgprintf_error("STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP");
+    palSetLine(LINE_LED2);
+    comm_dbgprintf("STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP");
     comm_dbgprintf("in command Stop \n\r");
 }
 
@@ -125,7 +126,8 @@ void commandStart(void){
     //TODO: Command to start
     engIgnitionSwitchOn ();
     engStarterSwitchOn ();
-    comm_dbgprintf_error("START START START START START START START START START START START ");
+    palSetLine(LINE_LED1);
+    comm_dbgprintf("START START START START START START START START START START START ");
     comm_dbgprintf("in command Start \n\r");
 
 }
@@ -197,7 +199,7 @@ void testMain( void ){
     structForFunc.on_stop   = commandStop;
     structForFunc.on_interrupt_timer = connectionErrorCb;
 
-    comm_init(&structForFunc, CONNECTION_FAIL_OK_DELAY, false);
+    comm_init(&structForFunc, CONNECTION_FAIL_OK_DELAY, true);
 
     BaseChannel *dbg_chn = comm_get_channel();
 
@@ -373,6 +375,7 @@ void testMain( void ){
             break;
         }
 
+       // comm_dbgprintf("START START START START START START START START START START START ");
         comm_dbgprintf("Main State: %d\t gear_num: %d\t Clutch_pos: %d\t ",main_state, mtControlGetCurrentGearNum(), pedalsClutchGetPosition());
         comm_dbgprintf("Break_pos: %d\t speed %.02f\t eng_speed %.02f\t \n\r",pedalsBrakeGetPosition(), gazelGetSpeed(), gazelGetEngineSpeed());
         if(gazelGetI2cErrFlag())

@@ -252,6 +252,7 @@
 #define STM32_PWM_USE_TIM9                  FALSE
 #define STM32_PWM_USE_TIM11                  TRUE
 #define STM32_PWM_USE_TIM12                  FALSE
+#define STM32_PWM_USE_TIM13                  TRUE
 #define STM32_PWM_USE_TIM14                  TRUE
 #define STM32_PWM_TIM1_IRQ_PRIORITY         7
 #define STM32_PWM_TIM2_IRQ_PRIORITY         7

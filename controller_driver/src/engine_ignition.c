@@ -25,11 +25,11 @@ static THD_FUNCTION(eng_ignition, arg) {
 
             palClearLine(STARTER_PAL_LINE);
             while (  gazelGetEngineSpeed() < 710 ){
-                palSetLine(LINE_LED2);
+               // palSetLine(LINE_LED2);
                 chThdSleepMilliseconds( 50 );
             }
             palSetLine(STARTER_PAL_LINE);
-            palClearLine(LINE_LED2);
+            //palClearLine(LINE_LED2);
             comm_dbgprintf_info("Engine starts OK");
 
             //TODO: if after DELAY TIME engine speed still equal 0,
@@ -38,7 +38,7 @@ static THD_FUNCTION(eng_ignition, arg) {
 
             /* starting is finish -> thread goes to sleep*/
             is_engine_start_thd_working = 0;
-            palSetLine(LINE_LED3);
+            //palSetLine(LINE_LED3);
             chSysLock();
             chThdSuspendS(&trp_eng_ignition);
             chSysUnlock();

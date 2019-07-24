@@ -39,7 +39,7 @@
 #define		PROGRAM_ROUTINE_TEST_MAIN			            14
 
 
-#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_MAIN
+#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_COMMUNICATION
 
 /**************/
 /*** Macros ***/

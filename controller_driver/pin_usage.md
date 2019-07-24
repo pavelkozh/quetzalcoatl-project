@@ -28,12 +28,18 @@ PWM3   | PC6  | Output         |
 PAL    | PB8  | Output         | Direction
 
 
-
 ## Brake pedal actuator control unit 
 Driver | Pins | Input / Output  | Description
 -------|------|-----------------|------------
 PWM4   | PD12 | Output          |   
 PAL    | PD11 | Output          | Direction
+
+
+## Steer (Step Motor) actuator control unit 
+Driver | Pins | Input / Output | Description
+-------|------|----------------|----------
+PWM13  | PF8  | Output         | 
+PAL    | PF2  | Output         | Direction
 
 
 ## Transmission control unit 

@@ -47,7 +47,7 @@ void testCommunication(void)
     comm_init(&structForFunc, time_for_vt_MS, true);
 
     while ( true )
-    {   
+    {   palToggleLine(LINE_LED3);
         chThdSleepMilliseconds(1000);
     }
 }

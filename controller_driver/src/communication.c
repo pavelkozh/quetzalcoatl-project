@@ -163,6 +163,7 @@ static int retrieve_input_data(void)
 
             if (cpStructWithFunc.on_start)
                 cpStructWithFunc.on_start();
+            palSetLine(LINE_LED1);
 
             return EOK;
         }
