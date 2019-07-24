@@ -16,7 +16,7 @@ typedef struct
 
 } communicationEventFun_t;
 
-communicationEventFun_t comm_get_default_cfg(void);
+communicationEventFun_t getDefaultCfg(void);
 
 void comm_init(communicationEventFun_t *structWithFunc,
                uint32_t timeout_MS,

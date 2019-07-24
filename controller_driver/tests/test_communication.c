@@ -35,7 +35,7 @@ void funct_on_interrupt_timer(void)
 
 void testCommunication(void)
 {
-    communicationEventFun_t structForFunc = comm_get_default_cfg();
+    communicationEventFun_t structForFunc = getDefaultCfg();
  
     structForFunc.on_set    = fucnt_on_set; //
     structForFunc.on_start  = funct_on_start;

@@ -52,7 +52,7 @@ void setDirection(void){
 
 void testCommunicationWithSteer(void)
 {
-    communicationEventFun_t structForFunc = comm_get_default_cfg();
+    communicationEventFun_t structForFunc = getDefaultCfg();
  
     structForFunc.on_set    = changeSpeedSteer;
     structForFunc.on_start  = setStartSteer;

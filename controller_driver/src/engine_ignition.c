@@ -90,7 +90,7 @@ bool engStarterSwitchOn ( void )
         chSysUnlock();
     }
     //palClearLine(STARTER_PAL_LINE);
-    return  ( is_engine_start_thd_working && ( gazelGetEngineSpeed() > 750 ) );
+    return  ( !is_engine_start_thd_working && ( gazelGetEngineSpeed() > 750 ) );
 
 }
 
@@ -104,6 +104,7 @@ void engStarterSwitchOff ( void )
 void engIgnitionSwitchOff ( void )
 {
     palSetLine(IGNITION_PAL_LINE);
+    comm_dbgprintf_info("Engine turn off OK");
 }
 
 void engIgnitionSwitchOn ( void )

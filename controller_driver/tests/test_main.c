@@ -114,15 +114,19 @@ void commandSet( float speed, float angle ) {
     steerSetPosition(angle);
 }
 
-void commanStop(void){
+void commandStop(void){
     //TODO: Command to stop
     engIgnitionSwitchOff();
+    comm_dbgprintf_error("STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP");
+    comm_dbgprintf("in command Stop \n\r");
 }
 
-void commanStart(void){
+void commandStart(void){
     //TODO: Command to start
     engIgnitionSwitchOn ();
     engStarterSwitchOn ();
+    comm_dbgprintf_error("START START START START START START START START START START START ");
+    comm_dbgprintf("in command Start \n\r");
 
 }
 
@@ -186,14 +190,14 @@ void testMain( void ){
     engIgnitionInit();
     steerInit();
 
-    communicationEventFun_t structForFunc = comm_get_default_cfg();
+    communicationEventFun_t structForFunc = getDefaultCfg();
 
     structForFunc.on_set    = commandSet;
-    structForFunc.on_start  = commanStart;
-    structForFunc.on_stop   = commanStop;
+    structForFunc.on_start  = commandStart;
+    structForFunc.on_stop   = commandStop;
     structForFunc.on_interrupt_timer = connectionErrorCb;
 
-    comm_init(&structForFunc, CONNECTION_FAIL_OK_DELAY, true);
+    comm_init(&structForFunc, CONNECTION_FAIL_OK_DELAY, false);
 
     BaseChannel *dbg_chn = comm_get_channel();
 
@@ -205,7 +209,7 @@ void testMain( void ){
 
     while(1){
 
-
+        palToggleLine(LINE_LED3);
         sdReadTimeout( &SD3, sd_buff, 10, TIME_IMMEDIATE   );
 
         if(sd_buff[0] == 's')  commandSet( atoi(&sd_buff[1]), 0);
