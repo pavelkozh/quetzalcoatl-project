@@ -27,6 +27,10 @@ static THD_FUNCTION(eng_ignition, arg) {
             }
             palSetLine(STARTER_PAL_LINE);
             palClearLine(LINE_LED2);
+            comm_dbgprintf_info("Engine starts OK");
+
+            //TODO: if after DELAY TIME engine speed still equal 0,
+            //      then send engine start error
 
 
             /* starting is finish -> thread goes to sleep*/

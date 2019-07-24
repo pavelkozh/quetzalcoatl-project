@@ -183,12 +183,16 @@ void steerControlStop(void)
     }
 }
 
+//TODO write correct values (from encoder)
+#define STEER_POS_MAX_VAL 200.0
+#define STEER_POS_MIN_VAL -200.0
+
 void steerSetPosition(float val)
 {
-    if (val > 180.0)
-        val = 180.0;
-    if (val < -180.0)
-        val = -180.0;
+    if (val > STEER_POS_MAX_VAL)
+        val = STEER_POS_MAX_VAL;
+    if (val < -STEER_POS_MIN_VAL)
+        val = -STEER_POS_MIN_VAL;
     steer_angle_ref = val;
 }
 

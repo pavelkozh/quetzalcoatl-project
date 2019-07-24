@@ -3,13 +3,16 @@
 
 #include <ch.h>
 #include <hal.h>
+
 #include <MT.h>
 #include <MT_control.h>
 #include <feedback.h> 
 #include <pedals.h>
 #include <speed.h>
 #include <lld_steer.h>
+#include <steer_control.h>
 #include <emergency_stop.h>
+#include <engine_ignition.h>
 
 #include <stdint.h>
 #include <stdlib.h>

@@ -7,7 +7,7 @@
 
 // Main switch state
 #define MAIN_STATE_NOP                       0
-#define MAIN_STATE_FORWARD                     1
+#define MAIN_STATE_FORWARD                   1
 #define MAIN_STATE_STOP                      2
 #define MAIN_STATE_HIGHT_SPEEED_CONTROL      3
 #define MAIN_STATE_BACKWARD                  4
@@ -60,8 +60,8 @@ array elements contain numbers from 1 to 25 and detects curent gazel state
 static uint8_t arr_fuzzy_err[3][3] = {{1,3,5},{11,13,15},{21,23,25}};
 static uint8_t arr_fuzzy_ok[5][5] = {{1,2,3,4,5},{6,7,8,9,10},{11,12,13,14,15},{16,17,18,19,20},{21,22,23,24,25}};
 
-
-void CommandSet( float speed, float angle ) {
+//TODO:  what is steer angle variable range?
+void commandSet( float speed, float angle ) {
     speed_ref = speed;
 
     if(gazelGetI2cErrFlag()){
@@ -89,7 +89,7 @@ void CommandSet( float speed, float angle ) {
                     speed_ref_sign = 1;
         if(gazelGetSpeed() < 5)
             if(gazelGetSpeed() == 0)
-                speed_sign = 2
+                speed_sign = 2;
             else
                 if(mtControlGetCurrentGearNum() != 6)
                     speed_sign = 1;
@@ -102,15 +102,26 @@ void CommandSet( float speed, float angle ) {
                     speed_sign = 4;
     }
 
+
     //TODO: ADD Steer control
+    steerSetPosition(angle);
 }
 
-void CommanStop(void){
+void commanStop(void){
     //TODO: Command to stop
+    engIgnitionSwitchOff();
 }
 
-void CommanStart(void){
+void commanStart(void){
     //TODO: Command to start
+    engIgnitionSwitchOn ();
+    engStarterSwitchOn ();
+
+}
+
+void connectionErrorCb ( void ){
+    comm_dbgprintf_error("Connection fail");
+    emergencyFullStop();
 }
 
 static int8_t statrt_fun_state = 0 ;
@@ -154,20 +165,10 @@ bool start( uint8_t dir ){
     return 0;
 };
 
-// void  setFun(){
-
-// }
-// void  startFun(){
-
-// }
-// void  stopFun(){
-
-// }
+/* after this time connection error callback is execute*/
+#define CONNECTION_FAIL_OK_DELAY 3000  //ms
 
 void testMain( void ){
-
-    comm_init(NULL, 0, false);
-    BaseChannel *dbg_chn = comm_get_channel();
 
     feedbackInit();
     pedalsInit();
@@ -175,6 +176,21 @@ void testMain( void ){
     speedInit();
     emergencyStopInit();
     lowSpeedControlIntit();
+    engIgnitionInit();
+    steerInit();
+
+    communicationEventFun_t structForFunc = comm_get_default_cfg();
+
+    structForFunc.on_set    = commandSet;
+    structForFunc.on_start  = commanStart;
+    structForFunc.on_stop   = commanStop;
+    structForFunc.on_interrupt_timer = connectionErrorCb;
+
+    comm_init(&structForFunc, CONNECTION_FAIL_OK_DELAY, true);
+
+    BaseChannel *dbg_chn = comm_get_channel();
+
+
 
     char  sd_buff[10] = {'?','?','?','?','?','?','?','?','?','?'} ;
     bool start_flag = 0;
@@ -285,7 +301,7 @@ void testMain( void ){
             }
         }
 
-        if( speed == 0 )  main_state = MAIN_STATE_STOP;
+        if( speed_ref == 0 )  main_state = MAIN_STATE_STOP;
 
         switch(main_state){
         case MAIN_STATE_FORWARD:
