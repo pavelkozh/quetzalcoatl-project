@@ -20,6 +20,7 @@ PROJECT_MODULES =	src/lld_can.c                \
                     src/usbcfg.c                 \
                     src/steer_control.c          \
                     src/lld_steer_step_motor.c   \
+                    src/lld_steer_step_threaded.c   \
 
 
 PROJECT_TESTS   =	tests/test_pedals.c                    \
