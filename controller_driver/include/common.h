@@ -3,13 +3,17 @@
 
 #include <ch.h>
 #include <hal.h>
+
 #include <MT.h>
 #include <MT_control.h>
 #include <feedback.h> 
 #include <pedals.h>
 #include <speed.h>
 #include <lld_steer.h>
+#include <steer_control.h>
 #include <emergency_stop.h>
+#include <engine_ignition.h>
+#include <communication.h>
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -33,7 +37,7 @@
 #define		PROGRAM_ROUTINE_TEST_MAIN			            14
 
 
-#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_STEER_POS_LOOP
+#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_MAIN
 
 /**************/
 /*** Macros ***/

@@ -1,4 +1,3 @@
-
 #include <feedback.h>
 
 static gazelParam *gaz;
@@ -7,10 +6,13 @@ static int32_t px4flow_data[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 static uint8_t px4flow_cnt = 0;
 static int32_t px4flow_sum = 0;
 static int16_t last_px4flow = 0;
+static bool    i2c_err_flag = 0;
+static uint8_t i2c_err_cnt = 0;
 
 void px4_filter(){
       if(update() == MSG_OK){
-
+        i2c_err_flag = 0;
+        i2c_err_cnt = 0;
         if(ground_distance()>1000){
           px4flow_sum -= px4flow_data[px4flow_cnt];
 
@@ -26,7 +28,9 @@ void px4_filter(){
         }
       }
       else{
-          //chprintf( (BaseSequentialStream *)&SD3, "I2C error \r\n");
+        i2c_err_cnt++;
+        if(i2c_err_cnt > 30)
+          i2c_err_flag = 1;
       }
       gaz->Speed_px4flow = (px4flow_sum /20.0)*0.0036 ; //0.0036  0.0144
 };
@@ -67,7 +71,7 @@ void feedbackInit(void){
     gaz = (gazelParam *)gazelGetStruct();
     can_init();
     px4flowInit();
-    chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 5, can_rx, NULL);
+    chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 1, can_rx, NULL);
 
     if_feedback_module_initialized = 1;
 
@@ -86,7 +90,17 @@ int8_t gazelGetActualEnginePercentTorque (void){
 };
 
 double gazelGetSpeed(void){
-    return gaz->Speed;
+    if(i2c_err_flag)
+        return gaz->Speed;
+    else
+        if(gaz->Speed < 5){
+            if(gaz->Speed_px4flow < 0)
+              return -gaz->Speed_px4flow;
+            else
+              return gaz->Speed_px4flow;
+        }
+        else
+          return gaz->Speed;
 };
 
 double gazelGetSpeed_px4flow(void){
@@ -129,4 +143,6 @@ double gazelGetBrakePedalPosition(void){
   return gaz->BrakePedalPosition;
 };
 
-
+bool gazelGetI2cErrFlag( void ){
+  return i2c_err_flag;
+}
