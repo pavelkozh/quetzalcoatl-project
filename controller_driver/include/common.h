@@ -13,14 +13,16 @@
 #include <steer_control.h>
 #include <emergency_stop.h>
 #include <engine_ignition.h>
+
 #include <communication.h>
+
 
 #include <stdint.h>
 #include <stdlib.h>
 #include <errno.h>
 
-#define     PROGRAM_ROUTINE_MASTER                          1
 
+#define     PROGRAM_ROUTINE_MASTER                          1
 
 #define		PROGRAM_ROUTINE_TEST_FUZZY_LOGIC			    2
 #define     PROGRAM_ROUTINE_TEST_PX4FLOW                    3

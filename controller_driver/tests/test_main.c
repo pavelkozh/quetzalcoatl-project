@@ -6,7 +6,6 @@
 #include <common.h>
 
 
-
 // Main switch state
 #define MAIN_STATE_NOP                       0
 #define MAIN_STATE_FORWARD                   1
@@ -15,8 +14,10 @@
 #define MAIN_STATE_BACKWARD                  4
 #define MAIN_STATE_LOW_SPEED_CONTROL         5
 
+
 #define MAIN_STATE_FORWARD_CON               101
 #define MAIN_STATE_BACKWARD_CON              104
+
 
 
 //Start funtcion parameters
@@ -70,10 +71,12 @@ void commandSet( float speed, float angle ) {
         if (speed < 4.0 && speed > -4.0)
             speed_ref_sign = 1;
         else
+
             if(speed > 4.0)
                 speed_ref_sign = 0;
             else
                 speed_ref_sign = 2;
+
 
         if ( gazelGetSpeed() < 1.0 )
             if(mtControlGetCurrentGearNum() != 6)
@@ -82,7 +85,9 @@ void commandSet( float speed, float angle ) {
                 speed_ref_sign = 2;
     }else{
          if(speed < 5 && speed > -5)
+
             if(speed == 0 )
+
                 speed_ref_sign = 0;
             else
                 if(speed < 0)
@@ -97,7 +102,7 @@ void commandSet( float speed, float angle ) {
                     speed_sign = 1;
                 else
                     speed_sign = 3;
-        else
+        else 
             if(mtControlGetCurrentGearNum() != 6)
                     speed_sign = 0;
                 else

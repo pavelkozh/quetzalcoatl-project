@@ -4,6 +4,7 @@
 
 static void showHelp(void)
 {
+=
     comm_dbgprintf("Test LLD steer module \n\r");
     comm_dbgprintf("Commands: \n\r");
     comm_dbgprintf("  0 - Get motor expected state \n\r");
@@ -14,6 +15,7 @@ static void showHelp(void)
     comm_dbgprintf("  a - Decrease speed \n\r");
     comm_dbgprintf("  h - show help \n\r");
     comm_dbgprintf("  space - Reset speed \n\r");
+
 }
 
 void testSteer(void)

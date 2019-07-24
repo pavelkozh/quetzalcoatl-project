@@ -16,6 +16,7 @@ static void showHelp(void)
     comm_dbgprintf("  a - Decrease reference \n\r");
     comm_dbgprintf("  h - show help \n\r");
     comm_dbgprintf("  space - Reset reference \n\r");
+
 }
 
 void testSteerPositionControl(void)
