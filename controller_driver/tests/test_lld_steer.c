@@ -4,16 +4,18 @@
 
 static void showHelp(void)
 {
-    comm_dbgprintf("Test LLD steer module\n");
-    comm_dbgprintf("Commands:\n");
-    comm_dbgprintf("  0 - Get motor expected state\n");
-    comm_dbgprintf("  1 - Start/stop\n");
-    comm_dbgprintf("  2 - Change dir\n");
-    comm_dbgprintf("  3 - Perform driver sync\n");
-    comm_dbgprintf("  q - Increase speed\n");
-    comm_dbgprintf("  a - Decrease speed\n");
-    comm_dbgprintf("  h - show help\n");
-    comm_dbgprintf("  space - Reset speed\n");
+=
+    comm_dbgprintf("Test LLD steer module \n\r");
+    comm_dbgprintf("Commands: \n\r");
+    comm_dbgprintf("  0 - Get motor expected state \n\r");
+    comm_dbgprintf("  1 - Start/stop \n\r");
+    comm_dbgprintf("  2 - Change dir \n\r");
+    comm_dbgprintf("  3 - Perform driver sync \n\r");
+    comm_dbgprintf("  q - Increase speed \n\r");
+    comm_dbgprintf("  a - Decrease speed \n\r");
+    comm_dbgprintf("  h - show help \n\r");
+    comm_dbgprintf("  space - Reset speed \n\r");
+
 }
 
 void testSteer(void)
@@ -26,7 +28,7 @@ void testSteer(void)
 
     // uint8_t sd_buff[10];
     float perc_speed = 0;
-    float speed_delta = 5;
+    float speed_delta = 1;
     int sync_result;
 
     showHelp();
@@ -42,21 +44,21 @@ void testSteer(void)
             {
             case '1':
                 steerMotorStartStopControl();
-                comm_dbgprintf("Change start/stop\n");
+                comm_dbgprintf("Change start/stop\n\r");
                 break;
 
             case '2':
                 steerMotorDirChange();
-                comm_dbgprintf("Change direction\n");
+                comm_dbgprintf("Change direction\n\r");
                 break;
 
             case '3':
                 sync_result = steerSyncTestDriver();
-                comm_dbgprintf("Sync done, result: %d\n", sync_result);
+                comm_dbgprintf("Sync done, result: %d\n\r", sync_result);
                 break;
 
             case '0':
-                comm_dbgprintf("Pwr: %s / Dir: %s / Pos: %d\n",
+                comm_dbgprintf("Pwr: %s / Dir: %s / Pos: %d \n\r",
                                steerIsMotorEnable() ? "enabled" : "disabled",
                                steerMotorGetDirection() ? "clockwise" : "counterclockwise",
                                (int)steerGetPosition());
@@ -70,20 +72,20 @@ void testSteer(void)
                 perc_speed += speed_delta;
                 perc_speed = perc_speed > 100 ? 100 : perc_speed;
                 steerMotorSetSpeed(perc_speed);
-                comm_dbgprintf("Speed increase to %d\n", (int)perc_speed);
+                comm_dbgprintf("Speed increase to %d\n\r", (int)perc_speed);
                 break;
 
             case 'a':
                 perc_speed -= speed_delta;
                 perc_speed = perc_speed < 0 ? 0 : perc_speed;
                 steerMotorSetSpeed(perc_speed);
-                comm_dbgprintf("Speed decrease to %d\n", (int)perc_speed);
+                comm_dbgprintf("Speed decrease to %d\n\r", (int)perc_speed);
                 break;
 
             case ' ':
                 perc_speed = 0;
                 steerMotorSetSpeed(perc_speed);
-                comm_dbgprintf("Reset speed\n");
+                comm_dbgprintf("Reset speed\n\r");
                 break;
             }
         }

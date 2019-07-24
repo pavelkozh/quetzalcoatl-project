@@ -10,6 +10,9 @@ void steerControlStop(void);
 void steerSetPosition ( float val );
 float steerGetPos( void );
 int8_t steerMotroDirCalibration( void );
+void steerSetMoveToTheLeft ( void );
+void steerSetMoveToTheRight ( void );
+void steerSetStop ( void );
 
 /***Debug**/
 float steerDbgGetMotorCalcSpeedRef ( void );

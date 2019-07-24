@@ -25,4 +25,4 @@ gst-launch-1.0 -v v4l2src device=$dev_name ! \
         x264enc tune=zerolatency bitrate=$bitrate_kbps speed-preset=superfast \
             key-int-max=$keyframe_period_frames ! \
         rtph264pay ! udpsink host=$client_IP port=$client_port \
-    h. ! queue ! xvimagesink sync=false \
+    h. ! queue ! xvimagesink sync=false

@@ -259,7 +259,6 @@ int8_t shiftMTToNeutral ( uint16_t speed )
     if ( ( m_gorisontal.position == m_gorisontal.tracked_position) && ( m_vertical.position == m_vertical.tracked_position) )
     {
         currently_selected_gear = 0;
-        //palSetLine(LINE_LED1);
     }
 
     return currently_selected_gear;
@@ -273,32 +272,17 @@ int8_t shiftMTToNextGear (int8_t gear_num, uint16_t speed)
     {
         if ( currently_selected_gear != 0 ) //currently selected gear is not a neutral gear
         {
-//            if (  (( currently_selected_gear == 1 ) && (gear_num == 2)) ||  (( currently_selected_gear == 2 ) && (gear_num == 1))  )
-//            {
-//                currently_selected_gear = 0;
-//            }
-//            else
-//            {
-//                shiftMTToNeutral ( speed ); // firstly disable currently selected gear
-//            }
-
-
-
             shiftMTToNeutral ( speed ); // firstly disable currently selected gear
-
         }
         else
         {
             m_gorisontal.tracked_position =  points_array[gear_num].x;
             if ( m_gorisontal.position == m_gorisontal.tracked_position )
             {
-                //palToggleLine(LINE_LED2);
-               // palSetLine(LINE_LED2);
                 m_vertical.tracked_position   =  points_array[gear_num].y;
             }
             if ((   m_vertical.position == m_vertical.tracked_position ) && ( m_gorisontal.position == m_gorisontal.tracked_position ))
             {
-                palToggleLine(LINE_LED3);
                 currently_selected_gear = gear_num;
             }
         }

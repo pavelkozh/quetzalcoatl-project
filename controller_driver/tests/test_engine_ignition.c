@@ -30,6 +30,7 @@ void TestEngIgnition ( void )
     uint8_t var = 15;
 
     while(1) {
+        palToggleLine(LINE_LED1);
 
         sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
 

@@ -20,6 +20,9 @@ static THD_FUNCTION(eng_ignition, arg) {
             chSysUnlock();
         }
         else{
+            engIgnitionSwitchOn (); //
+            chThdSleepSeconds( 4 );
+
             palClearLine(STARTER_PAL_LINE);
             while (  gazelGetEngineSpeed() < 710 ){
                 palSetLine(LINE_LED2);
@@ -27,6 +30,10 @@ static THD_FUNCTION(eng_ignition, arg) {
             }
             palSetLine(STARTER_PAL_LINE);
             palClearLine(LINE_LED2);
+            comm_dbgprintf_info("Engine starts OK");
+
+            //TODO: if after DELAY TIME engine speed still equal 0,
+            //      then send engine start error
 
 
             /* starting is finish -> thread goes to sleep*/
@@ -66,7 +73,7 @@ void engIgnitionInit ( void )
     palSetLine(STARTER_PAL_LINE);
 
     feedbackInit();
-    //chThdCreateStatic(eng_ignition_wa, sizeof(eng_ignition_wa), NORMALPRIO + 1, eng_ignition, NULL);
+    chThdCreateStatic(eng_ignition_wa, sizeof(eng_ignition_wa), NORMALPRIO + 1, eng_ignition, NULL);
 
     if_eng_ignition_tnitialized = true;
 }
@@ -75,15 +82,14 @@ void engIgnitionInit ( void )
 
 bool engStarterSwitchOn ( void )
 {
-//    if (is_engine_start_thd_working == 0) {
-//        is_engine_start_thd_working = 1;
-//        palSetLine(LINE_LED1);
-//        /* Wake up engine start thread */
-//        chSysLock();
-//        chThdResumeS(&trp_eng_ignition, MSG_OK);
-//        chSysUnlock();
-//    }
-    palClearLine(STARTER_PAL_LINE);
+    if (is_engine_start_thd_working == 0) {
+        is_engine_start_thd_working = 1;
+        /* Wake up engine start thread */
+        chSysLock();
+        chThdResumeS(&trp_eng_ignition, MSG_OK);
+        chSysUnlock();
+    }
+    //palClearLine(STARTER_PAL_LINE);
     return  ( is_engine_start_thd_working && ( gazelGetEngineSpeed() > 750 ) );
 
 }
