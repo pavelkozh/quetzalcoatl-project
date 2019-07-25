@@ -14,7 +14,10 @@ static THD_FUNCTION(mt_shift, arg) {
     while(1){
         if ( mt_shifting != -1 )
         {
-            pedalsClutchPress(1000);
+            if(pedalsClutchGetPosition() != pedalsClutchGetMaxPosition())
+            {
+                pedalsClutchPress(1000);
+            }
             if (pedalsClutchGetPosition() == pedalsClutchGetMaxPosition())
             {
                 switch (mt_shifting){
@@ -42,7 +45,9 @@ static THD_FUNCTION(mt_shift, arg) {
     }
 }
 
+static int8_t in_set = 0;
 void commandSet( int8_t vert_djoystic, int8_t steer_speed ) {
+    in_set = vert_djoystic;
     if ((vert_djoystic <= 5) || (mt_shifting != -1))
     {
         pedalsClutchMove( pedalsClutchGetMaxPosition(), 1000 );
@@ -69,20 +74,20 @@ void commandSet( int8_t vert_djoystic, int8_t steer_speed ) {
 
     //TODO: ADD Steer control
     if ( steer_speed > 0 ){
-        if ( steer_speed >= 20){
-            steer_speed = 20;
+        if ( steer_speed >= 10){
+            steer_speed = 10;
         }
-        else if ( steer_speed < 5)
+        else if ( steer_speed < 2)
         {
             steer_speed = 0;
         }
     }
     if ( steer_speed < 0 ){
         palSetLine(LINE_LED1);
-        if ( steer_speed <= -20){
-            steer_speed = -20;
+        if ( steer_speed <= -10){
+            steer_speed = -10;
         }
-        else if ( steer_speed > -5)
+        else if ( steer_speed > -2)
         {
             steer_speed = 0;
         }
@@ -110,11 +115,15 @@ void commandSteerStraight(void){
 }
 
 void commandStop(void){
-    engIgnitionSwitchOff();
+    //engIgnitionSwitchOff();
+    speedEngineControlStop();
 }
 
 void commandStart(void){
-    engStarterSwitchOn ();
+    //engStarterSwitchOn ();
+    speedSetEnginePIDReferenceValue ( 1200.0 ) ;
+    speedEngineControlStart();
+
 }
 
 void connectionErrorCb ( void ){
@@ -149,7 +158,8 @@ void testMainNew( void ){
     engIgnitionInit();
     lldSteerSMInit();
     soundSignalInit();
-//
+    speedInit();
+
     chThdCreateStatic(mt_shift_wa, sizeof(mt_shift_wa), NORMALPRIO, mt_shift, NULL);
 
     communicationEventFun_t structForFunc = getDefaultCfg();
@@ -172,6 +182,8 @@ void testMainNew( void ){
     while(1){
 
         palToggleLine(LINE_LED2);
+
+        comm_dbgprintf("set %d \t clutch pos %d \t brake pos %d \t  \n\r", in_set, pedalsClutchGetPosition(), pedalsBrakeGetPosition() );
 
         chThdSleepMilliseconds(500);
     }

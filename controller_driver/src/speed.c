@@ -20,7 +20,7 @@ static bool        engine_control_start = 0;
 static bool        vehicle_control_start = 0;
 
 static PIDControllerContext_t  pidCtx = {
-    .kp   = 1.0,
+    .kp   = 0.05,
     .ki   = 0.0,
     .kd   = 0,
     .integrLimit  = 5000,
@@ -64,7 +64,7 @@ uint32_t speedEngineControl( uint32_t engine_speed_rpm )
 
     /*  roughly reset integral */
     engine_control_value = CLIP_VALUE(engine_control_value,0,5000);
-    engine_control_value = uint32_map(engine_control_value,0,5000,0,100);
+    engine_control_value = double_map((float)engine_control_value,0.0,5000.0,0.0,100.0);
 
     return engine_control_value;
 
