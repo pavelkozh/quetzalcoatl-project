@@ -25,6 +25,7 @@ void testCommunication(void);
 void testMain( void );
 void TestSteerSM ( void );
 void TestSoundSignal( void );
+void testMainNew( void );
 
 static inline void testsRoutines( void )
 {
@@ -68,9 +69,14 @@ static inline void testsRoutines( void )
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_SOUND_SIGNAL)
     TestSoundSignal();
 
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_START)
+    TestStart();
 
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_MAIN)
     testMain();
+
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_MAIN_NEW)
+    testMainNew();
 
 
 #endif

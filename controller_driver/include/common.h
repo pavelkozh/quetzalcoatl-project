@@ -41,9 +41,11 @@
 #define		PROGRAM_ROUTINE_TEST_MAIN			            14
 #define     PROGRAM_ROUTINE_TEST_STEER_SM                   15
 #define     PROGRAM_ROUTINE_TEST_SOUND_SIGNAL               16
+#define     PROGRAM_ROUTINE_TEST_START                      17
+#define     PROGRAM_ROUTINE_TEST_MAIN_NEW                   18
 
 
-#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_MAIN
+#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_MAIN_NEW
 
 /**************/
 /*** Macros ***/

@@ -189,6 +189,37 @@ static int retrieve_input_data(void)
 
             return EOK;
         }
+
+        if (rcv_buffer[0] == 41 && rcv_buffer[1] == 42 && rcv_buffer[2] == 43)
+        {
+            usb_is_alive();
+
+            if (cpStructWithFunc.on_gear0)
+                cpStructWithFunc.on_gear0();
+
+            return EOK;
+        }
+
+        if (rcv_buffer[0] == 44 && rcv_buffer[1] == 45 && rcv_buffer[2] == 46)
+        {
+            usb_is_alive();
+
+            if (cpStructWithFunc.on_gear1)
+                cpStructWithFunc.on_gear1();
+
+            return EOK;
+        }
+
+        if (rcv_buffer[0] == 47 && rcv_buffer[1] == 48 && rcv_buffer[2] == 49)
+        {
+            usb_is_alive();
+
+            if (cpStructWithFunc.on_gear6)
+                cpStructWithFunc.on_gear6();
+
+            return EOK;
+        }
+
     }
 
     return ENODATA;

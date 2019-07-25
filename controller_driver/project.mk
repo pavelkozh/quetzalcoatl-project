@@ -35,9 +35,10 @@ PROJECT_TESTS   =	tests/test_pedals.c                    \
                     tests/test_steer_control.c             \
                     tests/test_emergency_stop.c            \
                     tests/test_steer_with_communication.c  \
-                    tests/test_main.c                      \
                     tests/test_lld_steer_step_motor.c      \
-                    test/test_sound_signal.c               \
+                    tests/test_sound_signal.c              \
+                    tests/test_start.c                     \
+                    tests/test_main_new.c                  \
 
 
 

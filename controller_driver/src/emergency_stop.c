@@ -32,6 +32,7 @@ static THD_FUNCTION(emergency_button_stop, arg) {
             chSysUnlock();
         }
         else{
+           // soundSignalStartContiniousSignals ();
             //palSetLine(LINE_LED2);
             pedalsClutchPress ( 1000 );
 
@@ -39,7 +40,7 @@ static THD_FUNCTION(emergency_button_stop, arg) {
                 chThdSleepMilliseconds( 50 );
             }
 
-            pedalsBrakePress( 5000 );
+            pedalsBrakePress( 1000 );
             while(pedalsBrakeGetState()){
                 chThdSleepMilliseconds( 50 );
             }

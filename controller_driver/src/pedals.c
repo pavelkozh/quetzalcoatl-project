@@ -85,6 +85,7 @@ void pedalsInit ( void ){
 
      /* Accelerator pedal init*/
      extDacInit();
+    // palSetLine(LINE_LED1);
      if_pedals_module_initialized = 1;
 }
 
@@ -115,7 +116,9 @@ int32_t pedalsClutchMove (double position, uint16_t speed ){
  * @params    speed - movement speed (look "moveClutchPedal" function description )
  */
 void pedalsClutchPress ( uint16_t speed ){
+     palSetLine(LINE_LED1);
     MotorRunContinuous(&ClutchM, 0, speed);
+
 }
 
 /*

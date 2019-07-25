@@ -12,6 +12,9 @@ typedef struct
     void (*on_set)(comm_speed_t speed, comm_steer_t angle);
     void (*on_start)(void);
     void (*on_stop)(void);
+    void (*on_gear0)(void);
+    void (*on_gear1)(void);
+    void (*on_gear6)(void);
     void (*on_steer_straight)(void);
     void (*on_interrupt_timer)(void);
 

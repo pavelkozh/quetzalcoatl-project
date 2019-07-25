@@ -32,7 +32,7 @@ static THD_FUNCTION(sound_signal, arg) {
                 soundSignalOff();
 
                 start_signal_flag = false;
-                start_signal_flag = true;
+                //in_move_signal_flag = true;
             }
             if ( in_move_signal_flag )
             {
