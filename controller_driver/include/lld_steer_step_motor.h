@@ -7,7 +7,8 @@
 
 void lldSteerSMInit ( void );
 int32_t lldSteerSMSetPosition (double position, uint16_t speed );
-void lldSteerSMMove ( uint16_t speed );
+void lldSteerSMMoveToTheRight ( uint16_t speed );
+void lldSteerSMMoveToTheLeft ( uint16_t speed );
 void lldSteerSMStop ( void );
 void lldSteerSMChangeSpeed ( uint16_t new_speed );
 int32_t lldSteerSMGetPosition ( void );

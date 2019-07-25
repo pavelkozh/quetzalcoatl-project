@@ -15,7 +15,7 @@ MotorDriver SteerM = {
     .rising_edge_cb  =   risingEdgeSteerMCallback,
     .falling_edge_cb =   fallingEdgeSteerMCallback,
     .max_position    =   50000,
-    .min_position     =  -50000
+    .min_position    =  -50000
 };
 void risingEdgeSteerMCallback(PWMDriver *pwmd){
 
@@ -26,6 +26,7 @@ void fallingEdgeSteerMCallback(PWMDriver *pwmd){
 
     (void) pwmd;
     fallingEdgeCb(&SteerM);
+    //palToggleLine(LINE_LED1);
 }
 
 
@@ -38,15 +39,18 @@ void lldSteerSMInit ( void ){
      }
 
      /* Clutch init*/
-     palSetLineMode( PAL_LINE( GPIOB, 14),  PAL_MODE_ALTERNATE(2) );
+     palSetLineMode( PAL_LINE( GPIOB, 14),  PAL_MODE_ALTERNATE(9) );
      palSetLineMode( SteerM.dir_line, PAL_MODE_OUTPUT_PUSHPULL);
      MotorlldControlInit( &SteerM );
 
      if_lld_steer_module_initialized = 1;
 }
 
-void lldSteerSMMove ( uint16_t speed ){
+void lldSteerSMMoveToTheRight ( uint16_t speed ){
     MotorRunContinuous(&SteerM, 0, speed);
+}
+void lldSteerSMMoveToTheLeft ( uint16_t speed ){
+    MotorRunContinuous(&SteerM, 1, speed);
 }
 
 int32_t lldSteerSMSetPosition (double position, uint16_t speed ){

@@ -2,14 +2,10 @@
 
 
 //PWM define
-#define DRIVE_PWMD            &PWMD3    // PWM Driver
 #define DRIVE_PWM_FREQ            50000000   // PWM clock frequency [Hz]
-#define DRIVE_PWM_PERIOD        500       // PWM period[tics]  
-#define DRIVE_PWM_PULSE_WIDTH        100       // PWM pulse width   
-#define DRIVE_PWM_PIN         6     // pwm pin
-#define DRIVE_PWM_PORT          GPIOC   // pwm pin port
-#define DRIVE_PWM_PAL_MODE_ALTERNATE  2     // Alternate mod ffor pwm pin
-#define DRIVE_GPTD            &GPTD5    // Driver for count pwm pulse
+#define DRIVE_PWM_PERIOD          500       // PWM period[tics]
+#define DRIVE_PWM_PULSE_WIDTH     100       // PWM pulse width
+
 #define DRIVE_GPTD_TIM_REG_SMCR     TIM_SMCR_SMS_0 | TIM_SMCR_SMS_1 | TIM_SMCR_SMS_2 | TIM_SMCR_TS_0 //Settings for Slave mode PWMD
 
 //Drive
@@ -59,7 +55,7 @@ PWMConfig pwmconf = {
         .period    = DRIVE_PWM_PERIOD,
         .callback  = NULL,
         .channels  = {
-                        {.mode = PWM_OUTPUT_ACTIVE_HIGH, .callback = NULL}, // Channel 1 is working (CH1 = PC6)
+                        {.mode = PWM_OUTPUT_ACTIVE_HIGH, .callback = NULL},
                         {.mode = PWM_OUTPUT_DISABLED,    .callback = NULL},
                         {.mode = PWM_OUTPUT_DISABLED,    .callback = NULL},
                         {.mode = PWM_OUTPUT_DISABLED,    .callback = NULL}

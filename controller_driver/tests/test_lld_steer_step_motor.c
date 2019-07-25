@@ -35,12 +35,13 @@ void TestSteerSM ( void )
 
 
         if(sd_buff[0]=='c') { lldSteerSMStop(); }
-        if(sd_buff[0]=='x') lldSteerSMSetPosition (4000, 50000);
-        if(sd_buff[0]=='z') lldSteerSMMove ( 20000 );
+        if(sd_buff[6]=='a') lldSteerSMSetPosition (atoi(sd_buff), 10000);
+        if(sd_buff[6]=='z') lldSteerSMMoveToTheRight ( atoi(sd_buff) );
+        if(sd_buff[6]=='x') lldSteerSMMoveToTheLeft  ( atoi(sd_buff) );
         if(sd_buff[0]=='f') speed_ref += SPEED_REF_CHANGE_STEP;
         if(sd_buff[6]=='e') speed_ref -= SPEED_REF_CHANGE_STEP;
 
-        //lldSteerSMChangeSpeed ( speed_ref );
+
 
 
 
