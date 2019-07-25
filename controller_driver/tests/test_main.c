@@ -64,15 +64,15 @@ static uint8_t arr_fuzzy_err[3][3] = {{1,3,5},{11,13,15},{21,23,25}};
 static uint8_t arr_fuzzy_ok[5][5] = {{1,2,3,4,5},{6,7,8,9,10},{11,12,13,14,15},{16,17,18,19,20},{21,22,23,24,25}};
 
 //TODO:  what is steer angle variable range?
-void commandSet( float speed, float angle ) {
-    speed_ref = speed;
+void commandSet( int8_t avto_speed, int8_t steer_speed ) {
+    speed_ref = avto_speed;
 
     if(gazelGetI2cErrFlag()){
-        if (speed < 4.0 && speed > -4.0)
+        if (avto_speed < 4 && avto_speed > -4)
             speed_ref_sign = 1;
         else
 
-            if(speed > 4.0)
+            if(avto_speed > 4)
                 speed_ref_sign = 0;
             else
                 speed_ref_sign = 2;
@@ -84,13 +84,13 @@ void commandSet( float speed, float angle ) {
             else
                 speed_ref_sign = 2;
     }else{
-         if(speed < 5 && speed > -5)
+         if(avto_speed < 5 && avto_speed > -5)
 
-            if(speed == 0 )
+            if(avto_speed == 0 )
 
                 speed_ref_sign = 0;
             else
-                if(speed < 0)
+                if(avto_speed < 0)
                     speed_ref_sign = 3;
                 else
                     speed_ref_sign = 1;
@@ -110,26 +110,69 @@ void commandSet( float speed, float angle ) {
     }
 
 
+
+   // steer_speed =  double_map(steer_speed, -100.0, 100.0, -50000.0, 50000.0);
+
+
+    comm_dbgprintf("Steer reference: %d\t  \n\r", steer_speed);
     //TODO: ADD Steer control
-    steerSetPosition(angle);
+    if ( steer_speed > 0 ){
+        if ( steer_speed >= 100){
+            steer_speed = 100;
+        }
+        else if ( steer_speed < 5)
+        {
+            steer_speed = 0;
+        }
+    }
+    if ( steer_speed < 0 ){
+        palSetLine(LINE_LED1);
+        if ( steer_speed <= -100){
+            steer_speed = -100;
+        }
+        else if ( steer_speed > -5)
+        {
+            steer_speed = 0;
+        }
+    }
+
+    if ( (steer_speed >= 5 ) &&  (steer_speed <= 100 ) )
+    {
+        lldSteerSMMoveToTheRight((uint16_t)( 1000000.0/ ( 0.842 * (float)steer_speed + 15.79) ));
+    }
+    else if ( (steer_speed >= -100 ) &&  (steer_speed <= -5 ) )
+    {
+        lldSteerSMMoveToTheLeft((uint16_t)( 1000000.0/ ( 0.842 * (float)steer_speed + 15.79) ));
+    }
+    else /* case steer_speed = 0 */ {
+        lldSteerSMStop();
+    }
+}
+
+
+void commandSteerStraight(void){
+
+    lldSteerSMSetPosition(0, 20000);
+    comm_dbgprintf("*************************************************************************\n\r");
+    comm_dbgprintf("                                                                         \n\r");
+    comm_dbgprintf("                                                                         \n\r");
+    comm_dbgprintf("                                                                         \n\r");
+    comm_dbgprintf("*************************************************************************\n\r");
 }
 
 void commandStop(void){
     //TODO: Command to stop
     engIgnitionSwitchOff();
-    palSetLine(LINE_LED2);
+    soundSignalStopContiniousSignals();
     comm_dbgprintf("STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP");
-    comm_dbgprintf("in command Stop \n\r");
 }
 
 void commandStart(void){
     //TODO: Command to start
     engIgnitionSwitchOn ();
     engStarterSwitchOn ();
-    palSetLine(LINE_LED1);
+   // soundSignalStartContiniousSignals();
     comm_dbgprintf("START START START START START START START START START START START ");
-    comm_dbgprintf("in command Start \n\r");
-
 }
 
 void connectionErrorCb ( void ){
@@ -178,6 +221,12 @@ bool start( uint8_t dir ){
     return 0;
 };
 
+
+
+
+
+
+
 /* after this time connection error callback is execute*/
 #define CONNECTION_FAIL_OK_DELAY 3000  //ms
 
@@ -190,13 +239,16 @@ void testMain( void ){
     emergencyStopInit();
     lowSpeedControlIntit();
     engIgnitionInit();
-    steerInit();
+    //steerInit();
+    lldSteerSMInit();
+    soundSignalInit();
 
     communicationEventFun_t structForFunc = getDefaultCfg();
 
-    structForFunc.on_set    = commandSet;
-    structForFunc.on_start  = commandStart;
-    structForFunc.on_stop   = commandStop;
+    structForFunc.on_set             = commandSet;
+    structForFunc.on_start           = commandStart;
+    structForFunc.on_stop            = commandStop;
+    structForFunc.on_steer_straight  = commandSteerStraight;
     structForFunc.on_interrupt_timer = connectionErrorCb;
 
     comm_init(&structForFunc, CONNECTION_FAIL_OK_DELAY, true);
@@ -206,22 +258,24 @@ void testMain( void ){
 
 
 
+
+
     char  sd_buff[10] = {'?','?','?','?','?','?','?','?','?','?'} ;
     bool start_flag = 0;
     int8_t state = 0;
 
     while(1){
 
-        palToggleLine(LINE_LED3);
-        sdReadTimeout( &SD3, sd_buff, 10, TIME_IMMEDIATE   );
-
-        if(sd_buff[0] == 's')  commandSet( atoi(&sd_buff[1]), 0);
-        if(sd_buff[0] == 'p')  main_state = MAIN_STATE_STOP;
-
-        for (int i = 0; i < 9; i++)
-        {
-        sd_buff[i]='?';
-        }
+        palToggleLine(LINE_LED2);
+//        sdReadTimeout( &SD3, sd_buff, 10, TIME_IMMEDIATE   );
+//
+//        if(sd_buff[0] == 's')  commandSet( atoi(&sd_buff[1]), 0);
+//        if(sd_buff[0] == 'p')  main_state = MAIN_STATE_STOP;
+//
+//        for (int i = 0; i < 9; i++)
+//        {
+//        sd_buff[i]='?';
+//        }
 
         if(main_state == MAIN_STATE_NOP){
             switch (arr_fuzzy_err[speed_sign][speed_ref_sign]) {
@@ -376,11 +430,10 @@ void testMain( void ){
             break;
         }
 
-       // comm_dbgprintf("START START START START START START START START START START START ");
-        comm_dbgprintf("Main State: %d\t gear_num: %d\t Clutch_pos: %d\t ",main_state, mtControlGetCurrentGearNum(), pedalsClutchGetPosition());
-        comm_dbgprintf("Break_pos: %d\t speed %.02f\t eng_speed %.02f\t \n\r",pedalsBrakeGetPosition(), gazelGetSpeed(), gazelGetEngineSpeed());
-        if(gazelGetI2cErrFlag())
-            comm_dbgprintf("I2c error!\r\n");
+        //comm_dbgprintf("Main State: %d\t gear_num: %d\t Clutch_pos: %d\t ",main_state, mtControlGetCurrentGearNum(), pedalsClutchGetPosition());
+        //comm_dbgprintf("Break_pos: %d\t speed %.02f\t eng_speed %.02f\t \n\r",pedalsBrakeGetPosition(), gazelGetSpeed(), gazelGetEngineSpeed());
+//        if(gazelGetI2cErrFlag())
+//            comm_dbgprintf("I2c error!\r\n");
         chThdSleepMilliseconds(100);
     }
 }

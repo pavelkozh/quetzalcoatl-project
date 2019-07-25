@@ -178,6 +178,17 @@ static int retrieve_input_data(void)
 
             return EOK;
         }
+
+        /* Steer straight */
+        if (rcv_buffer[0] == 91 && rcv_buffer[1] == 8 && rcv_buffer[2] == 185)
+        {
+            usb_is_alive();
+
+            if (cpStructWithFunc.on_steer_straight)
+                cpStructWithFunc.on_steer_straight();
+
+            return EOK;
+        }
     }
 
     return ENODATA;

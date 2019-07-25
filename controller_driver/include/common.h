@@ -13,6 +13,8 @@
 #include <steer_control.h>
 #include <emergency_stop.h>
 #include <engine_ignition.h>
+#include <lld_steer_step_motor.h>
+#include <sound_signal.h>
 
 #include <communication.h>
 
@@ -38,9 +40,10 @@
 #define     PROGRAM_ROUTINE_TEST_STEER_WITH_COMMUNICATION   13
 #define		PROGRAM_ROUTINE_TEST_MAIN			            14
 #define     PROGRAM_ROUTINE_TEST_STEER_SM                   15
+#define     PROGRAM_ROUTINE_TEST_SOUND_SIGNAL               16
 
 
-#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_STEER_SM
+#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_MAIN
 
 /**************/
 /*** Macros ***/

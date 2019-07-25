@@ -1,7 +1,7 @@
 # Controller periphery usage
  
 ## NOTE!!!
-1) PE6 do not connected to board
+1) PE6 do not connected to board, PH1 ??
 2) PC11, PC10 do not working when try to pull down    
 
 
@@ -90,5 +90,12 @@ Driver | Pins | Input / Output | Description
 -------|------|----------------|----------
 PAL    | PF12 |   Output       | Ignition
 PAL    | PF13 |   Output       | Starter
+
+
+## Avto Signal (bi-bi)
+Driver | Pins | Input / Output | Description
+-------|------|----------------|----------
+PAL    | PB2  |   Output       | 
+
 
 

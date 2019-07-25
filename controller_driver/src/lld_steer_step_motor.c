@@ -14,8 +14,8 @@ MotorDriver SteerM = {
     .dir_line        =   PAL_LINE(GPIOF, 2),
     .rising_edge_cb  =   risingEdgeSteerMCallback,
     .falling_edge_cb =   fallingEdgeSteerMCallback,
-    .max_position    =   50000,
-    .min_position    =  -50000
+    .max_position    =   10000,
+    .min_position    =  -10000
 };
 void risingEdgeSteerMCallback(PWMDriver *pwmd){
 
