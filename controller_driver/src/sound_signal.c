@@ -26,24 +26,24 @@ static THD_FUNCTION(sound_signal, arg) {
                 soundSignalOn();
                 chThdSleepMilliseconds( 800 );
                 soundSignalOff();
-                chThdSleepMilliseconds( 500 );
+                chThdSleepMilliseconds( 1000 );
                 soundSignalOn();
                 chThdSleepMilliseconds( 800 );
                 soundSignalOff();
 
                 start_signal_flag = false;
-                //in_move_signal_flag = true;
+                in_move_signal_flag = true;
             }
             if ( in_move_signal_flag )
             {
                 soundSignalOn();
                 chThdSleepMilliseconds( 100 );
                 soundSignalOff();
-                chThdSleepMilliseconds( 5000 );
+                chThdSleepMilliseconds( 2000 );
                 soundSignalOn();
                 chThdSleepMilliseconds( 100 );
                 soundSignalOff();
-                chThdSleepMilliseconds( 5000 );
+                chThdSleepMilliseconds( 2000 );
             }
 
         }

@@ -21,15 +21,15 @@ static bool        vehicle_control_start = 0;
 
 static PIDControllerContext_t  pidCtx = {
     .kp   = 0.05,
-    .ki   = 0.0,
+    .ki   = 0.005,
     .kd   = 0,
     .integrLimit  = 5000,
-    .integZone = 0.5
+    .integZone = 1.0
 };
 
 static PIDControllerContext_t  pidCtxV = {
     .kp   = 5.0,
-    .ki   = 0.1,
+    .ki   = 0.01,
     .kd   = 0,
     .integrLimit  = 100,
     .integZone = 0.9
@@ -40,14 +40,14 @@ static PIDControllerContext_t  pidCtxV = {
  * @param    engine_speed_rpm - reference [rpm]
  * @return   engine_control_value - GAS control [dac units]
  */
-uint32_t speedEngineControl( uint32_t engine_speed_rpm )
+float speedEngineControl( float engine_speed_rpm )
 {
 
     //engine_speed_rpm = uint32_map(engine_speed_rpm,0,5000,0,5000);
     //engine_speed_rpm  = CLIP_VALUE( engine_speed_rpm, 0, 100 );
     //int16_t current_engine_speed = uint32_map(gazelGetEngineSpeed(),0,5000,0,5000);
 
-    int16_t error = engine_speed_rpm - gazelGetEngineSpeed();
+    float error = engine_speed_rpm - gazelGetEngineSpeed();
 
     /* Dead zone for (p) error */
     if ( abs(error) < CSErrorDeadzoneHalfwidth )
@@ -63,8 +63,8 @@ uint32_t speedEngineControl( uint32_t engine_speed_rpm )
 
 
     /*  roughly reset integral */
-    engine_control_value = CLIP_VALUE(engine_control_value,0,5000);
-    engine_control_value = double_map((float)engine_control_value,0.0,5000.0,0.0,100.0);
+    engine_control_value = CLIP_VALUE(engine_control_value,0.0,10000.0);
+    engine_control_value = double_map((float)engine_control_value,0.0,10000.0,0.0,100.0);
 
     return engine_control_value;
 

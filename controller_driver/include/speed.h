@@ -8,7 +8,7 @@
  * @param     engine_speed_rpm - reference [rpm]
  * @return    engine_control_value - GAS control [dac units]
  */
-uint32_t sppedEngineControl( uint32_t engine_speed_rpm );
+float speedEngineControl( float engine_speed_rpm );
 
 /**
  * @brief     Vehicle speed control function

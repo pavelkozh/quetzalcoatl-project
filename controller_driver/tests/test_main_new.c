@@ -115,12 +115,14 @@ void commandSteerStraight(void){
 }
 
 void commandStop(void){
-    //engIgnitionSwitchOff();
+    engIgnitionSwitchOff();
+
     speedEngineControlStop();
 }
 
 void commandStart(void){
-    //engStarterSwitchOn ();
+    engStarterSwitchOn ();
+    soundSignalStartContiniousSignals();
     speedSetEnginePIDReferenceValue ( 1200.0 ) ;
     speedEngineControlStart();
 
@@ -154,10 +156,10 @@ void testMainNew( void ){
     feedbackInit();
     pedalsInit();
     mtControlInit();
-   // emergencyStopInit();
+    emergencyStopInit();
     engIgnitionInit();
     lldSteerSMInit();
-    soundSignalInit();
+    //soundSignalInit();
     speedInit();
 
     chThdCreateStatic(mt_shift_wa, sizeof(mt_shift_wa), NORMALPRIO, mt_shift, NULL);
@@ -183,7 +185,12 @@ void testMainNew( void ){
 
         palToggleLine(LINE_LED2);
 
-        comm_dbgprintf("set %d \t clutch pos %d \t brake pos %d \t  \n\r", in_set, pedalsClutchGetPosition(), pedalsBrakeGetPosition() );
+        if ( mt_shifting != -1)
+        {
+            comm_dbgprintf ("Gear shifting = %d\t",mt_shifting);
+        }
+
+        comm_dbgprintf("speed: %d\t eng_speed: %d\t gear: %d\t gear_flag: %d\t clutch pos: %d\t brake pos: %d\t  \n\r",(uint16_t)gazelGetSpeed(), (uint16_t)gazelGetEngineSpeed(), mtControlGetCurrentGearNum(), pedalsClutchGetPosition(), pedalsBrakeGetPosition() );
 
         chThdSleepMilliseconds(500);
     }
