@@ -7,6 +7,13 @@ class CommandTypes(object):
 	COMM_START = "start"
 	COMM_STOP = "stop"
 	COMM_SET = "set"
+	COMM_STEER = "steer"
+	# NEW START
+	COMM_STEER2 = "steer2"
+	# NEW END
+	# NEW START
+	COMM_STEER3 = "steer3"
+	# NEW END
 
 class CommandCreate(object):
 	def create(type_, value = None):
@@ -40,6 +47,19 @@ class CommandPub(object):
 	def send_set(self, speed, steer):
 		json_str = CommandCreate.create(CommandTypes.COMM_SET, [speed, steer])
 		self.pub.send(json_str)
+	def send_steer(self):
+		json_str = CommandCreate.create(CommandTypes.COMM_STEER, None)
+		self.pub.send(json_str)
+	# NEW START
+	def send_steer2(self):
+		json_str = CommandCreate.create(CommandTypes.COMM_STEER2, None)
+		self.pub.send(json_str)
+	# NEW END
+	# NEW START
+	def send_steer3(self):
+		json_str = CommandCreate.create(CommandTypes.COMM_STEER3, None)
+		self.pub.send(json_str)
+	# NEW END
 
 class CommandSub(object):
 	def __init__(self, ip='127.0.0.1'):
@@ -49,6 +69,13 @@ class CommandSub(object):
 		self.on_enable = None
 		self.on_disable = None
 		self.on_set = None
+		self.on_steer = None
+		# NEW START
+		self.on_steer2 = None
+		# NEW END
+		# NEW START
+		self.on_steer3 = None
+		# NEW END
 
 	def on_msg(self, data):
 		dictionary = CommandParse.parse(data)
@@ -64,6 +91,19 @@ class CommandSub(object):
 		if dictionary['type'] == CommandTypes.COMM_STOP:
 			if self.on_stop:
 				self.on_stop()
+		if dictionary['type'] == CommandTypes.COMM_STEER:
+			if self.on_steer:
+				self.on_steer()
+		# NEW START
+		if dictionary['type'] == CommandTypes.COMM_STEER2:
+			if self.on_steer2:
+				self.on_steer2()
+		# NEW END
+		# NEW START
+		if dictionary['type'] == CommandTypes.COMM_STEER3:
+			if self.on_steer3:
+				self.on_steer3()
+		# NEW END
 		if dictionary['type'] == CommandTypes.COMM_SET:
 			if self.on_set:
 				speed, angle = dictionary['value']
@@ -80,9 +120,19 @@ if __name__ == '__main__':
 		print('i received start')
 	def stop_handler():
 		print('i received stop')
+	def steer_handler():
+		print('I received STEER')
+	# NEW START
+	def steer2_handler():
+		print('I received STEER2')
+	# NEW END
 	sub.on_set = set_handler
 	sub.on_start = start_handler
 	sub.on_stop = stop_handler
+	sub.on_steer = steer_handler
+	# NEW START
+	sub.on_steer2 = steer2_handler
+	# NEW END
 
 	pub = CommandPub(ip = '127.0.0.1')
 	while 1:
@@ -100,5 +150,12 @@ if __name__ == '__main__':
 		time.sleep(1)
 		print('I send set 5, 7')
 		pub.send_set(5, 7)
+		time.sleep(1)
+		pub.send_steer()
+		print('I send STEER')
+		# NEW START
+		pub.send_steer2()
+		print('I send STEER2')
+		# NEW END
 		time.sleep(1)
 
