@@ -32,7 +32,7 @@ if args.debug:
 # MAIN for gazel computer
 
 BROCKER_IP = '127.0.0.1'
-#STM_COMMUNICATION_DEVICE='/dev/serial/by-id/usb-STMicroelectronics_ChibiOS_RT_Virtual_COM_Port_404-if00'
+# STM_COMMUNICATION_DEVICE='/dev/serial/by-id/usb-STMicroelectronics_ChibiOS_RT_Virtual_COM_Port_404-if00'
 STM_COMMUNICATION_DEVICE='/dev/ttyACM1'
 # STM_COMMUNICATION_DEVICE='/dev/serial/by-id/usb-STMicroelectronics_STM32_STLink_0671FF504955857567171741-if02'
 global SEND_DATA_ENABLE 
@@ -52,44 +52,76 @@ except:
 
 sub = command.CommandSub(ip = BROCKER_IP)
 def set_handler(load):
-    if comun and SEND_DATA_ENABLE == 2:
-        state_pub.send("SET VALUES sssssssssssssssssssssssssssssssssssssvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
+    print('i get set')
+    if comun:
+        # state_pub.send("SET VALUES sssssssssssssssssssssssssssssssssssssvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
         comun.set_control(load['speed'], load['steer'],)
     rootLogger.debug('COMM_SET: speed = {}, steer = {}'.format(load['speed'], load['steer']))
 def start_handler():
-    if comun and SEND_DATA_ENABLE == 2:
-        state_pub.send("START tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt")
+    print('i get start')
+    if comun:
+        # state_pub.send("START tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt")
         comun.on_start()
     rootLogger.debug("COMM_START")
 def stop_handler():
+    print('i get stop')
     if comun:
-        if SEND_DATA_ENABLE == 2:
-            comun.on_stop()
-            state_pub.send('STOP ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp')
+        comun.on_stop()
+        # state_pub.send('STOP ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp')
     rootLogger.debug("COMM_STOP")
 def enable_handler():
+    print('i get enable')
     global SEND_DATA_ENABLE
     SEND_DATA_ENABLE = 2
     if comun:
-        state_pub.send("ENABLE EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+        # state_pub.send("ENABLE EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
         comun.activate_connection()
     rootLogger.debug("COMM_ENABLE")
 def disable_handler():
+    print('i get disable')
     global SEND_DATA_ENABLE
     SEND_DATA_ENABLE = 1
     if comun:
-        state_pub.send('DISABLE ddddddddddddddddddddddddddddddddddddddddddd')
+        # state_pub.send('DISABLE ddddddddddddddddddddddddddddddddddddddddddd')
         SEND_DATA_ENABLE = 1
         comun.deactivate_connection()
     rootLogger.debug("COMM_DISABLE")
+def steer_handler():
+    print('i get steer')
+    if comun:
+        print('In steer handler')
+        # state_pub.send("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        comun.on_steer()
+    rootLogger.debug("COMM_STEER")
+def steer2_handler():
+    # print('i get ster GGGGGGGGGGGGGGGGGGGGGGG')
+    if comun:
+        print('In steer2 handler')
+        # state_pub.send("????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????")
+        comun.on_green()
+    rootLogger.debug("COMM_STEER2")
+def steer3_handler():
+    print('i get ster 33333333333333333333333333333333333333333333333333333333333333333333333')
+    if comun:
+        print('In steer3 handler')
+        # state_pub.send("????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????")
+        comun.on_r3()
+    rootLogger.debug("COMM_STEER3")
+
 
 sub.on_set = set_handler
 sub.on_start = start_handler
 sub.on_stop = stop_handler
 sub.on_enable = enable_handler
 sub.on_disable = disable_handler
+sub.on_steer = steer_handler
+sub.on_steer2 = steer2_handler
+sub.on_steer3 = steer3_handler
+
 
 while True:	
+    # print ("LOOP    ")
+    # state_pub.send("loop")
     if comun:
         inp = comun.get_state_msg()
         # print("inp = {}".format(inp))
@@ -98,15 +130,15 @@ while True:
             
             if inp.lvl == communication.StateMessage.INFO_LVL or \
                 inp.lvl == communication.StateMessage.UNKNOWN_LVL:
-                rootLogger.info('From uC: {}'.format(inp.msg))
+                # rootLogger.info('From uC: {}'.format(inp.msg))
                 state_pub.send(inp.msg)
 
             if inp.lvl == communication.StateMessage.WARNING_LVL:
-                rootLogger.warning('From uC: {}'.format(inp.msg))
+                # rootLogger.warning('From uC: {}'.format(inp.msg))
                 state_pub.send(inp.msg)
 
             if inp.lvl == communication.StateMessage.ERROR_LVL:
-                rootLogger.error('From uC: {}'.format(inp.msg))
+                # rootLogger.error('From uC: {}'.format(inp.msg))
                 state_pub.send(inp.msg)
 
     time.sleep(0.001)
