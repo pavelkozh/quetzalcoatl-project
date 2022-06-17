@@ -7,6 +7,6 @@
 **/.DS_Store
 **/__pycache__
 *.pyc
-
+/software/third_party/
 
 
