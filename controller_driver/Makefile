@@ -90,6 +90,10 @@ endif
 # Define project name here
 PROJECT = ch
 
+ifndef CHIBIOS_ROOT
+  $(error CHIBIOS_ROOT is not set)
+endif
+
 # TODO <<< Set this correct!
 # Imported source files and paths
 # CHIBIOS = ../../chibios176
