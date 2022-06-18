@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<robot
+		name="gazel"
+		xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:include filename="$(find quetzalcoatl_description)/urdf/base.urdf.xacro" />
+	<xacro:include filename="$(find maddrive_urdf_tools)/urdf/macros/realsense.urdf.xacro" />
+
+	<xacro:realsense_435
+			name="rs_camera_left"
+			base_link_name="base_front_axis_link"
+			xyz="0.05 1 1.45"
+			rpy="0 0 0.1" />
+
+	<xacro:realsense_435
+			name="rs_camera_right"
+			base_link_name="base_front_axis_link"
+			xyz="0.05 -1 1.45"
+			rpy="0 0 -0.1" />
+
+</robot>

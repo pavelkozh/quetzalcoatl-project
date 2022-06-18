@@ -1,0 +1,181 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:include filename="$(find quetzalcoatl_description)/urdf/params.urdf.xacro" />
+	<xacro:include filename="$(find maddrive_urdf_tools)/urdf/macros/wheels.urdf.xacro" />
+	<xacro:include filename="$(find maddrive_urdf_tools)/urdf/macros/inertia.urdf.xacro" />
+
+	<!-- Large box =) -->
+	<link name="base_center">
+		<visual>
+			<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+			<geometry>
+				<box size="${body_length} ${body_width} ${body_heigth}" />
+			</geometry>
+		</visual>
+		<collision>
+			<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+			<geometry>
+				<box size="${body_length} ${body_width} ${body_heigth}" />
+			</geometry>
+		</collision>
+		<xacro:box_inertia
+				width="${body_width}"
+				length="${body_length}"
+				height="${body_heigth}"
+				mass="${body_mass}">
+			<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+		</xacro:box_inertia>
+	</link>
+
+	<link name="nose_center">
+		<visual>
+			<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+			<geometry>
+				<box size="${nose_length} ${nose_width} ${nose_heigth}" />
+			</geometry>
+		</visual>
+		<collision>
+			<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+			<geometry>
+				<box size="${nose_length} ${nose_width} ${nose_heigth}" />
+			</geometry>
+		</collision>
+		<xacro:box_inertia
+				width="${nose_width}"
+				length="${nose_length}"
+				height="${nose_heigth}"
+				mass="${nose_mass}">
+			<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+		</xacro:box_inertia>
+	</link>
+
+	<!-- BASE FOOTPRINT-->
+	<link name="base_footprint" />
+	<gazebo reference="base_footprint" />
+
+	<link name="base_link" />
+	<gazebo reference="base_link" />
+
+	<link name="base_front_axis_link" />
+	<gazebo reference="base_front_axis_link" />
+
+	<joint
+			name="base_footprint_2_link"
+			type="fixed">
+		<parent link="base_footprint" />
+		<child link="base_link" />
+		<origin
+				xyz="0 0 ${wheel_radius}"
+				rpy="0 0 0" />
+	</joint>
+
+	<joint
+			name="base_link_2_center"
+			type="fixed">
+		<parent link="base_link" />
+		<child link="base_center" />
+		<origin
+				xyz="${body_length/2-rear_wheel_2_bumper} 0 ${body_heigth/2}"
+				rpy="0 0 0" />
+	</joint>
+
+	<joint
+			name="base_link_2_front_axis"
+			type="fixed">
+		<parent link="base_link" />
+		<child link="base_front_axis_link" />
+		<origin
+				xyz="${wheelbase} 0 0"
+				rpy="0 0 0" />
+	</joint>
+
+	<joint
+			name="base_front_axis_2_nose_center"
+			type="fixed">
+		<parent link="base_front_axis_link" />
+		<child link="nose_center" />
+		<origin
+				xyz="${nose_length/2} 0 ${nose_heigth/2}"
+				rpy="0 0 0" />
+	</joint>
+
+	<gazebo>
+		<plugin
+				name="interface_plugin"
+				filename="libackermann_controller_plugin.so">
+			<debug>false</debug>
+			<maxSteerRad>${wheel_mid_turn_limit}</maxSteerRad>
+			<wheelbase>${wheelbase}</wheelbase>
+			<wheelRadius>${wheel_radius}</wheelRadius>
+			<wheelTrackWidth>${track_width}</wheelTrackWidth>
+			<commandTopic>cmd_vel</commandTopic>
+			<robotBaseFrame>base_footprint</robotBaseFrame>
+			<!-- <odomFrame>${odom_frame}</odomFrame> -->
+			<!-- <pubTf>$(arg pub_tf)</pubTf> -->
+			<robotName>$(arg robot_name)</robotName>
+			<updateRate>50.0</updateRate>
+
+			<RL_driveJoint>rear_left_wheel_speed_joint</RL_driveJoint>
+			<RR_driveJoint>rear_right_wheel_speed_joint</RR_driveJoint>
+			<FL_steerJoint>front_left_wheel_steer_joint</FL_steerJoint>
+			<FR_steerJoint>front_right_wheel_steer_joint</FR_steerJoint>
+
+			<!--PID settings - - - - - - - - - - - - - - - - - - - -
+				p      -    proportional gain
+				i      -    intergral gain
+				d      -    derivative gain
+				imax   -    anti windup max
+				imin   -    anti windup min
+			- - - - - - - - - - - - - - - - - - - - - - - - - -  -->
+
+			<!-- Wheel Velocity PID settings -->
+			<drive_p>30000.0</drive_p>
+			<drive_i>300.0</drive_i>
+			<drive_d>10.0</drive_d>
+			<drive_imax>100.0</drive_imax>
+			<drive_imin>-100.0</drive_imin>
+			<drive_max_effort>10000.0</drive_max_effort>
+
+			<!-- Steering PID settings -->
+			<steer_p>30000.0</steer_p>
+			<steer_i>2000.0</steer_i>
+			<steer_d>10.0</steer_d>
+			<steer_imax>500.0</steer_imax>
+			<steer_imin>-500.0</steer_imin>
+			<steer_max_effort>20000.0</steer_max_effort>
+
+		</plugin>
+	</gazebo>
+
+	<xacro:steer_wheel
+			name="front_right_wheel"
+			base_name="base_link"
+			xyz="${wheelbase} -${track_width/2} 0"
+			steer_limit="${wheel_mid_turn_limit}" />
+	<xacro:steer_wheel
+			name="front_left_wheel"
+			base_name="base_link"
+			xyz="${wheelbase} ${track_width/2} 0"
+			steer_limit="${wheel_mid_turn_limit}" />
+	<xacro:speed_wheel
+			name="rear_right_wheel"
+			base_name="base_link"
+			xyz="0 -${track_width/2} 0" />
+	<xacro:speed_wheel
+			name="rear_left_wheel"
+			base_name="base_link"
+			xyz="0 ${track_width/2} 0" />
+</robot>
