@@ -122,6 +122,7 @@
 			<wheelRadius>${wheel_radius}</wheelRadius>
 			<wheelTrackWidth>${track_width}</wheelTrackWidth>
 			<commandTopic>cmd_vel</commandTopic>
+			<odomTopic>wheel_odom</odomTopic>
 			<robotBaseFrame>base_footprint</robotBaseFrame>
 			<!-- <odomFrame>${odom_frame}</odomFrame> -->
 			<!-- <pubTf>$(arg pub_tf)</pubTf> -->
