@@ -1,6 +1,5 @@
-# Quetzalcoatl project
-
-Проект под командной разработкой  
+# Quetzalcoatl uC firmware
+  
 Некоторые [правила оформления](https://github.com/KaiL4eK/tools_sandbox/blob/master/rules_template.md)
 
 
