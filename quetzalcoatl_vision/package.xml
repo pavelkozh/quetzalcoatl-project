@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>quetzalcoatl_vision</name>
+  <version>0.0.0</version>
+  <description>The quetzalcoatl_vision package</description>
+
+  <maintainer email="ashenone23@todo.todo">ashenone23</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <export>
+
+  </export>
+</package>

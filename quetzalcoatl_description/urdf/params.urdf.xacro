@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:property name="yaml_file" value="$(find quetzalcoatl_description)/config/props.yaml" />
+    <xacro:property name="props" value="${xacro.load_yaml(yaml_file)}" />
+
+    <xacro:property name="bumper_2_front_wheel" value="0.875" />
+    <xacro:property name="rear_wheel_2_bumper" value="1.587" />
+
+    <xacro:property name="wheelbase" value="${props['wheelbase']}" />
+    <xacro:property name="half_wheelbase" value="${wheelbase/2}" />
+    <xacro:property name="track_width" value="${props['track_width']}" />
+
+    <xacro:property name="body_length" value="${wheelbase+rear_wheel_2_bumper}" />
+    <xacro:property name="body_width" value="2.068" />
+    <xacro:property name="body_heigth" value="2.753" />
+    <!-- Full except nose and wheels -->
+    <xacro:property name="body_mass" value="3466" />
+
+    <xacro:property name="nose_length" value="${bumper_2_front_wheel}" />
+    <xacro:property name="nose_width" value="2.068" />
+    <xacro:property name="nose_heigth" value="${body_heigth/3}" />
+    <xacro:property name="nose_mass" value="500" />
+
+    <xacro:property name="wheel_width" value="0.15" />
+    <xacro:property name="wheel_radius" value="${props['wheel_radius']}" />
+    <!-- Wheel mass is approximate -->
+    <xacro:property name="wheel_mass" value="20" />
+    <xacro:property name="wheel_mid_turn_limit" value="${props['max_wheel_angle_deg']/180*pi}" />
+
+    <!-- <xacro:arg name="odom_frame" default="wheel_odom" /> -->
+    <!-- <xacro:arg name="pub_tf" default="false" /> -->
+    <xacro:arg name="robot_name" default="gazel" />
+</robot>
