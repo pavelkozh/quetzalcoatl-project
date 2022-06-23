@@ -64,14 +64,6 @@ extern "C"
 
             tcpConnection->recv_timeout = RECEIVE_TIMEOUT;
 
-            // error = netconn_bind(tcpConnection, NULL, CONNECTION_PORT);
-            // if (error != ERR_OK)
-            // {
-            //     comm_dbgprintf_error("Connection failed: %d", error);
-            //     reconnectFlag = 1;
-            //     return;
-            // }
-
             comm_dbgprintf_info("Binded, TCP connection start");
 
             error = netconn_connect(tcpConnection, &ServerIPaddr, SERVER_PORT);
@@ -89,8 +81,7 @@ extern "C"
 
         void init(char *dst)
         {
-            // TODO - reimplement with uC stack
-            // Init with destination definition (like 10.143.123.454:11411)
+            // TODO - Init with destination definition (like 10.143.123.454:11411)
             comm_dbgprintf_info("Attempt to initialize finction with destination argument - not supported, call init() with default");
             init();
         }
@@ -103,7 +94,7 @@ extern "C"
                 return -1;
             }
 
-            err_t reciveError;
+            err_t receiveError;
             uint8_t retBuff;
             static struct netbuf *inbuf;
             static uint8_t *buf;
@@ -114,24 +105,20 @@ extern "C"
             {
                 if (nextBuffFlag == 0)
                 {
-                    reciveError = netconn_recv(tcpConnection, &inbuf);
+                    receiveError = netconn_recv(tcpConnection, &inbuf);
                 }
-                if (reciveError == ERR_OK || nextBuffFlag == 1)
+                if (receiveError == ERR_OK || nextBuffFlag == 1)
                 {
                     nextBuffFlag = 0;
                     netbuf_data(inbuf, (void **)&buf, &buflen);
                 }
                 else
                 {
-                    if (reciveError == ERR_CONN)
+                    /* ERR_RST ~ -11, ERR_CLSD ~ -12, ERR_CONN ~ -13 */
+                    if (receiveError <= ERR_RST)
                     {
                         reconnectFlag = 1;
-                        comm_dbgprintf_error("Start reconnection");
-                    }
-                    if (reciveError == ERR_CLSD)
-                    {
-                        // reconnectFlag = 1;
-                        // comm_dbgprintf_error("Start reconnection");
+                        comm_dbgprintf_error("Start reconnection: %d", receiveError);
                     }
                     return -1;
                 }
