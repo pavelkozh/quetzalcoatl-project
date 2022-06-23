@@ -35,5 +35,6 @@ void comm_dbgprintf_info(const char *format, ...);
 /* Use carefully, as USB can freeze controller! */
 BaseChannel *comm_get_channel(void);
 
+void haltSystem(char *msg);
 
 #endif //_COMMUNICATION_
