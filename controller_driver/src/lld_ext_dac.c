@@ -30,10 +30,10 @@ static const SPIConfig spicfg = {
 	.cr2 = SPI_CR2_DS //16-bit size mode
 };
 
-void extDacInit( ){
+void extDacInit(){
 	palSetLineMode( EXTERNAL_DAC_CLK_LINE , EXTERNAL_DAC_CLK_MODE ); 		// SPI SCK.
 	palSetLineMode( EXTERNAL_DAC_MISO_LINE , EXTERNAL_DAC_MISO_MODE );    // MISO.
-	palSetLineMode( EXTERNAL_DAC_MOSI_LINE , EXTERNAL_DAC_MOSI_MODE );    // MOSI.
+	// palSetLineMode( EXTERNAL_DAC_MOSI_LINE , EXTERNAL_DAC_MOSI_MODE );    // MOSI.
 	palSetLine( EXTERNAL_DAC_MOSI_LINE );
 	palSetLineMode( EXTERNAL_DAC_CS_LINE , EXTERNAL_DAC_CS_MODE);        // CS0.
 	palSetLine( EXTERNAL_DAC_CS_LINE );

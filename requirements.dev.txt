@@ -1,0 +1,5 @@
+-r requirements.txt
+
+black~=21.6b0
+pydot~=1.4.2
+matplotlib~=3.4.2

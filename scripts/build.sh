@@ -6,6 +6,7 @@ catkin build \
     quetzalcoatl_software \
     quetzalcoatl_vision \
     quetzalcoatl_maps \
+    quetzalcoatl_msgs \
     quetzalcoatl_description \
     maddrive_urdf_tools \
     ackermann_controller_plugin \

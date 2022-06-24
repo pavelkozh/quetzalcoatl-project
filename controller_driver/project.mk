@@ -1,4 +1,5 @@
-
+ROSLIB = src/ros_lib
+include $(ROSLIB)/ros.mk
 
 PROJECT_MODULES =	src/lld_can.c                \
 			        src/lld_ext_dac.c            \
@@ -23,7 +24,6 @@ PROJECT_MODULES =	src/lld_can.c                \
                     src/sound_signal.c           \
                  # src/lld_steer_step_threaded.c   \
 
-
 PROJECT_TESTS   =	tests/test_pedals.c                    \
                     tests/test_speed.c                     \
                     tests/test_mt_control.c                \
@@ -39,15 +39,11 @@ PROJECT_TESTS   =	tests/test_pedals.c                    \
                     tests/test_sound_signal.c              \
                     tests/test_start.c                     \
                     tests/test_main_new.c                  \
-
-
-
+                    tests/test_ros_comm.c
 
 PROJECT_CSRC    =	src/main.c src/common.c \
 					$(PROJECT_MODULES) $(PROJECT_TESTS)
-PROJECT_CPPSRC 	= 
-
+PROJECT_CPPSRC 	= $(ROSSRC) src/ros.cpp
 PROJECT_INCDIR	=	include tests $(ROSINC)
-
 PROJECT_LIBS	= -lm
 

@@ -319,7 +319,7 @@ void comm_dbgprintf_info(const char *format, ...)
         return;
 
     char buffer[64];
-    sprintf(buffer, "INF: %s", format);
+    sprintf(buffer, "INF: %s\r\n", format);
 
     va_list ap;
     va_start(ap, format);
@@ -337,7 +337,7 @@ void comm_dbgprintf_warning(const char *format, ...)
         return;
 
     char buffer[64];
-    sprintf(buffer, "WARN: %s", format);
+    sprintf(buffer, "WRN: %s\r\n", format);
 
     va_list ap;
     va_start(ap, format);
@@ -355,10 +355,18 @@ void comm_dbgprintf_error(const char *format, ...)
         return;
 
     char buffer[64];
-    sprintf(buffer, "ERR: %s", format);
+    sprintf(buffer, "ERR: %s\r\n", format);
 
     va_list ap;
     va_start(ap, format);
     chvprintf(debug_stream, buffer, ap);
     va_end(ap);
 }
+
+void haltSystem(char *msg) {
+    comm_dbgprintf_error(msg);
+    palToggleLine(LINE_LED3);
+    chThdSleepMilliseconds(100);
+    chSysHalt(msg);
+}
+

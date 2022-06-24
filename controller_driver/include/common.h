@@ -43,6 +43,7 @@
 #define     PROGRAM_ROUTINE_TEST_SOUND_SIGNAL               16
 #define     PROGRAM_ROUTINE_TEST_START                      17
 #define     PROGRAM_ROUTINE_TEST_MAIN_NEW                   18
+#define     PROGRAM_ROUTINE_TEST_ROS_COMM                   19
 
 
 #define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_MAIN_NEW
@@ -73,7 +74,6 @@ uint8_t uint8_map(uint8_t x, uint8_t in_min, uint8_t in_max, uint8_t out_min, ui
 uint32_t uint32_map(uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_min, uint32_t out_max);
 double double_map(double x, double in_min, double in_max, double out_min, double out_max);
 int8_t sign ( float var );
-
 
 #endif /* INCLUDE_COMMON_H_ */
 

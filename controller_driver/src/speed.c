@@ -104,7 +104,7 @@ float speedVehicleControl( float speed )
     return VehicleControl;
 }
 
-static THD_WORKING_AREA(pid_wa, 256);
+static THD_WORKING_AREA(pid_wa, 1024);
     static THD_FUNCTION(pid, arg) {
 
     (void)arg;
@@ -191,6 +191,7 @@ void speedInit(void) {
     pedalsInit();
     if_speed_control_module_initialized = true;
 
+    comm_dbgprintf_info("speedInit() done");
 }
 
 void speedEngineControlStart(void) {
