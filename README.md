@@ -6,17 +6,3 @@
 
 ## [Доки по Газели](https://disk.yandex.ru/d/_3zzZoxEZ3Ugxg)
 
-## Some notes
-
-Для работы над данным проектом были добавлены PWM драйверы.
-
-Для установки патча скопируйте папку (не удаляйте предыдущую) `os` из папки `chibios_patch` к себе в папку `chibios*`.
-
-## Установка для ChibiOS
-
-- `export CHIBIOS_ROOT=$HOME/ChibiStudio/ChibiStudio17/chibios176/`
-- `sudo apt install gcc-arm-none-eabi`
-- `rsync -avp chibios_patch/os/ $CHIBIOS_ROOT/os/`
-
-## Сборка
-
