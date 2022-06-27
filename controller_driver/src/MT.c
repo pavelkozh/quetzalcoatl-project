@@ -96,8 +96,13 @@ void mtMotorsControlInit ( void )
     points_array[1].x = -21000;//-30000; //first gear horizontal coordinate
     points_array[1].y = 27000; //first gear vertical coordinate
     /*second gear coordinates*/
-    points_array[2].x = -15000; //second gear horizontal coordinate
-    points_array[2].y = -25000; //second gear vertical coordinate
+    //points_array[2].x = -15000; //second gear horizontal coordinate
+   // points_array[2].y = -25000; //second gear vertical coordinate
+
+    points_array[2].x = -24000; //second gear horizontal coordinate
+    points_array[2].y = -22000; //second gear vertical coordinate
+
+
     /*third gear coordinates*/
     points_array[3].x = 0; //third gear horizontal coordinate
     points_array[3].y = 13000; //third gear vertical coordinate
@@ -108,8 +113,12 @@ void mtMotorsControlInit ( void )
     points_array[5].x = 12500; //fifth gear horizontal coordinate
     points_array[5].y = 13000; //fifth gear vertical coordinate
     /*reverse gear coordinates*/
-    points_array[6].x = 20000; //reverse gear horizontal coordinate
-    points_array[6].y = -21000;//-24000; //reverse gear vertical coordinate
+    //points_array[6].x = 20000; //reverse gear horizontal coordinate
+    //points_array[6].y = -21000;//-24000; //reverse gear vertical coordinate
+
+    points_array[6].x = 25000; //reverse gear horizontal coordinate
+    points_array[6].y = -18000;//-24000; //reverse gear vertical coordinate
+
 
     if_mt_motors_control_module_initialized = 1;
 }

@@ -19,7 +19,7 @@ static bool shift_enable_flag = 0;  // Gearshifting enable flag (service variabl
 
 
 
-
+//
 
 static THD_WORKING_AREA(gearshift_wa, 256);
 static THD_FUNCTION(gearshift, arg) {
@@ -29,13 +29,13 @@ static THD_FUNCTION(gearshift, arg) {
 
 
         switch(gear){
-        case 0: gear_num = shiftMTToNeutral ( 5000 ); break;
-        case 1: gear_num = shiftMTToNextGear(1,2000); break;
-        case 2: gear_num = shiftMTToNextGear(2,10000); break;
+        case 0: gear_num = shiftMTToNeutral ( 1000 ); break;
+        case 1: gear_num = shiftMTToNextGear(1,1000); break;
+        case 2: gear_num = shiftMTToNextGear(2,1000); break;
         case 3: gear_num = shiftMTToNextGear(3,10000); break;
         case 4: gear_num = shiftMTToNextGear(4,10000); break;
         case 5: gear_num = shiftMTToNextGear(5,10000); break;
-        case 6: gear_num = shiftMTToNextGear(6,10000); break;
+        case 6: gear_num = shiftMTToNextGear(6,1000); break;
         }
 
         /* Shifting is finish and thread go to sleep! */
