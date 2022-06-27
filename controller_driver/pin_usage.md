@@ -67,6 +67,11 @@ SPI2   | PC2  |                | MISO
 SPI2   | PB15 |                | MOSI
 PAL    | PB12 |                | CS
 
+## New analog absolute encoder (steer unit)
+Driver | Pins | Input / Output | Description
+-------|------|----------------|----------
+ADC3   | PF4  |                | analog input
+
 
 ## Steer motor driver
 Driver | Pins | Input / Output | Description
