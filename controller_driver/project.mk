@@ -39,6 +39,7 @@ PROJECT_TESTS   =	tests/test_pedals.c                    \
                     tests/test_sound_signal.c              \
                     tests/test_start.c                     \
                     tests/test_main_new.c                  \
+                    tests/test_analog_encoder.c                  \
                     tests/test_ros_comm.c
 
 PROJECT_CSRC    =	src/main.c src/common.c \

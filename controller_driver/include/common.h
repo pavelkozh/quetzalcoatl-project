@@ -44,9 +44,10 @@
 #define     PROGRAM_ROUTINE_TEST_START                      17
 #define     PROGRAM_ROUTINE_TEST_MAIN_NEW                   18
 #define     PROGRAM_ROUTINE_TEST_ROS_COMM                   19
+#define     PROGRAM_ROUTINE_TEST_ANALOG_ENCODER             20
 
 
-#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_MAIN_NEW
+#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_ANALOG_ENCODER
 
 /**************/
 /*** Macros ***/

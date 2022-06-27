@@ -27,6 +27,7 @@ void TestSteerSM ( void );
 void TestSoundSignal( void );
 void testMainNew( void );
 void testRosComm(void);
+void testAnalogEncoder(void);
 
 static inline void testsRoutines( void )
 {
@@ -81,6 +82,9 @@ static inline void testsRoutines( void )
 
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ROS_COMM)
     testRosComm();
+
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ANALOG_ENCODER)
+    testAnalogEncoder();
 
 #endif
 
