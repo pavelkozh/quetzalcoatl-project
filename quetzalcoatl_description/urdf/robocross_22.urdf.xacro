@@ -5,6 +5,7 @@
 
 	<xacro:include filename="$(find quetzalcoatl_description)/urdf/base.urdf.xacro" />
 	<xacro:include filename="$(find maddrive_urdf_tools)/urdf/macros/realsense.urdf.xacro" />
+	<xacro:include filename="$(find maddrive_urdf_tools)/urdf/macros/elp_stereo.urdf.xacro" />
 
 	<xacro:realsense_435
 			name="rs_camera_left"
@@ -18,4 +19,9 @@
 			xyz="0.05 -1 1.45"
 			rpy="0 0 -0.1" />
 
+	<xacro:elp_stereo
+			name="elp_stereo"
+			base_link_name="base_link"
+			xyz="-1.587 0 0.2"
+			rpy="0 0 ${pi}" />
 </robot>

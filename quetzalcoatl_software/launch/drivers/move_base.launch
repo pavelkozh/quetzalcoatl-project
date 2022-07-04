@@ -9,7 +9,7 @@
 
   <arg name="cmd_topic" default="cmd_vel" />
 
-  <arg name="footprint" default="[ [4.62, 0.534], [-1.587, 0.534], [-1.587, -0.534], [4.62, -0.534] ]" />
+  <arg name="footprint" default="[ [4.62, 1.256], [-1.587, 1.256], [-1.587, -1.256], [4.62, -1.256] ]" />
 
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 

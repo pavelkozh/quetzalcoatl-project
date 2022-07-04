@@ -105,7 +105,7 @@ void rosInit(tprio_t prio)
 
     /* ROS setup */
     ros_node.initNode();
-    ros_node.setSpinTimeout(300);
+    ros_node.setSpinTimeout(200);
 
     /* ROS publishers */
     ros_node.advertise(topic_out_state);
