@@ -2,6 +2,11 @@
 #include <lld_steer.h>
 #include <communication.h>
 
+static const SerialConfig sdcfg = {
+  .speed = 115200,
+  .cr1 = 0, .cr2 = 0, .cr3 = 0
+};
+
 static void showHelp(void)
 {
     comm_dbgprintf("Test LLD steer module \n\r");
@@ -19,6 +24,7 @@ static void showHelp(void)
 
 void testSteer(void)
 {
+    sdStart( &SD3, &sdcfg );
     steerEncInit();
     steerMotorInit();
 
@@ -31,9 +37,11 @@ void testSteer(void)
     int sync_result;
 
     showHelp();
+    uint8_t sd_buff[10];
 
     while (1)
     {
+        sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
         msg_t msg = chnGetTimeout(dbg_chn, MS2ST(100));
         if (msg != MSG_TIMEOUT)
         {
@@ -106,6 +114,7 @@ void testSteer(void)
             sd_buff[i] = '?';
         }
 #endif
+
         chThdSleepMilliseconds(100);
     }
 }

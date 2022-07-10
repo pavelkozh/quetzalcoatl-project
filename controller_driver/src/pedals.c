@@ -26,7 +26,7 @@ MotorDriver ClutchM = {
     .dir_line        =   PAL_LINE(GPIOB, 8),
     .rising_edge_cb  =   risingEdgeClutchMCallback,
     .falling_edge_cb =   fallingEdgeClutchMCallback,
-    .max_position    =   100000,
+    .max_position    =   60000,
     .min_position     =  0
 };
 void risingEdgeClutchMCallback(PWMDriver *pwmd){

@@ -15,10 +15,10 @@ int main(void)
     /* Init LWIP */
     lwipthread_opts_t opts;
     struct ip_addr ip, gateway, netmask;
-    IP4_ADDR(&ip, 9, 9, 9, 2);
-    IP4_ADDR(&gateway, 9, 9, 9, 1);
+    IP4_ADDR(&ip, 10, 100, 7, 4);
+    IP4_ADDR(&gateway, 10, 100, 7, 3);
     IP4_ADDR(&netmask, 255, 255, 255, 0);
-    uint8_t macaddr[6] = {0xC2, 0xAF, 0x51, 0x05, 0xCF, 0x46};
+    uint8_t macaddr[6] = {0xC2, 0xAF, 0x51, 0x05, 0xCA, 0x46};
 
     opts.address = ip.addr;
     opts.gateway = gateway.addr;
@@ -33,6 +33,7 @@ int main(void)
     testsRoutines();
 
 #else
+
     while (1)
     {
         chThdSleepMilliseconds(1000);

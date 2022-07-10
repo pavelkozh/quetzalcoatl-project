@@ -2,6 +2,9 @@
 #include <chprintf.h>
 
 #include <lld_steer_step_motor.h>
+#include <lld_steer.h>
+
+uint16_t val;
 
 static const SerialConfig sdcfg = {
   .speed = 115200,
@@ -22,6 +25,7 @@ void TestSteerSM ( void )
 
 
     lldSteerSMInit();
+    steerEncInit();
 
     uint8_t sd_buff[10];
     uint16_t speed_ref =  3000;
@@ -29,13 +33,12 @@ void TestSteerSM ( void )
     while(1) {
 
         palToggleLine(LINE_LED2);
-       // palToggleLine(LINE_LED3);
 
         sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
 
 
         if(sd_buff[0]=='c') { lldSteerSMStop(); }
-        if(sd_buff[5]=='a') lldSteerSMSetPosition (atoi(sd_buff), 10000);
+        if(sd_buff[5]=='a') lldSteerSMSetPosition (atoi(sd_buff), 15000);
         if(sd_buff[6]=='z') lldSteerSMMoveToTheRight ( atoi(sd_buff) );
         if(sd_buff[6]=='x') lldSteerSMMoveToTheLeft  ( atoi(sd_buff) );
         if(sd_buff[0]=='f') speed_ref += SPEED_REF_CHANGE_STEP;
@@ -44,13 +47,8 @@ void TestSteerSM ( void )
         if(sd_buff[0]=='p') lldSteerSMSetPosition (-2000, 10000);
         if(sd_buff[0]=='k') lldSteerSMSetPosition (2000, 10000);
 
-
-
-
-
-
-        chprintf( (BaseSequentialStream *)&SD3, "pos %d\t state %d\t mode %d\t speed %d\t   \n\r", lldSteerSMGetPosition (),lldSteerSMGetState (), lldSteerSMGetMode (), lldSteerSMGetSpeed ());
-
+        val=steerGetPosition();
+        chprintf( (BaseSequentialStream *)&SD3, "pos %d\t state %d\t mode %d\t speed %d\t encoder %d   \n\r", lldSteerSMGetPosition (),lldSteerSMGetState (), lldSteerSMGetMode (), lldSteerSMGetSpeed (),steerGetPosition());
 
 
 
@@ -60,7 +58,7 @@ void TestSteerSM ( void )
           sd_buff[i]='?';
         }
 
-        chThdSleepMilliseconds( 500 );
+        chThdSleepMilliseconds( 50 );
     }
 }
 

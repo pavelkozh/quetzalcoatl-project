@@ -44,7 +44,7 @@ extern "C"
         RosSocketHardware()
         {
             // Constructor
-            IP4_ADDR(&ServerIPaddr, 9, 9, 9, 1);
+            IP4_ADDR(&ServerIPaddr, 10, 100, 7, 3);
             startTime = current_time();
         }
 
@@ -143,6 +143,7 @@ extern "C"
             err_t sentError;
             sentError = netconn_write(tcpConnection, data, length, NETCONN_COPY);
             int err = sentError * -1;
+
         }
 
         uint32_t current_time()

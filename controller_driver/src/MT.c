@@ -78,11 +78,12 @@ void mtMotorsControlInit ( void )
 
     /*Motor driver Setting */
     palSetLineMode( PAL_LINE( GPIOF, 7),  PAL_MODE_ALTERNATE(3) );
-    palSetLineMode( m_vertical.dir_line, PAL_MODE_OUTPUT_PUSHPULL);
+    palSetLineMode( m_vertical.dir_line, PAL_MODE_OUTPUT_PUSHPULL);//
+
     MotorlldControlInit( &m_vertical );
 
     palSetLineMode( PAL_LINE( GPIOF, 9),  PAL_MODE_ALTERNATE(9) );
-    palSetLineMode( m_gorisontal.dir_line, PAL_MODE_OUTPUT_PUSHPULL);
+    palSetLineMode( m_gorisontal.dir_line, PAL_MODE_OUTPUT_PUSHPULL);//push pull - old;
     MotorlldControlInit( &m_gorisontal );
 
     palSetPadMode( GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL );    //Led 1
@@ -93,16 +94,16 @@ void mtMotorsControlInit ( void )
     points_array[0].x = 0; //neutral gear horizontal coordinate
     points_array[0].y = 0; //neutral gear vertical coordinate
     /*first gear coordinates*/
-    points_array[1].x = -21000;//-30000; //first gear horizontal coordinate
+    points_array[1].x = -25000;//-30000; //first gear horizontal coordinate
     points_array[1].y = 27000; //first gear vertical coordinate
     /*second gear coordinates*/
     //points_array[2].x = -15000; //second gear horizontal coordinate
-   // points_array[2].y = -25000; //second gear vertical coordinate
+   //  points_array[2].y = -25000; //second gear vertical coordinate
 
-    points_array[2].x = -24000; //second gear horizontal coordinate
+    points_array[2].x = -26000; //second gear horizontal coordinate
     points_array[2].y = -22000; //second gear vertical coordinate
 
-
+//
     /*third gear coordinates*/
     points_array[3].x = 0; //third gear horizontal coordinate
     points_array[3].y = 13000; //third gear vertical coordinate

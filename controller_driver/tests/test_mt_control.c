@@ -29,13 +29,12 @@ void TestMTControl ( void )
     chprintf( (BaseSequentialStream *)&SD3, " Start \n\r");
 
     mtControlInit ();
-    //feedbackInit();
+    feedbackInit();
     speedInit();
 
     uint8_t sd_buff[10];
     /* no gear */
     //int8_t current_gear = -1;
-
     while(1) {
 
         palToggleLine(LINE_LED1);
@@ -64,7 +63,7 @@ void TestMTControl ( void )
 
 //        chprintf( (BaseSequentialStream *)&SD3, " gear_num: %d gear_g_pos: %d gear_v_pos: %d v__target_pos: %d g__target_pos %d \n\r",mtControlGetCurrentGearNum(), getGorisontalPosition (), getVerticalPosition(), getVerticalTargetPosition (), getGorisontalTargetPosition());
         chprintf( (BaseSequentialStream *)&SD3, " gear_num: %d gear_g_pos: %d gear_v_pos: %d v__target_pos: %d g__target_pos %d g__max_pos %d v__max_pos %d \n\r",mtControlGetCurrentGearNum(), getGorisontalPosition (), getVerticalPosition(), getVerticalTargetPosition (), getGorisontalTargetPosition(),getGorisontalMaxPosition(),getVerticalMaxPosition());
-
+        //chprintf( (BaseSequentialStream *)&SD3, " rots: %f\n\r",gazelGetEngineSpeed());
 
         for (int i = 0; i < 9; i++)
         {

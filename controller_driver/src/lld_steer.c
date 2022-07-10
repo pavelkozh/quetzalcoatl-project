@@ -66,15 +66,17 @@ void steerEncReadValue(void)
     spiReleaseBus(ABS_ENC_SPI_DRIVER);
 }
 
-float steerGetPosition(void)
+uint16_t steerGetPosition(void)//float
 {
     // palToggleLine(LINE_LED1);
     steerEncReadValue();
     // palToggleLine(LINE_LED3);
     int16_t ang = 0;
     ang = (rxbuf[0] & 0b0111111111111000) >> 3; // main variable
-    return (float)double_map(ang, 0, 4095, 0, 360);
+    //return (float)double_map(ang, 0, 4095, 0, 360);
+    return ang;
 }
+
 
 /****************************************************************************/
 /******************* STEER DRIVER SETUP *************************************/

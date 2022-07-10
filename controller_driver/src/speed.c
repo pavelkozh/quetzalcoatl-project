@@ -6,7 +6,7 @@
 
 static float       val = 57;  //57 = 1.1V
 static float       Eref = 770.0;
-static float       Vref = 0;
+static float       Vref = 3;
 
 
 static double VehicleControl = 0;

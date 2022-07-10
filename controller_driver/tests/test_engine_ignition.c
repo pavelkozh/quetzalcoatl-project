@@ -5,6 +5,7 @@
 #include <feedback.h>
 
 #include <emergency_stop.h>
+#include <sound_signal.h>
 
 static const SerialConfig sdcfg = {
   .speed = 115200,
@@ -24,6 +25,8 @@ void TestEngIgnition ( void )
 
     engIgnitionInit();
     feedbackInit();
+    soundSignalInit();
+
    // emergencyStopInit();
 
     uint8_t sd_buff[10];
@@ -39,6 +42,8 @@ void TestEngIgnition ( void )
         if(sd_buff[0]=='s') engIgnitionSwitchOff();
         if(sd_buff[0]=='b') engStarterSwitchOn();
         if(sd_buff[0]=='d') engStarterSwitchOff();
+        if(sd_buff[0]=='q') soundSignalStartContiniousSignals();
+        if(sd_buff[0]=='w') soundSignalStopContiniousSignals();
 
         if(sd_buff[4]=='e') engIgnitionDbgSetEngSpeed (atoi(sd_buff));
 

@@ -98,7 +98,7 @@ void fallingEdgeCb(MotorDriver *mtd){
                     mtd -> state = MOTOR_STOPED;
                 }else{
 
-                if( palReadLine(mtd->dir_line) ) 
+                if( palReadLine(mtd->dir_line) ) //
                     mtd -> position--;
                 else
                     mtd -> position++;

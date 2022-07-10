@@ -5,7 +5,6 @@
 
 #define EMERGENCY_STOP_LINE       PAL_LINE( GPIOA, 0 )
 
-
 static thread_reference_t trp_emergency_button_stop = NULL;
 // controls thread's state: when false, thread sleeps
 static bool is_breaking_thread_work = false;
@@ -34,20 +33,21 @@ static THD_FUNCTION(emergency_button_stop, arg) {
         else{
            // soundSignalStartContiniousSignals ();
             //palSetLine(LINE_LED2);
-            pedalsClutchPress ( 1000 );
-
-            while(pedalsClutchGetState()){
-                chThdSleepMilliseconds( 50 );
-            }
 
             pedalsBrakePress( 1000 );
             while(pedalsBrakeGetState()){
                 chThdSleepMilliseconds( 50 );
             }
 
+            pedalsClutchPress ( 1000 );
+            while(pedalsClutchGetState()){
+                chThdSleepMilliseconds( 50 );
+            }
+
             while ( mtControlMannualyShiftGear(0) !=0 ){
                 chThdSleepMilliseconds( 50 );
             }
+
 
 //                  pedalsClutchRelease(1000);
                   
@@ -59,9 +59,9 @@ static THD_FUNCTION(emergency_button_stop, arg) {
              is_breaking_thread_work = false;
              is_emergency_stop_btn_pressed = false;
            //  palClearLine(LINE_LED2);
-             chSysLock();
+             /*chSysLock();
              chThdSuspendS(&trp_emergency_button_stop);
-             chSysUnlock();
+             chSysUnlock();*/
 //              }
 //            }
         }
@@ -95,15 +95,25 @@ void extcb_base(EXTDriver *extp, expchannel_t channel)
     (void)channel;
     /* Set flag */
     //palToggleLine(LINE_LED1);
-    if (is_breaking_thread_work == false) {
-        is_emergency_stop_btn_pressed = true;
-        is_breaking_thread_work = true;
-//        chprintf( (BaseSequentialStream *)&SD3, "In Interrupt\n\r");
-        /* Wake up braking thread */
-        chSysLockFromISR();
-        chThdResumeI(&trp_emergency_button_stop, MSG_OK);
-        chSysUnlockFromISR();
-    }
+
+    //if (palReadPad(GPIOA,0)==0){
+
+
+/*
+        if (is_breaking_thread_work == false) {
+            is_emergency_stop_btn_pressed = true;
+            is_breaking_thread_work = true;
+    //        chprintf( (BaseSequentialStream *)&SD3, "In Interrupt\n\r");
+
+            chSysLockFromISR();
+            chThdResumeI(&trp_emergency_button_stop, MSG_OK);
+            chSysUnlockFromISR();
+        }
+
+*/
+        palToggleLine(LINE_LED3);
+
+        //}
 
 }
 
@@ -120,19 +130,20 @@ void emergencyStopInit( void ) {
 //    palSetPadMode( GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL );    //Led
 //    palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
 
-    pedalsInit();
-    mtControlInit();
+    //pedalsInit();
+    //mtControlInit();
     chThdCreateStatic(emergency_button_stop_wa, sizeof(emergency_button_stop_wa), NORMALPRIO + 15, emergency_button_stop, NULL);
-  	palSetLineMode( PAL_LINE(GPIOA,0), PAL_MODE_INPUT_PULLDOWN);
-  	commonExtDriverInit();
-  	EXTChannelConfig base_conf = {
-  	    .mode = EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA,
+  	//palSetLineMode( PAL_LINE(GPIOA,0), PAL_MODE_INPUT_PULLDOWN);
+  	//commonExtDriverInit();
+  	//EXTChannelConfig base_conf = {
+  	/*    .mode = EXT_CH_MODE_FALLING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA,
   	    .cb = extcb_base
-  	};
+  	};*/
 
-	extSetChannelMode( &EXTD1, 0, &base_conf );
+	//extSetChannelMode( &EXTD1, 0, &base_conf );
 
 
 
 	isInitialized = true;
 }
+

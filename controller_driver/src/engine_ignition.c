@@ -20,6 +20,7 @@ static THD_FUNCTION(eng_ignition, arg) {
             chSysUnlock();
         }
         else{
+
             engIgnitionSwitchOn (); //
             chThdSleepSeconds( 4 );
 
@@ -69,6 +70,7 @@ void engIgnitionInit ( void )
     palSetLineMode( IGNITION_PAL_LINE, PAL_MODE_OUTPUT_OPENDRAIN );
     palSetLineMode( STARTER_PAL_LINE,  PAL_MODE_OUTPUT_OPENDRAIN );
 
+
     palSetLine(IGNITION_PAL_LINE);
     palSetLine(STARTER_PAL_LINE);
 
@@ -85,11 +87,13 @@ bool engStarterSwitchOn ( void )
     if (is_engine_start_thd_working == 0) {
         is_engine_start_thd_working = 1;
         /* Wake up engine start thread */
+        soundSignalStartContiniousSignals();
         chSysLock();
         chThdResumeS(&trp_eng_ignition, MSG_OK);
         chSysUnlock();
     }
     //palClearLine(STARTER_PAL_LINE);
+
     return  ( !is_engine_start_thd_working && ( gazelGetEngineSpeed() > 750 ) );
 
 }

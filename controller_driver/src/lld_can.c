@@ -45,7 +45,7 @@ void canUpdate(void){
             }
 };
 
-
+//
 // /*
 //  * Transmitter thread.
 //  */
@@ -71,6 +71,7 @@ void canUpdate(void){
 //     chThdSleepMilliseconds(10);
 //   }
 // }
+
 
 
 void can_init ( void )

@@ -26,8 +26,8 @@ void TestSpeed ( void )
 
     //palSetLine(LINE_LED2);
     speedInit();
-    //feedbackInit();
-    //pedalsInit();
+    feedbackInit();
+    pedalsInit();
 
 
     uint8_t sd_buff[10];

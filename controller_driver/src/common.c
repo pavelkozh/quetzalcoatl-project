@@ -15,6 +15,10 @@ double double_map(double x, double in_min, double in_max, double out_min, double
 {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
+float float_map(float x, float in_min, float in_max, float out_min, float out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 
 int8_t sign ( float var )
 {

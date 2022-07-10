@@ -4,6 +4,14 @@
 #include <common.h>
 #include <ros_proto.h>
 
+static const SerialConfig sdcfg = {
+  .speed = 115200,
+  .cr1 = 0, .cr2 = 0, .cr3 = 0
+};
+
+uint8_t sd_buff[10];
+
+
 static int8_t mt_shifting = -1; // -1-> no shifting
 
 // static thread_reference_t trh_mt_shift = NULL;
@@ -125,6 +133,7 @@ void commandStop(void)
     engIgnitionSwitchOff();
 
     speedEngineControlStop();
+
 }
 
 void commandStart(void)
@@ -132,7 +141,7 @@ void commandStart(void)
     engStarterSwitchOn();
     soundSignalStartContiniousSignals();
     speedSetEnginePIDReferenceValue(1200.0);
-    speedEngineControlStart();
+    speedEngineConstrolStart();
 }
 
 void connectionErrorCb(void)
@@ -171,7 +180,7 @@ void testMainNew(void)
     structForFunc.on_gear6 = commandGearSecond;
 
     // comm_init(&structForFunc, CONNECTION_FAIL_OK_DELAY, true);
-    comm_init(&structForFunc, CONNECTION_FAIL_OK_DELAY, false);
+    comm_init(NULL, CONNECTION_FAIL_OK_DELAY, false);
 
     feedbackInit();
     pedalsInit();
@@ -186,24 +195,36 @@ void testMainNew(void)
 
     rosInit(NORMALPRIO);
     gazel_ros_send_state_t state = {
-        .linear_speed = 12,
-        .steering_angle = 0.1
+        .linear_speed = 5,
+        .steering_angle = 0.0
     };
 
     while (1)
     {
+        sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
+
+       // if(sd_buff[0]=='s') { commandStart(); }
+       // if(sd_buff[0]=='d') { commandStop(); }
+       // if(sd_buff[0]=='a') { commandSteerStraight(); }
+       // if(sd_buff[0]=='q') { pedalsClutchRelease(1000);pedalsBrakeRelease(1000); }
+
+//
+
+
+
+
         if (mt_shifting != -1)
         {
             comm_dbgprintf("Gear shifting = %d\t", mt_shifting);
         }
 
-        comm_dbgprintf("speed: %d\t eng_speed: %d\t gear: %d\t gear_flag: %d\t clutch pos: %d\t brake pos: %d\t  \n\r", 
+        comm_dbgprintf("speed: %d\t eng_speed: %d\t gear: %d\t clutch pos: %d\t brake pos: %d\t  \n\r",
                             (uint16_t)gazelGetSpeed(), (uint16_t)gazelGetEngineSpeed(), 
                             mtControlGetCurrentGearNum(), pedalsClutchGetPosition(), 
                             pedalsBrakeGetPosition());
 
         rosSendState(state);
 
-        chThdSleepMilliseconds(1000);
+        chThdSleepMilliseconds(100);
     }
 }

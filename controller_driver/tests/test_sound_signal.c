@@ -24,7 +24,6 @@ void TestSoundSignal( void )
 
     soundSignalInit();
 
-
     uint8_t sd_buff[10];
 
     while(1) {

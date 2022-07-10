@@ -2,7 +2,7 @@
 #include <common.h>
 #include <ros.h>
 #include <ros/node_handle.h>
-
+#include <chprintf.h>
 /**************/
 /* ROS things */
 /**************/
@@ -28,10 +28,27 @@
 
 ros::NodeHandle ros_node;
 
+extern double  vs;
+extern float steer_angle_rad;
+extern int8_t mt_shifting;
+extern int8_t flag_rul;
+
 void cmd_cb(const quetzalcoatl_msgs::GazelState &msg)
 {
-    comm_dbgprintf_info("New command: %d, %d", (int)(msg.linear_speed*10), (int)(msg.angle_steering*10));
+//    comm_dbgprintf_info("New command: %d, %d", (int)(msg.linear_speed*10), (int)(msg.angle_steering*10));
+    //chprintf( (BaseSequentialStream *)&SD3, "New command: %d, %d\n\r", (int)(msg.linear_speed*10), (int)(msg.angle_steering*10));
     // TODO - call here your functions to write new targets
+    double vst = ((double)(msg.linear_speed))*3.6;// Vref update
+    if(vst<=0){
+        vs=0;
+    }else{
+        vs=vst;
+    }
+
+    steer_angle_rad = (float)(msg.angle_steering);
+    flag_rul=1;
+
+
 }
 
 ros::Subscriber<quetzalcoatl_msgs::GazelState> topic_in_state("state_cmd", &cmd_cb);
@@ -71,6 +88,7 @@ void rosSendState(gazel_ros_send_state_t state)
     setTime(outMsg.stamp);
 
     topic_out_state.publish(&outMsg);
+
 }
 
 /*
@@ -86,7 +104,7 @@ static THD_FUNCTION(Spinner, arg)
     initialized = true;
 
     comm_dbgprintf_info("Start spinning");
-
+    int count = 20;
     while (true)
     {
         systime_t time = chVTGetSystemTimeX();
@@ -97,6 +115,11 @@ static THD_FUNCTION(Spinner, arg)
         }
 
         chThdSleepUntilWindowed( time, time + MS2ST( 20 ) );
+
+        if (count++ > 20) {
+            count = 0;
+            chprintf( (BaseSequentialStream *)&SD3, "ROS process\n\r");
+        }
     }
 }
 
@@ -105,7 +128,7 @@ void rosInit(tprio_t prio)
 
     /* ROS setup */
     ros_node.initNode();
-    ros_node.setSpinTimeout(200);
+    ros_node.setSpinTimeout(500);
 
     /* ROS publishers */
     ros_node.advertise(topic_out_state);
@@ -116,4 +139,6 @@ void rosInit(tprio_t prio)
 
     /* Main ROS thread */
     chThdCreateStatic(waSpinner, sizeof(waSpinner), prio, Spinner, NULL);
+    chprintf( (BaseSequentialStream *)&SD3, "ROS thread init\n\r");
+
 }
