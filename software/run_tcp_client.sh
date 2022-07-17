@@ -2,8 +2,8 @@
 
 clear
 
-server_IP=127.0.0.1
-port=5000
+server_IP=192.168.1.55
+port=4000
 
 gst-launch-1.0 -v \
     tcpclientsrc host=$server_IP port=$port ! \
