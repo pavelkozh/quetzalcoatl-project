@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+
+    <node pkg="tf" type="static_transform_publisher" name="tf_base_footprint_2_link" args="0 0 0.33 0 0 0 /base_footprint /base_link 1000" />
+    <node pkg="tf" type="static_transform_publisher" name="tf_base_footprint_2_rear_axis_link" args="0 0 0.33 0 0 0 /base_footprint /base_rear_axis_link 1000" />
+    <node pkg="tf" type="static_transform_publisher" name="tf_base_footprint_2_front_axis_link" args="3.745 0 0 0 0 0 /base_rear_axis_link /base_front_axis_link 1000" />
+    
+
+    <node pkg="tf" type="static_transform_publisher" name="tf_base_2_camera_left" args="0.18 0.81 0.95 0.26 -0.03 -0.05 /base_front_axis_link /rs_camera_left_link 1000" />
+    <node pkg="tf" type="static_transform_publisher" name="tf_base_2_camera_right" args="0.18 -0.81 0.95 -0.26 -0.03 -0.05 /base_front_axis_link /rs_camera_right_link 1000" />
+    <node pkg="tf" type="static_transform_publisher" name="tf_base_2_lidar" args="0.46 0 0.9 -2.0 0 0 /base_front_axis_link /velodyne 1000" />
+    <!-- <node pkg="tf" type="static_transform_publisher" name="tf_base_2_lidar" args="0.46 0 1.254 -2.0 0 0 /base_front_axis_link /velodyne 1000" /> -->
+    <!-- <node pkg="tf" type="static_transform_publisher" name="tf_base_2_lidar" args="0.46 0 1.254 -1.9543951 0 0 /base_front_axis_link /velodyne 1000" /> -->
+
+
+</launch>

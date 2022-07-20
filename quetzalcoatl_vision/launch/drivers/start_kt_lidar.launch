@@ -8,7 +8,8 @@
         output="log">
       <remap
           from="~KT_lidar"
-          to="/quetzalcoatl/kt_cloud2" />
+          to="/quetzalcoatl/kt_cloud" />
+      <param name="LidarName" value="10.100.7.110" />
     </node>
   </group>
 </launch>

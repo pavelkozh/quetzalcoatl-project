@@ -34,11 +34,9 @@
   <!-- Publish dynamic TFs (non-fixed joints) -->
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
 
-  <!-- IMU filter for rs-->
-  <include file="$(find quetzalcoatl_software)/launch/drivers/imu_filter.launch">
-    <arg name="in_topic" value="rs_camera_left/imu" />
-    <arg name="out_topic" value="rs_camera_left/imu/filtered" />
-  </include>
+  <!-- Sync cameras for RGBD-->
+
+<include file="$(find quetzalcoatl_software)/launch/sim/rgbd_sim_sync.launch"/>
 
 
 </launch>

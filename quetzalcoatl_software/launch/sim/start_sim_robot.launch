@@ -19,17 +19,17 @@
     </include>
 
     <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true" output="screen">
-        <rosparam command="load" file="$(find quetzalcoatl_software)/config/ekf/ekf_odom_vo.yaml" />
+        <rosparam command="load" file="$(find quetzalcoatl_software)/config/ekf/ekf_odom_wheel.yaml" />
         <remap from="odometry/filtered" to="/quetzalcoatl/odometry/filtered/local" />
     </node>
 
     <include file="$(find quetzalcoatl_software)/launch/drivers/move_base.launch">
-        <arg name="folder_name" value="move_base_sim" />
+        <arg name="folder_name" value="move_base_vo" />
         <arg name="cmd_topic" value="/cmd_vel" />
     </include>
 
     <include file="$(find quetzalcoatl_vision)/launch/start_rtabmap_multi.launch">
-        <arg name="nodelet" value="standalone rtabmap_ros/rgbd_sync"/>
+        <arg name="nodelet" value=""/>
         <arg name="rtabmap" value="true" />
         <arg name="localization" value="$(arg localization)" />
         <arg name="database_path" value="$(find quetzalcoatl_maps)/3d_maps/$(arg map_name)" />

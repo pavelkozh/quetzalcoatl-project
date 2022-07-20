@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /RobotModel1/Links1
-        - /rtabmap1
         - /elp_point_cloud1
       Splitter Ratio: 0.5
     Tree Height: 262
@@ -525,7 +524,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 69.77059173583984
+      Distance: 15.529304504394531
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -533,9 +532,9 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 11.585139274597168
-        Y: -1.2582372426986694
-        Z: 14.816755294799805
+        X: 0.4070214033126831
+        Y: -0.980249285697937
+        Z: 10.7360200881958
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
