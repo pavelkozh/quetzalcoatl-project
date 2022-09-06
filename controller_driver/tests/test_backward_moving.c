@@ -394,13 +394,9 @@ static THD_FUNCTION(steer_thr, arg) {
     while(1){
 
         if(flag_joystick==1){
-            //chprintf( (BaseSequentialStream *)&SD3, ">>1 speed:%f angle:%f\n\r",vs,steer_angle_rad);
             steer_angle=double_map((float)steer_angle_rad,-10.472,10.472,-10000.0,10000.0);
-            //clutch_pos=;
             //chprintf( (BaseSequentialStream *)&SD3, ">>2 speed:%f angle:%d\n\r",vs,steer_angle);
             //chprintf( (BaseSequentialStream *)&SD3, ">>2 cl_pos:%d angle:%d\n\r",pedalsClutchGetPosition(),steer_angle);
-
-            //
             lldSteerSMSetPosition (steer_angle, 20000 );
             pedalsClutchMove((uint32_t)clutch_pos,12500);
             flag_joystick=0;
@@ -436,7 +432,6 @@ void testBackwardMoving ( void )
     lldSteerSMInit();
     soundSignalInit();
     rosInit(NORMALPRIO+15);
-//
     //speedInit();
       chThdCreateStatic(emergency_stop_wa, sizeof(emergency_stop_wa), NORMALPRIO, emergency_stop_thr, NULL);//prio+15
       chThdCreateStatic(start_wa, sizeof(start_wa), NORMALPRIO, start_thr, NULL);
@@ -482,9 +477,7 @@ if(counter_ros++>20){
         if (sd_buff[6]=='m') pedalsBrakeMove(atoi(sd_buff),10000);
         if (sd_buff[5]=='a') {
 
-
-
-            //flag_rul=1;
+           //flag_rul=1;
         }
         if (sd_buff[0]=='f') emergencyFullStop();
         if (sd_buff[0]=='r') {
@@ -499,7 +492,7 @@ if(counter_ros++>20){
         {
             sd_buff[i]='?';
         }
-//
+        
         chThdSleepMilliseconds( 50 );
     }
 }
