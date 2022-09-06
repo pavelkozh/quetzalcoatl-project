@@ -24,7 +24,8 @@ int8_t mt_shifting=-1;
 static uint8_t flag_release_clutch=0;
 static bool flag_start_shift = false;
 static bool target_zone_flag=false;
-int8_t flag_rul=0;
+int8_t flag_joystick=0;
+float clutch_pos;
 static uint8_t CSErrorDeadzoneHalfwidth = 1;
 static bool brake_flag=1;
 static int counter_ros=0;
@@ -47,7 +48,7 @@ static double dErr= 0.0;
 static double res_buff[2] = {0.0,0.0};
 double  vs = 4;
 float steer_angle_rad=0;
-static int16_t steer_angle = 0;
+static int32_t steer_angle = 0;
 
 static const SerialConfig sdcfg = {
   .speed = 115200,
@@ -392,13 +393,17 @@ static THD_FUNCTION(steer_thr, arg) {
 
     while(1){
 
-        if(flag_rul==1){
+        if(flag_joystick==1){
             //chprintf( (BaseSequentialStream *)&SD3, ">>1 speed:%f angle:%f\n\r",vs,steer_angle_rad);
             steer_angle=double_map((float)steer_angle_rad,-10.472,10.472,-10000.0,10000.0);
-            chprintf( (BaseSequentialStream *)&SD3, ">>2 speed:%f angle:%d\n\r",vs,steer_angle);
+            //clutch_pos=;
+            //chprintf( (BaseSequentialStream *)&SD3, ">>2 speed:%f angle:%d\n\r",vs,steer_angle);
+            //chprintf( (BaseSequentialStream *)&SD3, ">>2 cl_pos:%d angle:%d\n\r",pedalsClutchGetPosition(),steer_angle);
+
             //
-            lldSteerSMSetPosition (steer_angle, 15000 );
-            flag_rul=0;
+            lldSteerSMSetPosition (steer_angle, 20000 );
+            pedalsClutchMove((uint32_t)clutch_pos,12500);
+            flag_joystick=0;
 
         }
         chThdSleepMilliseconds( 20 );
@@ -436,7 +441,7 @@ void testBackwardMoving ( void )
       chThdCreateStatic(emergency_stop_wa, sizeof(emergency_stop_wa), NORMALPRIO, emergency_stop_thr, NULL);//prio+15
       chThdCreateStatic(start_wa, sizeof(start_wa), NORMALPRIO, start_thr, NULL);
       chThdCreateStatic(mt_shift_wa, sizeof(mt_shift_wa), NORMALPRIO, mt_shift, NULL);
-      chThdCreateStatic(speed_control_wa, sizeof(speed_control_wa), NORMALPRIO, speed_control_thr, NULL);
+      //chThdCreateStatic(speed_control_wa, sizeof(speed_control_wa), NORMALPRIO, speed_control_thr, NULL);
       chThdCreateStatic(px4flow_wa, sizeof(px4flow_wa), NORMALPRIO+1, px4flow_thr, NULL);
       chThdCreateStatic(steer_wa, sizeof(steer_wa), NORMALPRIO, steer_thr, NULL);
 
@@ -465,15 +470,18 @@ if(counter_ros++>20){
 
         if (sd_buff[0]=='z') pedalsBrakeMove(20000,4000);
         if (sd_buff[0]=='s') startBackward();
-        if (sd_buff[0]=='w') mt_shifting=1;
+        if (sd_buff[0]=='w') shiftMTToNextGear(1,2000);//mt_shifting=1;
+        if (sd_buff[0]=='y') shiftMTToNextGear(6,2000);//mt_shifting=1;
         //chprintf( (BaseSequentialStream *)&SD3, ">>2 speed:%f angle:%d\n\r",vs,steer_angle);
-
+        chprintf( (BaseSequentialStream *)&SD3, "cl_pos:%d angle:%d\n\r",(uint32_t)clutch_pos,steer_angle);
         if (sd_buff[0]=='b') mt_shifting=6;
         if (sd_buff[0]=='n') mt_shifting=0;
         if (sd_buff[1]=='v') vs=atoi(sd_buff[0]);
         if (sd_buff[0]=='w') mt_shifting=1;
         if (sd_buff[6]=='e') pedalsClutchMove(atoi(sd_buff),25000);
+        if (sd_buff[6]=='m') pedalsBrakeMove(atoi(sd_buff),10000);
         if (sd_buff[5]=='a') {
+
 
 
             //flag_rul=1;

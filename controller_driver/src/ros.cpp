@@ -31,13 +31,17 @@ ros::NodeHandle ros_node;
 extern double  vs;
 extern float steer_angle_rad;
 extern int8_t mt_shifting;
-extern int8_t flag_rul;
+extern int8_t flag_joystick;
+extern float clutch_pos;
 
 void cmd_cb(const quetzalcoatl_msgs::GazelState &msg)
 {
 //    comm_dbgprintf_info("New command: %d, %d", (int)(msg.linear_speed*10), (int)(msg.angle_steering*10));
     //chprintf( (BaseSequentialStream *)&SD3, "New command: %d, %d\n\r", (int)(msg.linear_speed*10), (int)(msg.angle_steering*10));
     // TODO - call here your functions to write new targets
+
+    /*
+
     double vst = ((double)(msg.linear_speed))*3.6;// Vref update
     if(vst<=0){
         vs=0;
@@ -45,8 +49,20 @@ void cmd_cb(const quetzalcoatl_msgs::GazelState &msg)
         vs=vst;
     }
 
-    steer_angle_rad = (float)(msg.angle_steering);
-    flag_rul=1;
+    */
+
+    palToggleLine(LINE_LED2);
+
+    float cl_pos = ((float)(msg.linear_speed))*70000/100;// Vref update
+    if(cl_pos<=0){
+        clutch_pos=0;
+    }else{
+        clutch_pos=cl_pos;
+    }
+
+    steer_angle_rad = -1.0*(float)(msg.angle_steering);
+
+    flag_joystick=1;
 
 
 }
