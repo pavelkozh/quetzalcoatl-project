@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find quetzalcoatl_software)/launch/view/rviz_start.launch">
+        <arg name="rvizconfig" value="$(find quetzalcoatl_vision)/rviz/rs_multiple_raw.rviz"/>
+    </include>
+</launch>

@@ -1,0 +1,26 @@
+<launch>
+    <arg name="rgb_topic" default="color/image_raw" />
+    <arg name="depth_topic" default="aligned_depth_to_color/image_raw" />
+    <arg name="camera_info_topic" default="color/camera_info" />
+    <arg name="imu_topic" default="/rs_camera_left/imu/filtered" />
+
+    <group ns="rs_camera_left">
+        <node pkg="nodelet" type="nodelet" name="rgbd_sync" args="standalone rtabmap_ros/rgbd_sync" output="screen">
+            <remap from="rgb/image" to="$(arg rgb_topic)" />
+            <remap from="depth/image" to="$(arg depth_topic)" />
+            <remap from="rgb/camera_info" to="$(arg camera_info_topic)" />
+        </node>
+    </group>
+    <group ns="rs_camera_right">
+        <node pkg="nodelet" type="nodelet" name="rgbd_sync" args="standalone rtabmap_ros/rgbd_sync" output="screen">
+            <remap from="rgb/image" to="$(arg rgb_topic)" />
+            <remap from="depth/image" to="$(arg depth_topic)" />
+            <remap from="rgb/camera_info" to="$(arg camera_info_topic)" />
+        </node>
+    </group>
+
+    <include file="$(find quetzalcoatl_software)/launch/drivers/imu_filter.launch">
+        <arg name="in_topic" value="rs_camera_left/imu" />
+        <arg name="out_topic" value="rs_camera_left/imu/filtered" />
+    </include>
+</launch>

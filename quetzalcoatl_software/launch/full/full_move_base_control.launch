@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="map_name" default="dvorik.db" />
+  <arg name="map_name" default="to_8_map.db" />
   <arg name="localization" default="true" /> <!-- set false to start mapping with move_base-->
   <arg name="debug" default="false" />
   <arg name='rviz' default="true" />
-  <arg name='rtabmapviz' default='false' />
+  <arg name='rtabmapviz' default='true' />
 
-  <include file="$(find quetzalcoatl_software)/launch/drivers/quetzalcoatl_tf_transforms.launch" />
+  <!-- <include file="$(find quetzalcoatl_software)/launch/drivers/quetzalcoatl_tf_transforms.launch" /> -->
 
   <!-- <include file="$(find quetzalcoatl_software)/launch/drivers/uc_socket_server.launch" />
   <include file="$(find quetzalcoatl_software)/launch/drivers/uc_convertion_layer.launch" /> -->
   <!-- <include file="$(find quetzalcoatl_software)/launch/drivers/start_joy_teleop.launch" /> -->
 
   <!-- Start cameras -->
-  <include file="$(find quetzalcoatl_vision)/launch/drivers/start_rs_camera.launch" />
+  <!-- <include file="$(find quetzalcoatl_vision)/launch/drivers/start_rs_camera.launch" /> -->
   <!-- <include file="$(find quetzalcoatl_vision)/launch/drivers/start_elp_camera.launch"/>
   <include file="$(find quetzalcoatl_vision)/launch/drivers/start_head_stereo.launch"/> -->
 
@@ -25,8 +25,8 @@
   </include>
 
   <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true" output="screen">
-    <rosparam command="load" file="$(find quetzalcoatl_software)/config/ekf/ekf_vo.yaml" />
-    <remap from="odometry/filtered" to="quetzalcoatl/odometry/filtered" />
+    <rosparam command="load" file="$(find quetzalcoatl_software)/config/ekf/ekf_odom_vo.yaml" />
+    <remap from="odometry/filtered" to="quetzalcoatl/odometry/filtered/local" />
   </node> 
 
   <include file="$(find quetzalcoatl_software)/launch/drivers/move_base.launch">

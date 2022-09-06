@@ -24,8 +24,12 @@ try:
                 pygame.quit()
                 isActive = False
             if not joystick_disabled:
+                # print(event.type)
                 if event.type == pygame.JOYAXISMOTION:
+                    # print("axis motion")
+                    # print(event.axis)
                     if event.axis == joy_hrz_axis:
+                        print(event.axis)
                         if abs(event.value) > 0.02: 
                             hrz = (int)(event.value * 100)
                         else:
@@ -37,9 +41,14 @@ try:
                         else:
                             vrt = 0
                     
-                    print(vrt, hrz)
-                        
+                    
+                    elif event.axis == 2: #left
+                        print("left value = {}".format(event.value * 100 + 101))
+                    elif event.axis == 5: #right
+                        print("right value = {}".format(event.value * 100 + 101))
+                    print(vrt, hrz)   
                 if event.type == pygame.JOYBUTTONDOWN:
+                    print(event.button)
                     if event.button == 4:
                         print('Enable')
                     if event.button == 5:

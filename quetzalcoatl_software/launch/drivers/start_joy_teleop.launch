@@ -7,9 +7,9 @@
     <node pkg="quetzalcoatl_software" type="joy_ctrl.py" name="joy_ctrl" output="screen" >
     	<param name="debug" value="false" />
 
-    	<param name="speed/frwd_limit" value="2.5" />
-    	<param name="speed/bkwrd_limit" value="-2.5" />
-    	<param name="steer/limit" value="20" />
+    	<param name="speed/frwd_limit" value="1.2" />
+    	<param name="speed/bkwrd_limit" value="-1.2" />
+    	<param name="steer/limit" value="40" />
 
         <remap from="cmd_vel" to="quetzalcoatl/cmd_vel" />
     </node>

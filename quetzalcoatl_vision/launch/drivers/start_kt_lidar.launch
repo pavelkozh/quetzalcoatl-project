@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+  <group ns="quetzalcoatl">
+    <node
+        pkg="kronshtadt_lidar_driver"
+        type="kronshtadt_lidar_driver"
+        name="kt_lidar"
+        output="log">
+      <remap
+          from="~KT_lidar"
+          to="/quetzalcoatl/kt_cloud" />
+      <param name="LidarName" value="10.100.7.110" />
+    </node>
+  </group>
+</launch>

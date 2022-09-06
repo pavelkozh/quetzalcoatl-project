@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+    <include file="$(find quetzalcoatl_software)/launch/full/full_start_joy_control.launch"/>
+    <include file="$(find quetzalcoatl_software)/launch/drivers/tf_transforms.launch"/>
+    <!-- <include file="$(find quetzalcoatl_software)/launch/drivers/ublox.launch"/> -->
+
+    
+    <!-- Start cameras -->
+    <!-- <include file="$(find quetzalcoatl_vision)/launch/drivers/start_rs_camera.launch"/> -->
+    <!-- <include file="$(find quetzalcoatl_vision)/launch/drivers/start_elp_camera.launch"/> -->
+
+    <!-- SLAM-->
+    <include file="$(find quetzalcoatl_vision)/launch/start_rtabmap_multi.launch">
+        <arg name="localization" value="false" />
+        <arg name="database_path" value="$(find quetzalcoatl_maps)/3d_maps/new_map.db" />
+        <arg name="rtabmapviz" value="true"/>
+    </include>
+
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true" output="screen">
+        <rosparam command="load" file="$(find quetzalcoatl_software)/config/ekf/ekf_odom_vo.yaml" />
+        <remap from="odometry/filtered" to="/quetzalcoatl/odometry/filtered/local" />
+    </node>
+
+
+    <!-- <node if="$(arg debug)" pkg="rqt_plot" type="rqt_plot" name="steering_plot" output="screen" args="/quetzalcoatl/cmd_vel_raw/angular/z /quetzalcoatl/cmd_vel/angular/z" /> -->
+
+    <include file="$(find quetzalcoatl_software)/launch/view/rviz_start.launch">
+        <arg name="rvizconfig" value="$(find quetzalcoatl_software)/config/rviz/full_move_base.rviz" />
+    </include>
+</launch>

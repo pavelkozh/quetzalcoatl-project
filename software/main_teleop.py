@@ -17,8 +17,8 @@ parser.add_argument('-d', '--debug', action='store_true',
 args = parser.parse_args()
 
 # MAIN for gamepad+computer
-SERVER_IP = '127.0.0.1'
-# SERVER_IP = '10.139.1.134'
+# SERVER_IP = '127.0.0.1'
+SERVER_IP = '192.168.1.55'
 
 
 def setup_cameras_controller(logger=None):
@@ -56,6 +56,7 @@ rootLogger = setup_logger()
 cams_controller = setup_cameras_controller(rootLogger)
 
 # Must be after setup_logger()
+
 if args.debug:
     gzlog.enable_debug()
 
@@ -82,7 +83,8 @@ last_values = (0, 0)
 
 def sender_thread():
     while isActive:
-        time.sleep(1)
+        time.sleep(0.1)
+        # print(*last_values)
         pub.send_set(*last_values)
 
 
@@ -115,12 +117,12 @@ try:
                 if event.type == pygame.JOYAXISMOTION:
                     if event.axis == joy_hrz_axis:
                         if abs(event.value) > 0.02:
-                            hrz = int(event.value * 100)
+                            hrz = int(event.value * 10)
                         else:
                             hrz = 0
                     elif event.axis == joy_vrt_axis:
                         if abs(event.value) > 0.02:
-                            vrt = int(event.value * -10)
+                            vrt = int(event.value * -100)
                         else:
                             vrt = 0
 
@@ -128,8 +130,8 @@ try:
                         last_values = (vrt, hrz)
                         pub.send_set(vrt, hrz)
                         rootLogger.debug(
-                            'send_enable: vrt = {}, hrz = {}'.format(vrt, hrz))
-
+                            'send_set: vrt = {}, hrz = {}'.format(vrt, hrz))
+                    # print("ANGLE {}         SPEED {} ".format(hrz, vrt))
                 if event.type == pygame.JOYBUTTONDOWN:
                     # LB
                     if event.button == 4:
@@ -152,8 +154,17 @@ try:
                         cams_controller.switch_cam()
                         rootLogger.debug('switch camera')
                     # A / green
+                    #NEW START
                     if event.button == 0:
-                        rootLogger.debug('not used / green')
+                        pub.send_steer2()
+                        rootLogger.debug('green')
+                    #NEW END
+                    if event.button == 9:
+                        pub.send_steer()
+                        rootLogger.debug('R2')
+                    if event.button == 10:
+                        pub.send_steer3()
+                        rootLogger.debug('R3')
 
 finally:
     pygame.quit()

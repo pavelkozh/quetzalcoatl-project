@@ -52,6 +52,7 @@ class CommandPub(object):
 	def send_steer3(self):
 		json_str = CommandCreate.create(CommandTypes.COMM_STEER3, None)
 		self.pub.send(json_str)
+    
 class CommandSub(object):
 	def __init__(self, ip='127.0.0.1'):
 		self.sub = mc.MQTTControlSub(on_msg=self.on_msg,ip=ip) 
@@ -63,6 +64,7 @@ class CommandSub(object):
 		self.on_steer = None
 		self.on_steer2 = None
 		self.on_steer3 = None
+    
 	def on_msg(self, data):
 		dictionary = CommandParse.parse(data)
 		if dictionary['type'] == CommandTypes.COMM_ENABLE:
@@ -86,6 +88,7 @@ class CommandSub(object):
 		if dictionary['type'] == CommandTypes.COMM_STEER3:
 			if self.on_steer3:
 				self.on_steer3()
+
 		if dictionary['type'] == CommandTypes.COMM_SET:
 			if self.on_set:
 				speed, angle = dictionary['value']
@@ -103,11 +106,18 @@ if __name__ == '__main__':
 	def stop_handler():
 		print('i received stop')
 	def steer_handler():
-		print('i received STEER')
+		print('I received STEER')
+	# NEW START
+	def steer2_handler():
+		print('I received STEER2')
+	# NEW END
 	sub.on_set = set_handler
 	sub.on_start = start_handler
 	sub.on_stop = stop_handler
 	sub.on_steer = steer_handler
+	# NEW START
+	sub.on_steer2 = steer2_handler
+	# NEW END
 
 	pub = CommandPub(ip = '127.0.0.1')
 	while 1:
@@ -128,5 +138,10 @@ if __name__ == '__main__':
 		time.sleep(1)
 		pub.send_steer()
 		print('I send STEER')
+		# NEW START
+		pub.send_steer2()
+		print('I send STEER2')
+		# NEW END
+
 		time.sleep(1)
 

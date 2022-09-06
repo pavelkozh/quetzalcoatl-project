@@ -148,13 +148,15 @@ class CommunicationOnSerial(object):
 class StateMessage(object):
     """ Класс для определения приоритета сообщения.
 
-    Значения каждого типа сообщения:
+    Возвращаемые типы переменных:
 
-    "Information" - информационное сообщение.
+    "INFO_LVL" - информационное сообщение.
 
-    "Warning" - предупреждающее сообщение.
+    "WARNING_LVL" - предупреждающее сообщение.
 
-    "Error" - сообщение об ошибки.
+    "ERROR_LVL" - сообщение об ошибки.
+    
+    "UNKNOWN_LVL" - неизвестная ошибка.
     """
 
     UNKNOWN_LVL = 0
@@ -236,6 +238,7 @@ if __name__ == "__main__":
 
         # speed, angle = input('Print speed and angle: ').split()
         # Connection.set_control(int(speed), int(angle))
+
         inp = Connection.get_state_msg()
         # print('inp = {}'.format(inp))
         if inp:

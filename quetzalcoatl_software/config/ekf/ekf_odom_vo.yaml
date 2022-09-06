@@ -1,66 +1,45 @@
 #Configuation for robot odometry EKF
 #
-frequency: 30
-sensor_timeout: 0.1
+# The values are ordered as
+#     x, y, z,
+#     roll, pitch, yaw,
+#     vx, vy, vz,
+#     vroll, vpitch, vyaw,
+#     ax, ay, az
+frequency: 20
 
 two_d_mode: true
 publish_tf: true
-# initial_state: [5.0,  4.0,  3.0,
-#                0.0,  0.0,  1.57,
-#                 0.1,  0.2,  0.3,
-#                 0.0,  0.0,  0.0,
-#                 0.0,  0.0,  0.0]
 
 # Complete the frames section
-map_frame: map
-odom_frame: odom
-base_link_frame: base_footprint
-world_frame: odom
+map_frame: map              # Defaults to "map" if unspecified
+odom_frame: odom            # Defaults to "odom" if unspecified
+base_link_frame: base_footprint  # Defaults to "base_link" if unspecified
+world_frame: odom           # NB - set to odom for local
 
-transform_time_offset: 0.0
-
-# Stereo visual odometry
-odom0: /tigra/vo
-# The values are ordered as 
-#     x, y, z, 
-#     roll, pitch, yaw, 
-#     vx, vy, vz, 
-#     vroll, vpitch, vyaw, 
-#     ax, ay, az
-odom0_config:
+# Complete the odom0 configuration
+odom0: /quetzalcoatl/vo
+odom0_config: 
   [ true,   true,   true,
     true,   true,   true,
     true,   true,   true,
     false,  false,  false,
     false,  false,  false]
-odom0_queue_size: 5
-# odom0_differential: false
-# odom0_relative: true
+odom0_differential: true
+odom0_relative: false
 
-# RS IMU - disabled for rtabmap
-imu0: /rs_camera/imu/filtered
+# Complete the imu0 configuration
+imu0: /rs_camera_left/imu/filtered
 imu0_config:
-  [ false,  false,  false,
-    false,  false,  true,
-    false,  false,  false,
-    true,   true,   true,
-    false,  false,  false]
+   [false, false, false,
+   false,  false,  true,
+   false, false, false,
+   false,  false,  true,
+   false,  false,  false,]
 imu0_queue_size: 50
-imu0_differential: falseass
+imu0_differential: false
 imu0_relative: true
 imu0_remove_gravitational_acceleration: true
-
-# Wheel odometry
-odom1: /tigra/wheel_odom
-odom1_config:
-  [ false,  false,  false,
-    false,  false,  false,
-    true,   false,  false,
-    false,  false,  false,
-    false,  false,  false]
-odom1_queue_size: 5
-odom1_differential: true
-odom1_relative: false
 
 process_noise_covariance: [0.005, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                            0,    0.005, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
