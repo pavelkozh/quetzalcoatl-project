@@ -43,10 +43,10 @@
 
 ## Распиновка контроллера STM32F767ZI
 
-![avatar](controller_driver/stm32f767zi_pinout/pinout1.png)
+![avatar](/controller_driver/stm32f767zi_pinout/pinout1.png)
 
-![avatar](controller_driver/stm32f767zi_pinout/pinout2.png)
+![avatar](/controller_driver/stm32f767zi_pinout/pinout2.png)
 
 ![avatar](/controller_driver/stm32f767zi_pinout/pinout3.png)
 
-![avatar](controller_driver/stm32f767zi_pinout/pinout4.png)
+![avatar](/controller_driver/stm32f767zi_pinout/pinout4.png)
