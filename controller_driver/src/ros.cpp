@@ -64,6 +64,7 @@ void cmd_cb(const quetzalcoatl_msgs::GazelState &msg)
 
     flag_joystick=1;
 
+
 }
 
 ros::Subscriber<quetzalcoatl_msgs::GazelState> topic_in_state("state_cmd", &cmd_cb);

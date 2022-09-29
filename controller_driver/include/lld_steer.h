@@ -70,6 +70,6 @@ bool steerMotorEnableInvert ( void );
 bool steerMotorDirectionInvert( void );
 
 
-int steerSyncTestDriver();
+int steerSyncTestDriver(void);
 
 #endif  /*INCLUDE_LLD_STEER_H */

@@ -46,9 +46,10 @@
 #define     PROGRAM_ROUTINE_TEST_ROS_COMM                   19
 #define     PROGRAM_ROUTINE_TEST_ANALOG_ENCODER             20
 #define     PROGRAM_ROUTINE_TEST_BACKWARD_MOVING            21
+#define     PROGRAM_ROUTINE_TEST_GYRO                       22
 //
 
-#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_BACKWARD_MOVING
+#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_GYRO
 
 /**************/
 /*** Macros ***/

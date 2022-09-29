@@ -394,9 +394,13 @@ static THD_FUNCTION(steer_thr, arg) {
     while(1){
 
         if(flag_joystick==1){
+            //chprintf( (BaseSequentialStream *)&SD3, ">>1 speed:%f angle:%f\n\r",vs,steer_angle_rad);
             steer_angle=double_map((float)steer_angle_rad,-10.472,10.472,-10000.0,10000.0);
+            //clutch_pos=;
             //chprintf( (BaseSequentialStream *)&SD3, ">>2 speed:%f angle:%d\n\r",vs,steer_angle);
             //chprintf( (BaseSequentialStream *)&SD3, ">>2 cl_pos:%d angle:%d\n\r",pedalsClutchGetPosition(),steer_angle);
+
+            //
             lldSteerSMSetPosition (steer_angle, 20000 );
             pedalsClutchMove((uint32_t)clutch_pos,12500);
             flag_joystick=0;
@@ -431,7 +435,8 @@ void testBackwardMoving ( void )
     px4flowInit();
     lldSteerSMInit();
     soundSignalInit();
-    rosInit(NORMALPRIO+15);
+    //rosInit(NORMALPRIO);
+//
     //speedInit();
       chThdCreateStatic(emergency_stop_wa, sizeof(emergency_stop_wa), NORMALPRIO, emergency_stop_thr, NULL);//prio+15
       chThdCreateStatic(start_wa, sizeof(start_wa), NORMALPRIO, start_thr, NULL);
@@ -442,6 +447,7 @@ void testBackwardMoving ( void )
 
     chprintf( (BaseSequentialStream *)&SD3, "Start\n\r");
 
+    palSetLine(LINE_LED1);
     while(1) {
         /*if(brake_flag){
             brake_flag=0;
@@ -468,7 +474,7 @@ if(counter_ros++>20){
         if (sd_buff[0]=='w') shiftMTToNextGear(1,2000);//mt_shifting=1;
         if (sd_buff[0]=='y') shiftMTToNextGear(6,2000);//mt_shifting=1;
         //chprintf( (BaseSequentialStream *)&SD3, ">>2 speed:%f angle:%d\n\r",vs,steer_angle);
-        chprintf( (BaseSequentialStream *)&SD3, "cl_pos:%d angle:%d\n\r",(uint32_t)clutch_pos,steer_angle);
+        //chprintf( (BaseSequentialStream *)&SD3, "cl_pos:%d angle:%d\n\r",(uint32_t)clutch_pos,steer_angle);
         if (sd_buff[0]=='b') mt_shifting=6;
         if (sd_buff[0]=='n') mt_shifting=0;
         if (sd_buff[1]=='v') vs=atoi(sd_buff[0]);
@@ -477,7 +483,8 @@ if(counter_ros++>20){
         if (sd_buff[6]=='m') pedalsBrakeMove(atoi(sd_buff),10000);
         if (sd_buff[5]=='a') {
 
-           //flag_rul=1;
+
+            //flag_rul=1;
         }
         if (sd_buff[0]=='f') emergencyFullStop();
         if (sd_buff[0]=='r') {
@@ -485,14 +492,14 @@ if(counter_ros++>20){
         }
         //chprintf( (BaseSequentialStream *)&SD3, ">>3 speed:%f angle:%d\n\r",vs,steer_angle);
         //chprintf( (BaseSequentialStream *)&SD3, "steer:%d pos%d flag%d\n\r",steer_angle,lldSteerSMGetPosition(),flag_rul);
-          //chprintf( (BaseSequentialStream *)&SD3, "rot:%f\n\r",gazelGetEngineSpeed());
+         chprintf( (BaseSequentialStream *)&SD3, "rot:%f\n\r",gazelGetEngineSpeed());
         //chprintf( (BaseSequentialStream *)&SD3, "speed:%f angle:%d\n\r",vs,steer_angle_rad);
 
         for (int i = 0; i < 9; i++)
         {
             sd_buff[i]='?';
         }
-        
+//
         chThdSleepMilliseconds( 50 );
     }
 }

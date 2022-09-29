@@ -29,6 +29,7 @@ void testMainNew( void );
 void testRosComm(void);
 void testAnalogEncoder(void);
 void testBackwardMoving(void);
+void testGyro(void);
 
 static inline void testsRoutines( void )
 {
@@ -87,9 +88,13 @@ static inline void testsRoutines( void )
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_ANALOG_ENCODER)
     testAnalogEncoder();
 
-
 #elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_BACKWARD_MOVING)
     testBackwardMoving();
+
+#elif (MAIN_PROGRAM_ROUTINE == PROGRAM_ROUTINE_TEST_GYRO)
+    testGyro();
+
+
 #endif
 
 }

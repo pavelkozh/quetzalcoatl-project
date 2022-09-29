@@ -41,7 +41,8 @@ PROJECT_TESTS   =	tests/test_pedals.c                    \
                     tests/test_main_new.c                  \
                     tests/test_analog_encoder.c                  \
                     tests/test_ros_comm.c					\
-                    tests/test_backward_moving.c
+                    tests/test_backward_moving.c			\
+                    tests/test_gyro.c                      \
 
 PROJECT_CSRC    =	src/main.c src/common.c \
 					$(PROJECT_MODULES) $(PROJECT_TESTS)

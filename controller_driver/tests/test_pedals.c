@@ -22,6 +22,8 @@ void TestPedals ( void )
     palSetPadMode( GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL );    //Led
     palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
 
+    palSetLine(LINE_LED1);
+
 
     pedalsInit();
     feedbackInit();
