@@ -18,12 +18,6 @@ void testGyro ( void )
     palSetPadMode( GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL );    //Led
     palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
 
-    gyro_t angles = {
-        .x_angle_deg = 0,
-        .x_angle_deg = 0
-
-    };
-
     gyroInit();
 
     while(1) {
