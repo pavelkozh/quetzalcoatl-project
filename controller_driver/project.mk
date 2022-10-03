@@ -22,6 +22,7 @@ PROJECT_MODULES =	src/lld_can.c                \
                     src/steer_control.c          \
                     src/lld_steer_step_motor.c   \
                     src/sound_signal.c           \
+                    src/lld_gyroscope.c           \
                  # src/lld_steer_step_threaded.c   \
 
 PROJECT_TESTS   =	tests/test_pedals.c                    \

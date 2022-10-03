@@ -15,6 +15,7 @@
 #include <engine_ignition.h>
 #include <lld_steer_step_motor.h>
 #include <sound_signal.h>
+#include <lld_gyroscope.h>
 
 #include <communication.h>
 
