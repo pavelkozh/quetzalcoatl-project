@@ -26,6 +26,7 @@ int8_t sign ( float var )
     if ( var > 0 ) result = 1;
     if ( var < 0 ) result = -1;
     if ( var == 0 ) result = 0;
+    return result;
 
 }
 

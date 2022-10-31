@@ -1,8 +1,8 @@
 #include <lld_control.h>
 
-
+//TODO 54000000 frequency is needed
 //PWM define
-#define DRIVE_PWM_FREQ            50000000   // PWM clock frequency [Hz]
+#define DRIVE_PWM_FREQ            50000000   // PWM clock frequency [Hz] //
 #define DRIVE_PWM_PERIOD          500       // PWM period[tics]
 #define DRIVE_PWM_PULSE_WIDTH     100       // PWM pulse width
 
@@ -149,6 +149,7 @@ void PWMUnitInit ( MotorDriver *mtd ){
         pwm_conf_arr[ pwm_conf_cnt ].callback = mtd -> rising_edge_cb;
         pwm_conf_arr[ pwm_conf_cnt ].channels[0].callback = mtd -> falling_edge_cb;
         pwmStart( mtd -> pwmd , &pwm_conf_arr[ pwm_conf_cnt++ ]);
+        //pwmStart( mtd -> pwmd , &pwmconf);
         // pwmEnablePeriodicNotification(mtd->pwmd);
         // pwmEnableChannelNotification(mtd->pwmd,0);
 }

@@ -98,7 +98,7 @@ static THD_FUNCTION(can_rx, arg) {
     while (1)
     {
       canUpdate();
-      //px4_filter();
+      px4_filter();
 
       //gaz -> Speed += 1; 
       chThdSleepMilliseconds( 5 );
@@ -118,7 +118,7 @@ void feedbackInit(void){
 
     gaz = (gazelParam *)gazelGetStruct();
     can_init();
-    //px4flowInit();
+    px4flowInit();
     chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO, can_rx, NULL);//prio +15
 
     if_feedback_module_initialized = 1;

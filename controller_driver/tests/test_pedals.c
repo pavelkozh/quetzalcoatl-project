@@ -22,9 +22,6 @@ void TestPedals ( void )
     palSetPadMode( GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL );    //Led
     palSetPadMode( GPIOB, 14, PAL_MODE_OUTPUT_PUSHPULL );   //Led
 
-    palSetLine(LINE_LED1);
-
-
     pedalsInit();
     feedbackInit();
 
@@ -33,7 +30,7 @@ void TestPedals ( void )
     while(1) {
 
         sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
-
+        palToggleLine(LINE_LED2);
 
         if(sd_buff[0]=='c') { pedalsClutchStop(); pedalsBrakeStop(); }
 
@@ -60,9 +57,7 @@ void TestPedals ( void )
 
         /* Accelerator pedal test */
         if(sd_buff[4]=='u') pedalsAcceleratorControl ( atoi(sd_buff) );
-        //chprintf( (BaseSequentialStream *)&SD3, "Speed %f\r\n",gazelGetSpeed());
-
-
+        //chprintf( (BaseSequentialStream *)&SD3, "speed %f\r\n",gazelGetSpeed_px4flow());
 
 
         for (int i = 0; i < 9; i++)
@@ -70,7 +65,7 @@ void TestPedals ( void )
           sd_buff[i]='?';
         }
 
-        chThdSleepMilliseconds( 100 );
+        chThdSleepMilliseconds(100 );
     }
 }
 
