@@ -50,7 +50,7 @@
 #define     PROGRAM_ROUTINE_TEST_GYRO                       22
 //
 
-#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_MT_CONTROL
+#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_PEDALS
 
 /**************/
 /*** Macros ***/
@@ -69,6 +69,8 @@
  * @note    Must be called before EXT driver work
  */
 void commonExtDriverInit ( void );
+static void limit_switch_1_cb( EXTDriver *extp, expchannel_t channel );
+static void limit_switch_2_cb( EXTDriver *extp, expchannel_t channel );
 
 
 /**

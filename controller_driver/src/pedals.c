@@ -1,7 +1,7 @@
 #include <pedals.h>
 #include <lld_control.h>
 #include <lld_ext_dac.h>
-
+#include <common.h>
 
 
 
@@ -82,6 +82,10 @@ void pedalsInit ( void ){
     palSetLineMode( PAL_LINE( GPIOD, 12),  PAL_MODE_ALTERNATE(2) );
     palSetLineMode( BreakM.dir_line, PAL_MODE_OUTPUT_PUSHPULL);
     MotorlldControlInit( &BreakM );
+
+    /*pedals limit init*/
+    commonExtDriverInit();
+
 
     /* Accelerator pedal init*/
     extDacInit();

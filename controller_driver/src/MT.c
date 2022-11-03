@@ -83,7 +83,7 @@ void mtMotorsControlInit ( void )
     MotorlldControlInit( &m_vertical );
 
     palSetLineMode( PAL_LINE( GPIOF, 9),  PAL_MODE_ALTERNATE(9) );
-    palSetLineMode( m_gorisontal.dir_line, PAL_MODE_OUTPUT_PUSHPULL);//push pull - old;
+    palSetLineMode( m_gorisontal.dir_line, PAL_MODE_OUTPUT_PUSHPULL);
     MotorlldControlInit( &m_gorisontal );
 
     palSetPadMode( GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL );    //Led 1

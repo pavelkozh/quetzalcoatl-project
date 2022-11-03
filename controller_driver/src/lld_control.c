@@ -14,15 +14,6 @@
 #define DRIVE_DIRECTION_PIN_PORT      GPIOB   // Pin port set directions
 
 
-//Limit Switch
-#define DRIVE_LIMIT_SWITCH_1_PIN            9
-#define DRIVE_LIMIT_SWITCH_1_PIN_PORT       GPIOB
-#define DRIVE_LIMIT_SWITCH_1_EXT_MODE_GPIO  EXT_MODE_GPIOB
-#define DRIVE_LIMIT_SWITCH_2_PIN            15
-#define DRIVE_LIMIT_SWITCH_2_PIN_PORT       GPIOB
-#define DRIVE_LIMIT_SWITCH_2_EXT_MODE_GPIO  EXT_MODE_GPIOB
-
-
 // Motor define
 #define DRIVE_MAX_ANG                   160000      // 40 revolution or 20cm (5mm per revolution)
 #define DRIVE_MAX_SPEED                 100000      // 100Khz or 1500 rpm
@@ -149,21 +140,8 @@ void PWMUnitInit ( MotorDriver *mtd ){
         pwm_conf_arr[ pwm_conf_cnt ].callback = mtd -> rising_edge_cb;
         pwm_conf_arr[ pwm_conf_cnt ].channels[0].callback = mtd -> falling_edge_cb;
         pwmStart( mtd -> pwmd , &pwm_conf_arr[ pwm_conf_cnt++ ]);
-        //pwmStart( mtd -> pwmd , &pwmconf);
         // pwmEnablePeriodicNotification(mtd->pwmd);
         // pwmEnableChannelNotification(mtd->pwmd,0);
-}
-
-
-
-static void limit_switch_1_cb( EXTDriver *extp, expchannel_t channel ){
-     (void) extp ;
-     (void) channel ;
-
-}
-static void limit_switch_2_cb( EXTDriver *extp, expchannel_t channel ){
-    (void) extp ;
-    (void) channel ;
 }
 
 static bool         lld_control_Initialized       = false;
@@ -174,25 +152,6 @@ static bool         lld_control_Initialized       = false;
  */
 void MotorlldControlInit ( MotorDriver *mtd ){
             //if ( lld_control_Initialized ) return;
-
-#if DRIVE_LIMIT_SWITCH_USE
-            /*EXT driver initialization*/
-            commonExtDriverInit();
-
-            EXTChannelConfig limit_switch_1_conf,limit_switch_2_conf;
-
-            limit_switch_1_conf.mode  = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | DRIVE_LIMIT_SWITCH_1_EXT_MODE_GPIO;
-            limit_switch_1_conf.cb    = limit_switch_1_cb;
-
-            limit_switch_2_conf.mode  = EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | DRIVE_LIMIT_SWITCH_1_EXT_MODE_GPIO;
-            limit_switch_2_conf.cb    = limit_switch_2_cb;
-
-            palSetLineMode( PAL_LINE(DRIVE_LIMIT_SWITCH_1_PIN_PORT,DRIVE_LIMIT_SWITCH_1_PIN), PAL_MODE_INPUT_PULLUP);
-            palSetLineMode( PAL_LINE(DRIVE_LIMIT_SWITCH_2_PIN_PORT,DRIVE_LIMIT_SWITCH_2_PIN), PAL_MODE_INPUT_PULLUP);
-
-            extSetChannelMode( &EXTD1, DRIVE_LIMIT_SWITCH_1_PIN, &limit_switch_1_conf );
-            extSetChannelMode( &EXTD1, DRIVE_LIMIT_SWITCH_2_PIN, &limit_switch_2_conf );
-#endif
 
             mtd -> state = MOTOR_STOPED;
             mtd -> position = 0;

@@ -58,6 +58,11 @@ EXT1   |PG3   | Input          | horizontal axis left sensor
 EXT1   |PC11  | Input          | vertical   axis upper sensor
 EXT1   |PC12  | Input          | vertical   axis lower sensor   
 
+## Pedals calibration sensors 
+Driver | Pins | Input / Output | Description
+-------|------|----------------|------------
+EXT1   |PB9   | Input          | clutch sensor
+EXT1   |PG14  | Input          | brake sensor 
 
 ## Absolute encoder (steer unit)
 Driver | Pins | Input / Output | Description
