@@ -81,6 +81,9 @@ uint32_t uint32_map(uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_m
 double double_map(double x, double in_min, double in_max, double out_min, double out_max);
 float float_map(float x, float in_min, float in_max, float out_min, float out_max);
 int8_t sign ( float var );
-
+#define DRIVE_LIMIT_SWITCH_1_PIN            9
+#define DRIVE_LIMIT_SWITCH_1_PIN_PORT       GPIOB
+#define DRIVE_LIMIT_SWITCH_2_PIN            14
+#define DRIVE_LIMIT_SWITCH_2_PIN_PORT       GPIOG
 #endif /* INCLUDE_COMMON_H_ */
 

@@ -36,6 +36,7 @@ void TestPedals ( void )
 
         /* Clutch test*/
         if(sd_buff[0]=='x') pedalsClutchPress( 500 );
+        if(sd_buff[0]=='a') pedalsClutchInitialization();
         if(sd_buff[0]=='f') pedalsClutchRelease( 3000 );
         if(sd_buff[6]=='e') pedalsClutchMove(atoi(sd_buff),3000);
         if(sd_buff[5]=='y') pedalsClutchCalibrate(0, 3000, atoi(sd_buff));
@@ -46,14 +47,15 @@ void TestPedals ( void )
 //
         /* Brake test*/
         if(sd_buff[0]=='z') pedalsBrakePress( 3000 );
+        if(sd_buff[0]=='m') pedalsBrakeInitialization();
         if(sd_buff[0]=='o') pedalsBrakeRelease( 3000 );
         if(sd_buff[6]=='r') pedalsBrakeMove(atoi(sd_buff), 3000);
-        if(sd_buff[5]=='h') pedalsBrakeCalibrate (0, 3000, atoi(sd_buff));
-        if(sd_buff[5]=='w') pedalsBrakeCalibrate (1, 3000, atoi(sd_buff));
+        if(sd_buff[5]=='h') pedalsBrakeCalibrate (0, 3000, atoi(sd_buff));//на меня
+        if(sd_buff[5]=='w') pedalsBrakeCalibrate (1, 3000, atoi(sd_buff));//от меня
         if(sd_buff[6]=='g') pedalsBrakeChangeSpeed ( atoi(sd_buff) );
 
-        chprintf( (BaseSequentialStream *)&SD3, "ClState %d\t ClMode %d\t ClStatePos %d\t ClSpeed %d\t BrState %d\t BrMode %d\t BrStatePos %d\t BrSpeed %d\t \n\r",gazelGetClutchSwitch(), pedalsClutchGetMode(), pedalsClutchGetPosition(), pedalsClutchGetSpeed(),gazelGetBrakeSwitch(), pedalsBrakeGetMode(), pedalsBrakeGetPosition(), pedalsBrakeGetSpeed());
-        //chprintf( (BaseSequentialStream *)&SD3, "BrState %d\t BrMode %d\t BrStatePos %d\t BrSpeed %d\t \n\r",pedalsBrakeGetState(), pedalsBrakeGetMode(), pedalsBrakeGetPosition(), pedalsBrakeGetSpeed());
+        //chprintf( (BaseSequentialStream *)&SD3, "ClState %d\t ClMode %d\t ClStatePos %d\t ClSpeed %d\t BrState %d\t BrMode %d\t BrStatePos %d\t BrSpeed %d\t \n\r",gazelGetClutchSwitch(), pedalsClutchGetMode(), pedalsClutchGetPosition(), pedalsClutchGetSpeed(),gazelGetBrakeSwitch(), pedalsBrakeGetMode(), pedalsBrakeGetPosition(), pedalsBrakeGetSpeed());
+        chprintf( (BaseSequentialStream *)&SD3, "BrState %d\t BrMode %d\t BrStatePos %d\t BrSpeed %d\t \n\r",pedalsBrakeGetState(), pedalsBrakeGetMode(), pedalsBrakeGetPosition(), pedalsBrakeGetSpeed());
 
         /* Accelerator pedal test */
         if(sd_buff[4]=='u') pedalsAcceleratorControl ( atoi(sd_buff) );
