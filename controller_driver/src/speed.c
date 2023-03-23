@@ -20,11 +20,11 @@ static bool        engine_control_start = 0;
 static bool        vehicle_control_start = 0;
 
 static PIDControllerContext_t  pidCtx = {
-    .kp   = 0.05,
-    .ki   = 0.005,
-    .kd   = 0,
+    .kp   = 4,
+    .ki   = 0.1,
+    .kd   = 2,
     .integrLimit  = 5000,
-    .integZone = 1.0
+    .integZone = 0.85
 };
 
 static PIDControllerContext_t  pidCtxV = {
