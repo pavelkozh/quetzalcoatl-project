@@ -147,6 +147,13 @@ void pedalsClutchStop ( void ){
 }
 
 /*
+ * @brief      clutch pedal motor reset position
+ */
+void pedalsClutchResetPosition ( void ){
+    MotorResetPotision( &ClutchM );
+}
+
+/*
  * @brief     Function can change motor speed  "on the fly"
  * @params    new_speed (look "moveClutchPedal" function description for units )
  */
@@ -263,6 +270,13 @@ void pedalsBrakeStop ( void ){
 }
 
 /*
+ * @brief     reset Brake pedal motor position
+ */
+void pedalsBrakeResetPosition ( void ){
+    MotorResetPotision( &BreakM );
+}
+
+/*
  * @brief     Function can change motor speed  "on the fly"
  * @params    new_speed (look "moveClutchPedal" function description for units )
  */
@@ -363,4 +377,27 @@ void pedalsCalibrate ( void )
     else{
         pedalsBrakePress(10000);
     }
+}
+
+/****************************************************************************/
+/********************** INITIALIZATION OF BRAKE PEDALS  ********************************/
+/****************************************************************************/
+void pedalsBrakeInitialization(void)
+{
+    while(palReadPad(DRIVE_LIMIT_SWITCH_2_PIN_PORT,DRIVE_LIMIT_SWITCH_2_PIN)==1)
+    {
+        pedalsBrakeCalibrate (0, 3000, 1000);
+    }
+
+}
+/****************************************************************************/
+/********************** INITIALIZATION OF CLUTCH PEDALS  ********************************/
+/****************************************************************************/
+void pedalsClutchInitialization(void)
+{
+    while(palReadPad(DRIVE_LIMIT_SWITCH_1_PIN_PORT,DRIVE_LIMIT_SWITCH_1_PIN)==1)
+    {
+        pedalsClutchCalibrate (0, 3000, 1000);
+    }
+
 }

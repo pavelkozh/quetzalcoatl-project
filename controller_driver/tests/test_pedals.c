@@ -12,7 +12,6 @@ static const SerialConfig sdcfg = {
 };
 
 
-
 void TestPedals ( void )
 {
     sdStart( &SD3, &sdcfg );
@@ -59,6 +58,7 @@ void TestPedals ( void )
         /* Clutch test*/
         if(sd_buff[0]=='x') pedalsClutchPress( 500 );
         if(sd_buff[0]=='f') pedalsClutchRelease( 3000 );
+        if(sd_buff[0]=='a') pedalsClutchInitialization();
         if(sd_buff[6]=='e') pedalsClutchMove(atoi(sd_buff),3000);
         if(sd_buff[5]=='y') pedalsClutchCalibrate(0, 3000, atoi(sd_buff));
         if(sd_buff[5]=='q') pedalsClutchCalibrate(1, 3000, atoi(sd_buff));
@@ -67,6 +67,7 @@ void TestPedals ( void )
         /* Brake test*/
         if(sd_buff[0]=='z') pedalsBrakePress( 3000 );
         if(sd_buff[0]=='o') pedalsBrakeRelease( 3000 );
+        if(sd_buff[0]=='m') pedalsBrakeInitialization();
         if(sd_buff[6]=='r') pedalsBrakeMove(atoi(sd_buff), 3000);
         if(sd_buff[5]=='h') pedalsBrakeCalibrate (0, 3000, atoi(sd_buff));
         if(sd_buff[5]=='w') pedalsBrakeCalibrate (1, 3000, atoi(sd_buff));

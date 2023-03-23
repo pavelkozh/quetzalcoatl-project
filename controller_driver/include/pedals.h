@@ -233,6 +233,11 @@ int32_t pedalsBrakeGetMinPosition ( void );
 void pedalsAcceleratorControl ( float accelerator_pedal_pos );
 
 
+/********************* PEDALS INITIALIZATION*********************************/
+
+void pedalsBrakeInitialization(void);
+
+void pedalsClutchInitialization(void);
 
 
 #endif /* INCLUDE_PEDALS_H */
