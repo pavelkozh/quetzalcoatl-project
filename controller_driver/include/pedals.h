@@ -6,8 +6,8 @@
 
 
 
-#define ACCELERATOR_DAC_MIN_VAL             57.0
-#define ACCELERATOR_DAC_MAX_VAL             240.0
+#define ACCELERATOR_DAC_MIN_VAL             57.0  //57.0
+#define ACCELERATOR_DAC_MAX_VAL             215.0 //
 
 
 /************COMMON FOR BRAKE AND CLUTCH PEDALS MOTOR CONTROL SETUP *********/

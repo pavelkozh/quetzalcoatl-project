@@ -122,7 +122,6 @@ int32_t pedalsClutchMove (double position, uint16_t speed ){
  * @params    speed - movement speed (look "moveClutchPedal" function description )
  */
 void pedalsClutchPress ( uint16_t speed ){
-     palSetLine(LINE_LED1);
     MotorRunContinuous(&ClutchM, 0, speed);
 
 }
@@ -145,12 +144,6 @@ void pedalsClutchCalibrate( bool dir, uint16_t speed, uint16_t step ){
  */
 void pedalsClutchStop ( void ){
     MotorStop( &ClutchM );
-}
-/*
- * @brief      clutch pedal motor reset position
- */
-void pedalsClutchResetPosition ( void ){
-    MotorResetPotision( &ClutchM );
 }
 
 /*
@@ -268,12 +261,7 @@ void pedalsBrakeCalibrate ( bool dir, uint16_t speed, uint16_t step ){
 void pedalsBrakeStop ( void ){
     MotorStop( &BreakM );
 }
-/*
- * @brief     reset Brake pedal motor position
- */
-void pedalsBrakeResetPosition ( void ){
-    MotorResetPotision( &BreakM );
-}
+
 /*
  * @brief     Function can change motor speed  "on the fly"
  * @params    new_speed (look "moveClutchPedal" function description for units )
@@ -349,19 +337,18 @@ int32_t pedalsBrakeGetMinPosition ( void )
  */
 void pedalsAcceleratorControl ( float accelerator_pedal_pos )
 {
+
     accelerator_pedal_pos = CLIP_VALUE(accelerator_pedal_pos,0.0,100.0);
     uint8_t val = uint8_map (accelerator_pedal_pos, 0.0, 100.0, ACCELERATOR_DAC_MIN_VAL, ACCELERATOR_DAC_MAX_VAL);
-    extDacSetValue( ( uint8_t)( val*0.55 ) , val );
+//    uint8_t val = uint8_map (accelerator_pedal_pos, 0.0, 255.0, 0, 255);
+//    uint8_t val = (uint8_t) accelerator_pedal_pos;
+    extDacSetValue( ( uint8_t)( val*0.5 ) , val );
 }
-
-
-
-
 
 /****************************************************************************/
 /**********************  CALIBRATION PEDALS  ********************************/
 /****************************************************************************/
-static bool is_clutch_switch_changed = false;
+
 void pedalsCalibrate ( void )
 {
     if ( gazelGetClutchSwitch() ){
@@ -376,26 +363,4 @@ void pedalsCalibrate ( void )
     else{
         pedalsBrakePress(10000);
     }
-}
-/****************************************************************************/
-/********************** INITIALIZATION OF BRAKE PEDALS  ********************************/
-/****************************************************************************/
-void pedalsBrakeInitialization(void)
-{
-    while(palReadPad(DRIVE_LIMIT_SWITCH_2_PIN_PORT,DRIVE_LIMIT_SWITCH_2_PIN)==1)
-    {
-        pedalsBrakeCalibrate (0, 3000, 1000);
-    }
-
-}
-/****************************************************************************/
-/********************** INITIALIZATION OF CLUTCH PEDALS  ********************************/
-/****************************************************************************/
-void pedalsClutchInitialization(void)
-{
-    while(palReadPad(DRIVE_LIMIT_SWITCH_1_PIN_PORT,DRIVE_LIMIT_SWITCH_1_PIN)==1)
-    {
-        pedalsClutchCalibrate (0, 3000, 1000);
-    }
-
 }

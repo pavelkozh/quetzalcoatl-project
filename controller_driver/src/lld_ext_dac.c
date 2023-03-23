@@ -18,9 +18,9 @@
 /********SPI CONFIG**********/
 
 #define SPI_BUFFERS_SIZE    1U
+//#define SPI_BUFFERS_SIZE    1U
 
-static uint16_t txbuf[SPI_BUFFERS_SIZE];
-static uint16_t rxbuf[SPI_BUFFERS_SIZE];
+//static uint16_t txbuf[SPI_BUFFERS_SIZE];
 
 static const SPIConfig spicfg = {
 	.end_cb = NULL,
@@ -44,18 +44,18 @@ void extDacInit(){
 
 
 void  extDacSetValue( uint8_t valueA, uint8_t valueB){
-	//uint16_t val = (valueA<<8) | valueB;
-	txbuf[0] =(0x01<<8) | valueA;
-	txbuf[1] =(0x24<<8) | valueB;
+
+    uint16_t txbuf[SPI_BUFFERS_SIZE];
+    txbuf[0] =(0x01<<8) | valueA;//input register DAC A update
+    txbuf[1] =(0x24<<8) | valueB;//input register DAC B update + DAC A, DAC B output registers update
+
 
 	spiAcquireBus(EXTERNAL_DAC_SPI_DRIVER);
-
     spiSelect(EXTERNAL_DAC_SPI_DRIVER);
     spiSend(EXTERNAL_DAC_SPI_DRIVER, 1, txbuf);
     spiUnselect(EXTERNAL_DAC_SPI_DRIVER);
     spiSelect(EXTERNAL_DAC_SPI_DRIVER);
     spiSend(EXTERNAL_DAC_SPI_DRIVER, 1, txbuf+1);
     spiUnselect(EXTERNAL_DAC_SPI_DRIVER);
-
 	spiReleaseBus(EXTERNAL_DAC_SPI_DRIVER);
 }
