@@ -20,6 +20,11 @@ Driver | Pins | Input / Output | Description
 CAN1   | PD1  |                |CAN RX
 CAN1   | PD0  |                |CAN TX
 
+## speed sensor (camera)
+Driver | Pins | Input / Output | Description
+-------|------|----------------|----------
+I2C2   | PB10 |                |SCL
+I2C2   | PB11 |                |SDA
 
 ## Clutch pedal actuator control unit 
 Driver | Pins | Input / Output | Description

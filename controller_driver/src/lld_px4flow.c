@@ -3,13 +3,13 @@
 #define I2C_TEST_CALLBACK 0
 
 
-    struct i2c_frame frame;
-    struct i2c_integral_frame iframe;
-    //static i2cflags_t errors = 0;
-    static uint8_t rxbuf[25];
-    static uint8_t txbuf = 0x0;
-      msg_t status = MSG_OK;
-    systime_t tmo = MS2ST(10);
+struct i2c_frame frame;
+struct i2c_integral_frame iframe;
+static i2cflags_t errors = 0;
+static uint8_t rxbuf[25];
+static uint8_t txbuf = 0x0;
+msg_t status = MSG_OK;
+systime_t tmo = MS2ST(10);
 
 
 static const I2CConfig i2cfg2 = {
@@ -28,12 +28,11 @@ static const I2CConfig i2cfg2 = {
 
 void px4flowInit(void){
 
-  #if 1
   /** Start I2C bus 2 **/
   i2cStart(&I2CD2, &i2cfg2);
-  palSetPadMode(GPIOB, 10, PAL_STM32_OTYPE_OPENDRAIN | PAL_MODE_ALTERNATE(4));//PAL_STM32_OTYPE_OPENDRAIN | 
+  palSetPadMode(GPIOB, 10, PAL_STM32_OTYPE_OPENDRAIN | PAL_MODE_ALTERNATE(4));
   palSetPadMode(GPIOB, 11, PAL_STM32_OTYPE_OPENDRAIN | PAL_MODE_ALTERNATE(4));
-  #endif
+
 }
 
 
@@ -146,12 +145,12 @@ bool update(void)
     status = i2cMasterTransmitTimeout(&I2CD2, PX4FLOW_ADDRESS, &txbuf, 1, rxbuf, 22, tmo);
     i2cReleaseBus(&I2CD2);
 
-    if(status != MSG_OK)
-        return status;//i2cGetErrors(&I2CD2);
+//    if(status != MSG_OK)
+//        return status;//i2cGetErrors(&I2CD2);
 
-    // if (status != MSG_OK){
-    //   errors = i2cGetErrors(&I2CD2);
-    // }
+     if (status != MSG_OK){
+       errors = i2cGetErrors(&I2CD2);
+     }
 
     // read the data
       frame.frame_count       = read16(0,1);

@@ -46,10 +46,3 @@ void hscStop ( void )
 
 }
 
-
-
-
-
-
-
-

@@ -41,6 +41,7 @@ typedef struct
     int8_t ActualEnginePercentTorque ;
     double Speed;
     double Speed_px4flow;
+    double Speed_px4flow_nonfilter;
     uint8_t BrakeSwitch;
     uint8_t ClutchSwitch;
     float AcceleratorPedalPosition;
