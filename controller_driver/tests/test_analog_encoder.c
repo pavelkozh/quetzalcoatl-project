@@ -82,7 +82,6 @@ void testAnalogEncoder ( void )
     /* Just set the limit (interval) of timer counter, you can use this function
        not only for ADC triggering, but start infinite counting of timer for callback processing */
 
-
     sdStart( &SD3, &sdcfg );
     palSetPadMode( GPIOD, 8, PAL_MODE_ALTERNATE(7) );   // TX
     palSetPadMode( GPIOD, 9, PAL_MODE_ALTERNATE(7) );   // RX
@@ -95,7 +94,6 @@ void testAnalogEncoder ( void )
     chprintf( (BaseSequentialStream *)&SD3, "Start\n\r");
 
     while(1) {
-
 
         palToggleLine(LINE_LED1);
         chprintf( (BaseSequentialStream *)&SD3, "res :%d\n\r",adc_res);

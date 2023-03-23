@@ -5,14 +5,12 @@
 #include <feedback.h>
 //#include <pedals.h>
 
-
+extern gazelParam *gaz;
 
 static const SerialConfig sdcfg = {
   .speed = 115200,
   .cr1 = 0, .cr2 = 0, .cr3 = 0
 };
-
-
 
 void TestSpeed ( void )
 {
@@ -29,16 +27,31 @@ void TestSpeed ( void )
     feedbackInit();
     pedalsInit();
 
+    pedalsAcceleratorControl(0);
 
     uint8_t sd_buff[10];
 
+    sdGet(&SD3);// ожидание символа от GUI для синхронизации
 
     while(1) {
 
-        //palToggleLine(LINE_LED1);
+        float eng_speed = gazelGetEngineSpeed();
+        float acc_pos = gazelGetAcceleratorPedalPosition();
+        int8_t torque = gazelGetActualEnginePercentTorque();
+        double E_reference = speedGetEngineReference();
+        double speed_px4flow_filtered = gaz->Speed_px4flow;
+        double speed_can = gaz->Speed;
+
+        //Отправка данных
+        sdWrite(&SD3,(uint8_t*)&eng_speed,sizeof(eng_speed));
+        sdWrite(&SD3,(uint8_t*)&acc_pos,sizeof(acc_pos));
+        sdWrite(&SD3,(uint8_t*)&torque,sizeof(torque));
+        sdWrite(&SD3,(uint8_t*)&E_reference,sizeof(E_reference));
+        sdWrite(&SD3,(uint8_t*)&speed_px4flow_filtered,sizeof(speed_px4flow_filtered));
+        sdWrite(&SD3,(uint8_t*)&speed_can,sizeof(speed_can));
 
         sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );
-
+        palToggleLine(LINE_LED2);
 
         if(sd_buff[4]=='s') speedSetVehiclePIDReferenceValue ( (float)(atoi(sd_buff)/10.0) ) ;
         if(sd_buff[0]=='y') speedVehicleControlStart();
@@ -55,22 +68,17 @@ void TestSpeed ( void )
         if(sd_buff[0]=='i') pedalsBrakeCalibrate(0,5000,4000);
         if(sd_buff[0]=='p') pedalsBrakeCalibrate(1,5000,4000); //??? send negative pos!
 
+        if(sd_buff[4]=='u') pedalsAcceleratorControl ( atoi(sd_buff) );
 
        // chprintf( (BaseSequentialStream *)&SD3, " Speed %d\t EngSpeed  %d\t \n\r", 100, 53 );
-        chprintf( (BaseSequentialStream *)&SD3, " Speed  %.02f %\t EngSpeed %.02f %\t Vref %.02f %\t  Eref %.02f %\t pidVal %.02f %\t BrakePos %d %\t  \n\r", speedDbgGazelSpeed(), speedDbgGazelEngSpeed(), speedGetVehicleReference(),speedGetEngineReference(), speedGetPIDVal(), speedDbgBrakePos() );
-
-
-
-
-
+        //chprintf( (BaseSequentialStream *)&SD3, " Speed  %.02f %\t EngSpeed %.02f %\t Vref %.02f %\t  Eref %.02f %\t pidVal %.02f %\t BrakePos %d %\t  \n\r", speedDbgGazelSpeed(), speedDbgGazelEngSpeed(), speedGetVehicleReference(),speedGetEngineReference(), speedGetPIDVal(), speedDbgBrakePos() );
 
         for (int i = 0; i < 9; i++)
         {
           sd_buff[i]='?';
         }
 
-        //pedalsAcceleratorControl ( 0 );
-        chThdSleepMilliseconds( 500 );
+        chThdSleepMilliseconds( 50 );
     }
 }
 
