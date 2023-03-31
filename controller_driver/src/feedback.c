@@ -122,7 +122,7 @@ int8_t gazelGetDriverIsDemandEnginePercentTorque(void){
   return gaz->DriverIsDemandEnginePercentTorque;
 };
 
-int8_t gazelGetActualEnginePercentTorque (void){
+float gazelGetActualEnginePercentTorque (void){
   return gaz->ActualEnginePercentTorque ;
 };
 

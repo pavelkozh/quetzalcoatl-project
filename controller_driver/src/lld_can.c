@@ -20,7 +20,8 @@ static CANRxFrame rxmsg;
 static gazelParam gazel = {
   .EngineSpeed = 0.0 ,
   .DriverIsDemandEnginePercentTorque = 0,
-  .ActualEnginePercentTorque  = 0,
+  .EngineDemandTorque = 0,
+  .ActualEnginePercentTorque  = 0.0,
   .Speed = 0.0,
   .Speed_px4flow = 0.0,
   .AcceleratorPedalPosition = 0,
@@ -107,7 +108,8 @@ void can_handler(CANRxFrame msg){
     case PGN_ELECTRONIC_ENGINE_CONTROLLER_1: 
       gazel.EngineSpeed =0.125*( (msg.data8[4]<<8)|msg.data8[3]);
       gazel.DriverIsDemandEnginePercentTorque = msg.data8[1]-125;
-      gazel.ActualEnginePercentTorque = msg.data8[2]-125;
+      gazel.ActualEnginePercentTorque = ((float)(msg.data8[2]-125)) + (float)(msg.data8[0] >> 4)*0.125;
+      gazel.EngineDemandTorque = msg.data8[7]-125;
       break;
     case PGN_CRUISE_CONTROL_AND_VEHICL_SPEED:
       gazel.Speed = ((msg.data8[2]<<8)|msg.data8[1])/256.0;

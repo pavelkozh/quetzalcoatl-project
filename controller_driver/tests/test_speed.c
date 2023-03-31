@@ -37,15 +37,15 @@ void TestSpeed ( void )
 
         float eng_speed = gazelGetEngineSpeed();
         float acc_pos = gazelGetAcceleratorPedalPosition();
-        int8_t torque = gazelGetActualEnginePercentTorque();
-        double E_reference = speedGetEngineReference();
-        double speed_px4flow_filtered = gaz->Speed_px4flow;
-        double speed_can = gaz->Speed;
+        float torque = gazelGetActualEnginePercentTorque();
+        float E_reference = speedGetEngineReference();
+        float speed_px4flow_filtered = gaz->Speed_px4flow;
+        float speed_can = gaz->Speed;
 
         //Отправка данных
         sdWrite(&SD3,(uint8_t*)&eng_speed,sizeof(eng_speed));
-        sdWrite(&SD3,(uint8_t*)&acc_pos,sizeof(acc_pos));
         sdWrite(&SD3,(uint8_t*)&torque,sizeof(torque));
+        sdWrite(&SD3,(uint8_t*)&acc_pos,sizeof(acc_pos));
         sdWrite(&SD3,(uint8_t*)&E_reference,sizeof(E_reference));
         sdWrite(&SD3,(uint8_t*)&speed_px4flow_filtered,sizeof(speed_px4flow_filtered));
         sdWrite(&SD3,(uint8_t*)&speed_can,sizeof(speed_can));
@@ -70,7 +70,7 @@ void TestSpeed ( void )
 
         if(sd_buff[4]=='u') pedalsAcceleratorControl ( atoi(sd_buff) );
 
-       // chprintf( (BaseSequentialStream *)&SD3, " Speed %d\t EngSpeed  %d\t \n\r", 100, 53 );
+        //chprintf( (BaseSequentialStream *)&SD3, " M %.02f EngSpeed  %.02f\t \n\r", gazelGetActualEnginePercentTorque(), gazelGetEngineSpeed() );
         //chprintf( (BaseSequentialStream *)&SD3, " Speed  %.02f %\t EngSpeed %.02f %\t Vref %.02f %\t  Eref %.02f %\t pidVal %.02f %\t BrakePos %d %\t  \n\r", speedDbgGazelSpeed(), speedDbgGazelEngSpeed(), speedGetVehicleReference(),speedGetEngineReference(), speedGetPIDVal(), speedDbgBrakePos() );
 
         for (int i = 0; i < 9; i++)

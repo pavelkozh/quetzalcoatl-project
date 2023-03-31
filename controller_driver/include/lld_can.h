@@ -38,14 +38,15 @@ typedef struct
 {
     float EngineSpeed ;
     int8_t DriverIsDemandEnginePercentTorque;
-    int8_t ActualEnginePercentTorque ;
-    double Speed;
-    double Speed_px4flow;
-    double Speed_px4flow_nonfilter;
+    float ActualEnginePercentTorque ;
+    float Speed;
+    float Speed_px4flow;
+    float Speed_px4flow_nonfilter;
     uint8_t BrakeSwitch;
     uint8_t ClutchSwitch;
     float AcceleratorPedalPosition;
     int8_t PercentLoadAtCurrentSpeed;
+    int8_t EngineDemandTorque;
     double EngineFuelRate;
     double EngineInstantaneousFuelEconomy;
     double EngineThrottleValve;

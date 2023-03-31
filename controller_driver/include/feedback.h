@@ -10,7 +10,7 @@
 void feedbackInit(void);
 float gazelGetEngineSpeed (void);
 int8_t gazelGetDriverIsDemandEnginePercentTorque(void);
-int8_t gazelGetActualEnginePercentTorque (void);
+float gazelGetActualEnginePercentTorque (void);
 double gazelGetSpeed(void);
 double gazelGetSpeed_px4flow(void);
 uint8_t gazelGetBrakeSwitch(void);
