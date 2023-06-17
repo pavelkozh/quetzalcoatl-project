@@ -42,13 +42,13 @@ void TestPedals ( void )
 
 
         //Отправка данных
-        sdWrite(&SD3,(uint8_t*)&eng_speed,sizeof(eng_speed));
-        sdWrite(&SD3,(uint8_t*)&torque,sizeof(torque));
-        sdWrite(&SD3,(uint8_t*)&acc_pos,sizeof(acc_pos));
-//        sdWrite(&SD3,(uint8_t*)&speed,sizeof(speed));
-        sdWrite(&SD3,(uint8_t*)&speed_px4flow_filtered,sizeof(speed_px4flow_filtered));
-//        sdWrite(&SD3,(uint8_t*)&speed_px4flow,sizeof(speed_px4flow));
-        sdWrite(&SD3,(uint8_t*)&speed_can,sizeof(speed_can));
+//        sdWrite(&SD3,(uint8_t*)&eng_speed,sizeof(eng_speed));
+//        sdWrite(&SD3,(uint8_t*)&torque,sizeof(torque));
+//        sdWrite(&SD3,(uint8_t*)&acc_pos,sizeof(acc_pos));
+////        sdWrite(&SD3,(uint8_t*)&speed,sizeof(speed));
+//        sdWrite(&SD3,(uint8_t*)&speed_px4flow_filtered,sizeof(speed_px4flow_filtered));
+////        sdWrite(&SD3,(uint8_t*)&speed_px4flow,sizeof(speed_px4flow));
+//        sdWrite(&SD3,(uint8_t*)&speed_can,sizeof(speed_can));
 
         sdReadTimeout( &SD3, sd_buff, 9, TIME_IMMEDIATE );//прием команды
         palToggleLine(LINE_LED2);
@@ -73,7 +73,7 @@ void TestPedals ( void )
         if(sd_buff[5]=='w') pedalsBrakeCalibrate (1, 3000, atoi(sd_buff));
         if(sd_buff[6]=='g') pedalsBrakeChangeSpeed ( atoi(sd_buff) );
 
-        //chprintf( (BaseSequentialStream *)&SD3, "ClState %d\t ClMode %d\t ClStatePos %d\t ClSpeed %d\t BrState %d\t BrMode %d\t BrStatePos %d\t BrSpeed %d\t \n\r",gazelGetClutchSwitch(), pedalsClutchGetMode(), pedalsClutchGetPosition(), pedalsClutchGetSpeed(),gazelGetBrakeSwitch(), pedalsBrakeGetMode(), pedalsBrakeGetPosition(), pedalsBrakeGetSpeed());
+        chprintf( (BaseSequentialStream *)&SD3, "ClState %d\t ClMode %d\t ClStatePos %d\t ClSpeed %d\t BrState %d\t BrMode %d\t BrStatePos %d\t BrSpeed %d\t \n\r",gazelGetClutchSwitch(), pedalsClutchGetMode(), pedalsClutchGetPosition(), pedalsClutchGetSpeed(),gazelGetBrakeSwitch(), pedalsBrakeGetMode(), pedalsBrakeGetPosition(), pedalsBrakeGetSpeed());
         //chprintf( (BaseSequentialStream *)&SD3, "BrState %d\t BrMode %d\t BrStatePos %d\t BrSpeed %d\t \n\r",pedalsBrakeGetState(), pedalsBrakeGetMode(), pedalsBrakeGetPosition(), pedalsBrakeGetSpeed());
 
         /* Accelerator pedal test */

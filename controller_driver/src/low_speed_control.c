@@ -20,15 +20,17 @@ static bool fl_start_flag = 0;
 static bool target_zone_flag = 0;
 static uint8_t pedal_calibration_start_fag = 0;
 
-static uint32_t max_clutch_pos     = 75000;
-static uint32_t min_clutch_pos     = 50000;
+static uint32_t max_clutch_pos     = 80000;
+static uint32_t min_clutch_pos     = 20000;
 static uint16_t max_break_pos     = 2000;
 static uint16_t min_break_pos      = 0;
 
-static uint32_t max_clutch_speed = 3500;
+static uint32_t max_clutch_speed = 10000;//3500
 static uint32_t min_clutch_speed = 20000;
 static uint32_t max_break_speed = 6000;
 static uint32_t min_break_speed = 20000;
+
+extern gazelParam *gaz;
 
 static THD_WORKING_AREA(fl_wa, 256);
 static THD_FUNCTION(fl, arg) {
@@ -43,12 +45,12 @@ static THD_FUNCTION(fl, arg) {
 
         if(fl_start_flag == 1){
                 if(target_zone_flag == 0 ){
-                    if(pedalsClutchGetPosition()> 72000)
-                        pedalsClutchRelease( 1000 );
+                    if(pedalsClutchGetPosition()> 65000)
+                        pedalsClutchRelease( 2000 );
                     else
-                        pedalsClutchRelease( 35000 );
+                        pedalsClutchRelease( 12500 );
 
-                    if( gazelGetSpeed_px4flow() >= 0.1){
+                    if( gazelGetSpeed() >= 0.1){
                         max_clutch_pos = pedalsClutchGetPosition() + 7000;
                         min_clutch_pos = pedalsClutchGetPosition() -15000;
                         target_zone_flag = 1;

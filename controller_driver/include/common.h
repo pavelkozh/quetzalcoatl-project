@@ -50,7 +50,7 @@
 #define     PROGRAM_ROUTINE_TEST_GYRO                       22
 //
 
-#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_SPEED
+#define     MAIN_PROGRAM_ROUTINE  PROGRAM_ROUTINE_TEST_FUZZY_LOGIC
 
 /**************/
 /*** Macros ***/

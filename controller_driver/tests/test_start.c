@@ -43,9 +43,6 @@ void TestStart ( void )
 
       //  if(sd_buff[0] == 's')  commandSet( atoi(&sd_buff[1]), 0);
 
-
-
-
         if(sd_buff[1]=='g') mtControlMannualyShiftGear( (uint8_t)atoi(sd_buff) );
 
         if(sd_buff[0]=='x') pedalsClutchPress( 15000 );
@@ -57,8 +54,6 @@ void TestStart ( void )
 
         if(sd_buff[0]=='j') soundSignalOn();
         if(sd_buff[0]=='k') soundSignalOff();
-
-
 
         chprintf( (BaseSequentialStream *)&SD3, "gear_num: %d\t Clutch_pos: %d\t Break_pos: %d\t speed %.02f\t eng_speed %.02f\t \n\r",mtControlGetCurrentGearNum(), pedalsClutchGetPosition(),pedalsBrakeGetPosition(), gazelGetSpeed(), gazelGetEngineSpeed());
 

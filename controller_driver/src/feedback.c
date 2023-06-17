@@ -21,7 +21,8 @@ extern int8_t gear_num;
 static int32_t px4flow_data[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 static uint8_t px4flow_cnt = 0;
 static int32_t px4flow_sum = 0;
-static int16_t last_px4flow = 0;
+//static int16_t last_px4flow = 0;
+int16_t last_px4flow = 0;
 static bool    i2c_err_flag = 0;
 static uint8_t i2c_err_cnt = 0;
 
@@ -32,7 +33,7 @@ void px4_filter(void){
         if(ground_distance()>1000){
           px4flow_sum -= px4flow_data[px4flow_cnt];
 
-          if( ((last_px4flow - flow_comp_m_x())<500)&&((last_px4flow - flow_comp_m_x())>-500)) {
+          if( (abs((last_px4flow - flow_comp_m_x()))<1000)&&(abs((last_px4flow - flow_comp_m_x()))>-1000)) {
             px4flow_data[px4flow_cnt]= flow_comp_m_x();
             last_px4flow = flow_comp_m_x();
           }else{
@@ -89,7 +90,7 @@ static THD_FUNCTION(px4flow_rx, arg) {
     {
 
       px4_filter();
-      chThdSleepMilliseconds( 10 );
+      chThdSleepMilliseconds( 20 );
 
     }
 
@@ -108,7 +109,7 @@ void feedbackInit(void){
     can_init();
     px4flowInit();
     chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO, can_rx, NULL);//prio +15
-    chThdCreateStatic(px4flow_rx_wa, sizeof(px4flow_rx_wa), NORMALPRIO, px4flow_rx, NULL);//prio +15
+    chThdCreateStatic(px4flow_rx_wa, sizeof(px4flow_rx_wa), NORMALPRIO+1, px4flow_rx, NULL);//prio +15
 
     if_feedback_module_initialized = 1;
 
@@ -133,7 +134,7 @@ double gazelGetSpeed(void){
 
     }
     else
-        if(gaz->Speed <= 5){
+        if(gaz->Speed <= 8){//5
             if(gaz->Speed_px4flow < 0)
               return -gaz->Speed_px4flow;
             else

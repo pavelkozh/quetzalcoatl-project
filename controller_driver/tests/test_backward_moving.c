@@ -210,8 +210,6 @@ static THD_FUNCTION(speed_control_thr, arg) {
 
             chThdSleepMilliseconds( 20 );
 
-
-
     }
 }
 
@@ -223,7 +221,6 @@ static THD_FUNCTION(emergency_stop_thr, arg) {
 
         if(palReadPad(GPIOA,0)==0) {
 
-//
             if(flag_stop==false){
                 pedalsBrakePress( 1000 );
                 while(pedalsBrakeGetState()){
@@ -275,8 +272,6 @@ static THD_FUNCTION(mt_shift, arg)
 
             }
 
-
-            //chprintf( (BaseSequentialStream *)&SD3, " cl:%d\n\r",pedalsClutchGetPosition());
             if (pedalsClutchGetPosition() == pedalsClutchGetMaxPosition())
             {
                 switch (mt_shifting)
@@ -394,9 +389,8 @@ static THD_FUNCTION(steer_thr, arg) {
     while(1){
 
         if(flag_joystick==1){
-            //chprintf( (BaseSequentialStream *)&SD3, ">>1 speed:%f angle:%f\n\r",vs,steer_angle_rad);
+
             steer_angle=double_map((float)steer_angle_rad,-10.472,10.472,-10000.0,10000.0);
-            //clutch_pos=;
             //chprintf( (BaseSequentialStream *)&SD3, ">>2 speed:%f angle:%d\n\r",vs,steer_angle);
             //chprintf( (BaseSequentialStream *)&SD3, ">>2 cl_pos:%d angle:%d\n\r",pedalsClutchGetPosition(),steer_angle);
 

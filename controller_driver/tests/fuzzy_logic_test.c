@@ -7,6 +7,8 @@
 #include <chprintf.h>
 #include <pedals.h>
 
+extern gazelParam *gaz;
+extern int16_t last_px4flow;
 
 static const SerialConfig sdcfg = {
   .speed = 115200,
@@ -35,7 +37,7 @@ void TestFLRouting ( void )
 
     uint32_t CPSpeed = 5000;
     uint32_t steps = 4000;
-    uint16_t speed = 6000;
+    uint16_t speed = 2000;
     int32_t filter_px4flow = 0;
     float vs = 0;
 
@@ -44,7 +46,26 @@ void TestFLRouting ( void )
 
     static char  sd_buff[10] = {'?','?','?','?','?','?','?','?','?','?'} ;
 
+    sdGet(&SD3);// ожидание символа от GUI для синхронизации
+
     while(1) {
+
+        float eng_speed = gazelGetEngineSpeed();
+        float speed_px = gazelGetSpeed_px4flow();
+        float cl_pos = (float)(pedalsClutchGetPosition());
+        float cl_sp = (float)(pedalsClutchGetSpeed());
+        float br_pos = (float)(pedalsBrakeGetPosition());
+        float br_sp = (float)(pedalsBrakeGetSpeed());
+
+
+        //Отправка данных
+//        sdWrite(&SD3,(uint8_t*)&eng_speed,sizeof(eng_speed));
+//        sdWrite(&SD3,(uint8_t*)&speed_px,sizeof(speed_px));
+//        sdWrite(&SD3,(uint8_t*)&cl_pos,sizeof(cl_pos));
+//        sdWrite(&SD3,(uint8_t*)&cl_sp,sizeof(cl_sp));
+//        sdWrite(&SD3,(uint8_t*)&br_pos,sizeof(br_pos));
+//        sdWrite(&SD3,(uint8_t*)&br_sp,sizeof(br_sp));
+//        sdWrite(&SD3,(uint8_t*)&vs,sizeof(vs));
 
         sdReadTimeout( &SD3, sd_buff, 10, TIME_IMMEDIATE   );
 
@@ -66,17 +87,17 @@ void TestFLRouting ( void )
 
         //*****Fuzzy CONTROL*******//
 
-        if(sd_buff[0]=='q') { vs = (float) (atoi(&sd_buff[1])/100.0); lowSpeedSetReference( vs ); };
+        if(sd_buff[0]=='q') { vs = (float) (atoi(&sd_buff[1])/10.0); lowSpeedSetReference( vs ); };
         if(sd_buff[0]=='x') lowSpeedStart();
         if(sd_buff[0]=='c') lowSpeedStop();
 
-        chprintf( (BaseSequentialStream *)&SD3,"vs: %.02f E: %.02f Speed: %.02f dE: %.02f ClutchM: %d BreakM: %d EngSpeed: %.02f \n\r",vs,lowSpeedGetErr(),gazelGetSpeed(),lowSpeedGetdErr(),pedalsClutchGetPosition(),pedalsBrakeGetPosition(),gazelGetEngineSpeed());
 
-        palTogglePad( GPIOB, 0);
+       chprintf( (BaseSequentialStream *)&SD3,"vs: %.02f E: %.02f Speed: %.02f dE: %.02f ClutchM: %d BreakM: %d EngSpeed: %.02f \n\r",vs,lowSpeedGetErr(),gazelGetSpeed(),lowSpeedGetdErr(),pedalsClutchGetPosition(),pedalsBrakeGetPosition(),gazelGetEngineSpeed());
+//        chprintf( (BaseSequentialStream *)&SD3,"Speed: %.02f EngSpeed: %.02f ground: %d delta_pix %d \n\r",gazelGetSpeed(),gazelGetEngineSpeed(),ground_distance(),abs((last_px4flow - flow_comp_m_x())));
         for (int i = 0; i < 9; i++)
         {
           sd_buff[i]='?';
         }
-        chThdSleepMilliseconds( 500 );
+        chThdSleepMilliseconds( 50 );
     }
 }
